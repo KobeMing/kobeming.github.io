@@ -1,85 +1,15 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html>
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-<meta name="theme-color" content="#222">
-
-
-
-
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <meta charset="utf-8">
   
+  <title>Ming</title>
+
+  <!-- keywords -->
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="Hexo, NexT" />
-
-
-
-
-
-
-
-
-
-
-<meta name="description" content="Ming blogs">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Ming blogs">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ming">
 <meta property="og:url" content="http://yoursite.com/index.html">
@@ -89,241 +19,266 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ming">
 <meta name="twitter:description" content="Ming blogs">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Mist',
-    version: '5.1.3',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
-
-  <link rel="canonical" href="http://yoursite.com/"/>
-
-
-
-
-
-  <title>Ming</title>
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="../images/avatar.gif">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
   
 
+  <script src="//cdn.bootcss.com/require.js/2.3.2/require.min.js"></script>
+  <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
 
-
-
-
-
-
-
+  
 </head>
+<body>
+  <div id="container">
+    <div id="particles-js"></div>
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="../images/avatar.gif" class="js-avatar">
+			
+		</a>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+		</hgroup>
 
+		
+		<p class="header-subtitle">ming</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="https://github.com/smackgg/hexo-theme-smackdown">smackdown</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Pu Ming</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="../images/avatar.gif" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Pu Ming</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">ming</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap">
   
+    <article id="post-ReactNavigation" class="article article-type-post" itemscope itemprop="blogPost">
   
+    <div class="article-meta">
+      <a href="/2017/11/02/ReactNavigation/" class="article-date">
+  	<time datetime="2017-11-02T08:37:44.000Z" itemprop="datePublished">2017-11-02</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
     
-  
-
-  <div class="container sidebar-position-left 
-  page-home">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
+      <input type="hidden" class="isFancy" />
     
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Ming</span>
-        <span class="logo-line-after"><i></i></span>
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/02/ReactNavigation/">
+        ReactNavigation
+        
       </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="navigation"><a href="#navigation" class="headerlink" title="navigation"></a>navigation</h1><p>在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:<strong>navigate</strong>, <strong>goBack</strong>, <strong>state</strong>, <strong>setParams</strong>, <strong>dispatch</strong>, 可以在组件下console.log一下this.props就能看到.</p>
+<ul>
+<li>this.props.navigation.navigate(‘Two’, { name: ‘two’ }): push下一个页面</li>
+</ul>
+<blockquote>
+<p>routeName: 注册过的目标路由名称<br>params: 传递的参数<br>action: 如果该界面是一个navigator的话，将运行这个sub-action</p>
+<ul>
+<li>this.props.navigation.goBack(): 返回上一页</li>
+</ul>
+</blockquote>
+<ul>
+<li>this.props.navigation.state: 每个界面通过这去访问它的router，state其中包括了：</li>
+</ul>
+<blockquote>
+<p>routeName: 路由名<br>key: 路由身份标识<br>params: 参数</p>
+</blockquote>
+<ul>
+<li><p>this.props.navigation.setParams: 该方法允许界面更改router中的参数，可以用来动态的更改导航栏的内容</p>
+</li>
+<li><p>this.props.navigation.dispatch: 可以dispatch一些action，主要支持的action有：</p>
+<h6 id="1-navigate"><a href="#1-navigate" class="headerlink" title="1. navigate"></a>1. navigate</h6></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const navigationAction = NavigationActions.navigate(&#123;</div><div class="line">    routeName: &apos;Profile&apos;,</div><div class="line">    params: &#123;&#125;,</div><div class="line"></div><div class="line">    // navigate can have a nested navigate action that will be run inside the child router</div><div class="line">    action: NavigationActions.navigate(&#123; routeName: &apos;SubProfileRoute&apos;&#125;)</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(navigationAction)。</div></pre></td></tr></table></figure>
+<h6 id="2-reset"><a href="#2-reset" class="headerlink" title="2. reset"></a>2. reset</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const resetAction = NavigationActions.reset(&#123;</div><div class="line">    index: 0,</div><div class="line">    actions: [</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Profile&apos;&#125;),</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Two&apos;&#125;)</div><div class="line">    ]</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(resetAction)</div></pre></td></tr></table></figure>
+<h6 id="3-setParams"><a href="#3-setParams" class="headerlink" title="3. setParams"></a>3. setParams</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const setParamsAction = NavigationActions.setParams(&#123;</div><div class="line">    params: &#123;&#125;, // these are the new params that will be merged into the existing route params</div><div class="line">    // The key of the route that should get the new params</div><div class="line">    key: &apos;screen-123&apos;,</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(setParamsAction)</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
     </div>
       
-        <p class="site-subtitle">ming</p>
-      
-  </div>
-
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
-  </div>
-</div>
-
-<nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
-
-      
-    </ul>
-  
-
-  
-</nav>
-
-
-
- </div>
-    </header>
-
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
-            
-  <section id="posts" class="posts-expand">
     
-      
+  </div>
+  
+</article>
+
+
+
+
+
+
 
   
-
+    <article id="post-Redux-for-ReactNative" class="article article-type-post" itemscope itemprop="blogPost">
   
+    <div class="article-meta">
+      <a href="/2017/11/02/Redux-for-ReactNative/" class="article-date">
+  	<time datetime="2017-11-02T08:37:44.000Z" itemprop="datePublished">2017-11-02</time>
+</a>
+    </div>
   
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/02/Redux-for-ReactNative/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Pu Ming">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ming">
-    </span>
-
+  <div class="article-inner">
     
-      <header class="post-header">
-
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/02/Redux-for-ReactNative/">
+        Redux for ReactNative
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/02/Redux-for-ReactNative/" itemprop="url">Redux for ReactNative</a></h1>
-        
+      </a>
+    </h1>
+  
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-02T16:37:44+08:00">
-                2017-11-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
       </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
       
+    
+    <div class="article-entry" itemprop="articleBody">
       
-
-      
-        
-          
-            <h1 id="基本理论"><a href="#基本理论" class="headerlink" title="基本理论"></a>基本理论</h1><h2 id="1-官网定义："><a href="#1-官网定义：" class="headerlink" title="1.官网定义："></a>1.官网定义：</h2><p>Redux 是 JavaScript 状态容器，提供可预测化的状态管理。可以让你构建一致化的应用，运行于不同的环境（客户端、服务器、原生应用），并且易于测试。不仅于此，它还提供 超爽的开发体验，Redux 除了和 React 一起用外，还支持其它界面库。</p>
+        <h1 id="基本理论"><a href="#基本理论" class="headerlink" title="基本理论"></a>基本理论</h1><h2 id="1-官网定义："><a href="#1-官网定义：" class="headerlink" title="1.官网定义："></a>1.官网定义：</h2><p>Redux 是 JavaScript 状态容器，提供可预测化的状态管理。可以让你构建一致化的应用，运行于不同的环境（客户端、服务器、原生应用），并且易于测试。不仅于此，它还提供 超爽的开发体验，Redux 除了和 React 一起用外，还支持其它界面库。</p>
 <p>Redux就是一个state管理的库，它好比Android中的MVP架构一样，使得复杂的业务逻辑和视图状态变得简单、清晰。</p>
 <h2 id="2-三个原则："><a href="#2-三个原则：" class="headerlink" title="2.三个原则："></a>2.三个原则：</h2><ul>
 <li><strong>单一数据源</strong>：整个应用的state被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个<strong>store</strong>。</li>
@@ -478,269 +433,60 @@
 <p><a href="http://redux.js.org/" target="_blank" rel="external">官方文档</a></p>
 <p><a href="http://www.redux.org.cn/" target="_blank" rel="external">中文文档</a></p>
 
-          
-        
       
     </div>
     
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
+    <div class="article-info article-info-index">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/02/ReactNavigation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Pu Ming">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ming">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/11/02/ReactNavigation/" itemprop="url">ReactNavigation</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-02T16:37:44+08:00">
-                2017-11-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
       
       
 
       
-        
-          
-            <h1 id="navigation"><a href="#navigation" class="headerlink" title="navigation"></a>navigation</h1><p>在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:<strong>navigate</strong>, <strong>goBack</strong>, <strong>state</strong>, <strong>setParams</strong>, <strong>dispatch</strong>, 可以在组件下console.log一下this.props就能看到.</p>
-<ul>
-<li>this.props.navigation.navigate(‘Two’, { name: ‘two’ }): push下一个页面</li>
-</ul>
-<blockquote>
-<p>routeName: 注册过的目标路由名称<br>params: 传递的参数<br>action: 如果该界面是一个navigator的话，将运行这个sub-action</p>
-<ul>
-<li>this.props.navigation.goBack(): 返回上一页</li>
-</ul>
-</blockquote>
-<ul>
-<li>this.props.navigation.state: 每个界面通过这去访问它的router，state其中包括了：</li>
-</ul>
-<blockquote>
-<p>routeName: 路由名<br>key: 路由身份标识<br>params: 参数</p>
-</blockquote>
-<ul>
-<li><p>this.props.navigation.setParams: 该方法允许界面更改router中的参数，可以用来动态的更改导航栏的内容</p>
-</li>
-<li><p>this.props.navigation.dispatch: 可以dispatch一些action，主要支持的action有：</p>
-<h6 id="1-navigate"><a href="#1-navigate" class="headerlink" title="1. navigate"></a>1. navigate</h6></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const navigationAction = NavigationActions.navigate(&#123;</div><div class="line">    routeName: &apos;Profile&apos;,</div><div class="line">    params: &#123;&#125;,</div><div class="line"></div><div class="line">    // navigate can have a nested navigate action that will be run inside the child router</div><div class="line">    action: NavigationActions.navigate(&#123; routeName: &apos;SubProfileRoute&apos;&#125;)</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(navigationAction)。</div></pre></td></tr></table></figure>
-<h6 id="2-reset"><a href="#2-reset" class="headerlink" title="2. reset"></a>2. reset</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const resetAction = NavigationActions.reset(&#123;</div><div class="line">    index: 0,</div><div class="line">    actions: [</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Profile&apos;&#125;),</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Two&apos;&#125;)</div><div class="line">    ]</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(resetAction)</div></pre></td></tr></table></figure>
-<h6 id="3-setParams"><a href="#3-setParams" class="headerlink" title="3. setParams"></a>3. setParams</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const setParamsAction = NavigationActions.setParams(&#123;</div><div class="line">    params: &#123;&#125;, // these are the new params that will be merged into the existing route params</div><div class="line">    // The key of the route that should get the new params</div><div class="line">    key: &apos;screen-123&apos;,</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(setParamsAction)</div></pre></td></tr></table></figure>
-
-          
-        
-      
+      <div class="clearfix"></div>
     </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
+    
   </div>
   
-  
-  
-  </article>
+</article>
 
 
+
+
+
+
+
+  
+    <article id="post-Annotation" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/01/17/Annotation/" class="article-date">
+  	<time datetime="2017-01-17T08:37:44.000Z" itemprop="datePublished">2017-01-17</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/17/Annotation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Pu Ming">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Ming">
-    </span>
-
+      <input type="hidden" class="isFancy" />
     
-      <header class="post-header">
-
+    
+      <header class="article-header">
         
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/01/17/Annotation/">
+        Java注解
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/17/Annotation/" itemprop="url">Java注解</a></h1>
-        
+      </a>
+    </h1>
+  
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-17T16:37:44+08:00">
-                2017-01-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
       </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
       
+    
+    <div class="article-entry" itemprop="articleBody">
       
-
-      
-        
-          
-            <h1 id="Java-注解"><a href="#Java-注解" class="headerlink" title="Java 注解"></a>Java 注解</h1><h2 id="元注解："><a href="#元注解：" class="headerlink" title="元注解："></a>元注解：</h2><p>元注解的作用就是负责注解其他注解。Java5.0定义了4个标准的meta-annotation类型，它们被用来提供对其它 annotation类型作说明。Java5.0定义的元注解：</p>
+        <h1 id="Java-注解"><a href="#Java-注解" class="headerlink" title="Java 注解"></a>Java 注解</h1><h2 id="元注解："><a href="#元注解：" class="headerlink" title="元注解："></a>元注解：</h2><p>元注解的作用就是负责注解其他注解。Java5.0定义了4个标准的meta-annotation类型，它们被用来提供对其它 annotation类型作说明。Java5.0定义的元注解：</p>
 <ul>
 <li>1.@Target</li>
 <li>2.@Retention</li>
@@ -795,313 +541,517 @@
 <p>第三,如果只有一个参数成员,最好把参数名称设为”value”,后加小括号.例:下面的例子FruitName注解就只有一个参数成员。</p>
 <p>简单的自定义注解和使用注解实例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">package annotation;</div><div class="line"></div><div class="line">import java.lang.annotation.Documented;</div><div class="line">import java.lang.annotation.ElementType;</div><div class="line">import java.lang.annotation.Retention;</div><div class="line">import java.lang.annotation.RetentionPolicy;</div><div class="line">import java.lang.annotation.Target;</div><div class="line"></div><div class="line">/**</div><div class="line"> * 水果名称注解</div><div class="line"> * @author peida</div><div class="line"> *</div><div class="line"> */</div><div class="line">@Target(ElementType.FIELD)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">@Documented</div><div class="line">public @interface FruitName &#123;</div><div class="line">    String value() default &quot;&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 
-          
-        
       
     </div>
     
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
     
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
   </div>
   
+</article>
+
+
+
+
+
+
+
   
+    <article id="post-Handler机制" class="article article-type-post" itemscope itemprop="blogPost">
   
-  </article>
-
-
-    
-  </section>
-
-  
-
-
-          </div>
-          
-
-
-          
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    <div class="article-meta">
+      <a href="/2015/10/16/Handler机制/" class="article-date">
+  	<time datetime="2015-10-16T12:30:24.000Z" itemprop="datePublished">2015-10-16</time>
+</a>
     </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/10/16/Handler机制/">
+        Handler机制
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Handler消息传递机制"><a href="#Handler消息传递机制" class="headerlink" title="Handler消息传递机制"></a>Handler消息传递机制</h1><p>Android的消息处理有四个核心类：Handler、Looper、Message、MessageQueue，都在android.os包中。</p>
+<h2 id="一、线程的魔法师-Looper"><a href="#一、线程的魔法师-Looper" class="headerlink" title="一、线程的魔法师 Looper"></a>一、线程的魔法师 Looper</h2><p>Looper的字面意思是“循环器”,”轮询器”，它被设计用来使一个普通线程变成Looper线程。所谓Looper线程就是循环工作的线程。在程序开发中（尤其是GUI开发中），经常会需要一个线程不断循环，一旦有新任务则执行，执行完继续等待下一个任务，这就是Looper线程。使用Looper类创建Looper线程很简单，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public class LooperThread extends Thread &#123;</div><div class="line">    @Override</div><div class="line">    publicvoid run() &#123;</div><div class="line">// ①.将当前线程初始化为Looper线程</div><div class="line">        Looper.prepare();</div><div class="line">        public void handleMessage(Message msg) &#123;</div><div class="line">                super.handleMessage(msg);</div><div class="line">                switch (msg.what) &#123;</div><div class="line">                case 0:</div><div class="line">                    break;</div><div class="line">                default:</div><div class="line">                    break;</div><div class="line">            &#125;</div><div class="line">        &#125;      </div><div class="line">// ②.开始循环处理消息队列</div><div class="line">        Looper.loop();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过上面两行核心代码，普通线程就升级为Looper线程了！！！看看这两行代码各自做了什么。</p>
+<h3 id="1-Looper-prepare"><a href="#1-Looper-prepare" class="headerlink" title="(1)Looper.prepare()"></a>(1)Looper.prepare()</h3><p>现在你的线程中有一个Looper对象，它的内部维护了一个消息队列MQ。注意，一个Thread只能有一个Looper对象，为什么呢？咱们来看源码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">public class Looper &#123;</div><div class="line">    // 每个线程中的Looper对象其实是一个ThreadLocal，即线程本地存储(TLS)对象</div><div class="line">    privatestaticfinal ThreadLocal</div><div class="line">    sThreadLocal=new</div><div class="line"></div><div class="line">    ThreadLocal();</div><div class="line"></div><div class="line">    // Looper内的消息队列</div><div class="line">    final MessageQueue mQueue;</div><div class="line">    // 当前线程</div><div class="line">    Thread mThread;</div><div class="line">    // 。。。其他属性</div><div class="line"></div><div class="line">    // 每个Looper对象中有它的消息队列，和它所属的线程</div><div class="line">    private Looper() &#123;</div><div class="line">        mQueue = new MessageQueue();</div><div class="line">        mRun = true;</div><div class="line">        mThread = Thread.currentThread();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 我们调用该方法会在调用线程的TLS中创建Looper对象</div><div class="line">    publicstaticfinalvoid prepare() &#123;</div><div class="line">        if (sThreadLocal.get() != null) &#123;</div><div class="line">    // 试图在有Looper的线程中再次创建Looper将抛出异常</div><div class="line">            thrownew RuntimeException (&quot;Only one Looper may be created per thread&quot;);</div><div class="line">        &#125;</div><div class="line">        sThreadLocal.set(new Looper());</div><div class="line">    &#125;</div><div class="line">    // 其他方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>通过源码，prepare()背后的工作方式一目了然，其核心就是将looper对象定义为ThreadLocal,其实就是将一个唯一的Looper对象给添加到ThreadLocal中.</p>
+<h3 id="2-Looper-loop"><a href="#2-Looper-loop" class="headerlink" title="(2)Looper.loop()"></a>(2)Looper.loop()</h3><p>调用loop方法后，Looper线程就开始真正工作了，它不断从自己的MQ中取出队头的消息(也叫任务)执行。其源码分析如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">public static final void loop() &#123;</div><div class="line">    Looper me = myLooper();  //得到当前线程Looper</div><div class="line">    MessageQueue queue = me.mQueue;  //得到当前looper的MQ</div><div class="line">    Binder.clearCallingIdentity();</div><div class="line">    finallong ident = Binder.clearCallingIdentity();</div><div class="line">    // 开始循环</div><div class="line">    while (true) &#123;</div><div class="line">        Message msg</div><div class="line">        Message msg = queue.next(); // 取出message</div><div class="line">        if (msg != null) &#123;</div><div class="line">            if (msg.target == null) &#123;</div><div class="line">                // message没有target为结束信号，退出循环</div><div class="line">                return;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        // 日志。。。</div><div class="line">        if (me.mLogging != null)</div><div class="line">            me.mLogging.println(&quot;&gt;&gt;&gt;&gt;&gt; Dispatching to &quot; + msg.target + &quot;&quot; + msg.callback</div><div class="line">                    + &quot;: &quot; + msg.what);</div><div class="line">        // 非常重要！将真正的处理工作交给message的target，即后面要讲的handler</div><div class="line">        msg.target.dispatchMessage(msg);</div><div class="line">        // 还是日志。。。</div><div class="line">        if (me.mLogging != null) me.mLogging.println(&quot;&lt;&lt;&lt;&lt;&lt; Finished to&quot; + msg.target + &quot; </div><div class="line">                &quot;+ msg.callback);     </div><div class="line">                finallong newIdent = Binder.clearCallingIdentity();</div><div class="line">        if (ident != newIdent) &#123;</div><div class="line">            Log.wtf(&quot;Looper&quot;, &quot;Thread identity changed from 0x&quot;</div><div class="line">                    + Long.toHexString(ident) + &quot; to 0x&quot;</div><div class="line">                    + Long.toHexString(newIdent) + &quot; while dispatching to &quot;</div><div class="line">                    + msg.target.getClass().getName() + &quot;&quot;</div><div class="line">                    + msg.callback + &quot; what=&quot; + msg.what);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    // 回收message资源</div><div class="line">    msg.recycle();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>除了prepare()和loop()方法，Looper类还提供了一些有用的方法，比如:<br>Looper.myLooper()得到当前线程looper对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Looper.myLooper()得到当前线程looper对象：</div><div class="line">    public static final Looper myLooper()&#123;</div><div class="line">    // 在任意线程调用Looper.myLooper()返回的都是那个线程的looper</div><div class="line">    return (Looper)sThreadLocal.get();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>getThread()得到looper对象所属线程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public Thread getThread() &#123;</div><div class="line">    return mThread;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>quit()方法结束looper循环:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">publicvoid quit() &#123;</div><div class="line">// 创建一个空的message，它的target为NULL，表示结束循环消息</div><div class="line">        Message msg = Message.obtain();</div><div class="line">// 发出消息</div><div class="line">        mQueue.enqueueMessage(msg, 0);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>到此为止，你应该对Looper有了基本的了解，总结几点：</p>
+<ol>
+<li>每个线程有且最多只能有一个Looper对象，它是一个ThreadLocal;</li>
+<li>Looper内部有一个消息队列，loop()方法调用后线程开始不断从队列中取出消息执行;</li>
+<li>Looper使一个线程变成Looper线程。<br>那么，我们如何往MQ上添加消息呢？下面有请Handler！<h2 id="二、异步处理大师-Handler"><a href="#二、异步处理大师-Handler" class="headerlink" title="二、异步处理大师 Handler"></a>二、异步处理大师 Handler</h2>什么是handler？handler扮演了往MQ上添加消息和处理消息的角色（只处理由自己发出的消息），即通知MQ它要执行一个任务(sendMessage)，并在loop到自己的时候执行该任务(handleMessage)，整个过程是异步的。handler创建时会关联一个looper，默认的构造方法将关联当前线程的looper。默认的构造方法：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">public class handler &#123;</div><div class="line"></div><div class="line">    final MessageQueue mQueue;  // 关联的MQ</div><div class="line">    final Looper mLooper;  // 关联的looper</div><div class="line">    final Callback mCallback;</div><div class="line">// 其他属性........</div><div class="line"></div><div class="line">    public Handler() &#123;</div><div class="line">        if (FIND_POTENTIAL_LEAKS) &#123;</div><div class="line">            final Class&lt;? extends Handler&gt; klass = getClass();</div><div class="line">            if ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &amp;&amp;</div><div class="line">                    (klass.getModifiers() &amp; Modifier.STATIC) == 0) &#123;</div><div class="line">                Log.w(TAG, &quot;The following Handler class should be static or leaks might occur: &quot; +</div><div class="line">                        klass.getCanonicalName());</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">// 默认将关联当前线程的looper</div><div class="line">        mLooper = Looper.myLooper();</div><div class="line">// looper不能为空，即该默认的构造方法只能在looper线程中使用</div><div class="line">        if (mLooper == null) &#123;</div><div class="line">            thrownew RuntimeException (</div><div class="line">                    &quot;Can&apos;t create handler inside thread that has not called Looper.prepare()&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">// 重要！！！直接把关联looper的MQ作为自己的MQ，因此它的消息将发送到关联looper的MQ上</div><div class="line">    mQueue=mLooper.mQueue;</div><div class="line">    mCallback=null;</div><div class="line">&#125;</div><div class="line">// 其他方法</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面我们就可以为之前的LooperThread类加入Handler：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public class LooperThread extends Thread &#123;</div><div class="line">    private Handler handler1;</div><div class="line">    private Handler handler2;</div><div class="line">    @Override</div><div class="line">    publi cvoid</div><div class="line"></div><div class="line">    run() &#123;</div><div class="line">// 将当前线程初始化为Looper线程</div><div class="line">        Looper.prepare();</div><div class="line">// 实例化两个handler</div><div class="line">        handler1 = new Handler();</div><div class="line">        handler2 = new Handler();</div><div class="line"></div><div class="line">// 开始循环处理消息队列</div><div class="line">        Looper.loop();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，一个线程可以有多个Handler，但是只能有一个Looper！</p>
+<hr>
+<p>Handler发送消息<br>有了handler之后，我们就可以使用 </p>
+<ul>
+<li>post(Runnable), </li>
+<li>postAtTime(Runnable, long),</li>
+<li>postDelayed(Runnable, long),</li>
+<li>sendEmptyMessage(int),</li>
+<li>sendMessage(Message),</li>
+<li>sendMessageAtTime(Message, long)和</li>
+<li>sendMessageDelayed(Message, long).</li>
+</ul>
+<p>这些方法向MQ上发送消息了。光看这些API你可能会觉得handler能发两种消息，一种是Runnable对象，一种是message对象，这是直观的理解，但其实post发出的Runnable对象最后都被封装成message对象了，见源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"> // 此方法用于向关联的MQ上发送Runnable对象，它的run方法将在handler关联的looper线程中执行</div><div class="line">    public final boolean post(Runnable r) &#123;</div><div class="line">// 注意getPostMessage(r)将runnable封装成message</div><div class="line">        return sendMessageDelayed(getPostMessage(r), 0);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private final Message getPostMessage(Runnable r) &#123;</div><div class="line">        Message m = Message.obtain();  //得到空的message</div><div class="line">        m.callback = r;  //将runnable设为message的callback</div><div class="line">        return m;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public boolean sendMessageAtTime(Message msg, long uptimeMillis) &#123;</div><div class="line">        boolean sent = false;</div><div class="line">        MessageQueue queue = mQueue;</div><div class="line">        if (queue != null) &#123;</div><div class="line">            msg.target = this;  // message的target必须设为该handler！</div><div class="line">            sent = queue.enqueueMessage(msg, uptimeMillis);</div><div class="line">        &#125; else &#123;</div><div class="line">            RuntimeException e = new RuntimeException(</div><div class="line">                    this + &quot; sendMessageAtTime() called with no mQueue&quot;);</div><div class="line">            Log.w(&quot;Looper&quot;, e.getMessage(), e);</div><div class="line">        &#125;</div><div class="line">        return sent;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>总之通过handler发出的message有如下特点：</p>
+<ol>
+<li>message.target为该handler对象，这确保了looper执行到该message时能找到处理它的handler，即loop()方法中的关键代码msg.target.dispatchMessage(msg);</li>
+<li>post发出的message，其callback为Runnable对象</li>
+</ol>
+<p>Handler处理消息<br>说完了消息的发送，再来看下handler如何处理消息。消息的处理是通过核心方法dispatchMessage(Message msg)与钩子方法handleMessage(Messagemsg)完成的，见源码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">// 处理消息，该方法由looper调用</div><div class="line">    public void dispatchMessage(Message msg) &#123;</div><div class="line">        if (msg.callback != null) &#123;</div><div class="line">// 如果message设置了callback，即runnable消息，处理callback！</div><div class="line">            handleCallback(msg);</div><div class="line">        &#125; else &#123;</div><div class="line">// 如果handler本身设置了callback，则执行callback</div><div class="line">            if (mCallback != null) &#123;</div><div class="line">/* 这种方法允许让activity等来实现Handler.Callback接口，避免了自己编写handler重写</div><div class="line">handleMessage方法。 */</div><div class="line">                if (mCallback.handleMessage(msg)) &#123;</div><div class="line">                    return;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">// 如果message没有callback，则调用handler的钩子方法handleMessage</div><div class="line">        handleMessage(msg);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 处理runnable消息</div><div class="line">    private final void handleCallback(Message message) &#123;</div><div class="line">        message.callback.run();  //直接调用run方法！</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 由子类实现的钩子方法</div><div class="line">    public void handleMessage(Message msg) &#123;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>可以看到，除了handleMessage(Message msg)和Runnable对象的run方法由开发者实现外（实现具体逻辑），handler的内部工作机制对开发者是透明的。这正是handler API设计的精妙之处！</p>
+<p>==Handler的用处==</p>
+<p>handler被描述为“异步处理大师”，这归功于Handler拥有下面两个重要的特点：</p>
+<ol>
+<li>handler可以在任意线程发送消息，这些消息会被添加到关联的MQ上。</li>
+<li>handler是在它关联的looper线程中处理消息的。 </li>
+</ol>
+<p>这就解决了android最经典的不能在其他非主线程中更新UI的问题。android的主线程也是一个looper线程(looper在android中运用很广)，我们在其中创建的handler默认将关联主线程MQ。因此，利用handler的一个solution就是在activity中创建handler并将其引用传递给worker thread，worker thread执行完任务后使用handler发送消息通知activity更新UI。</p>
+<p>当然，handler能做的远远不仅如此，由于它能post Runnable对象，它还能与Looper配合实现经典的Pipeline Thread(流水线线程)模式。</p>
+<h2 id="三、封装任务-Message"><a href="#三、封装任务-Message" class="headerlink" title="三、封装任务 Message"></a>三、封装任务 Message</h2><p>在整个消息处理机制中，message又叫task，封装了任务携带的信息和处理该任务的handler。message的用法比较简单，使用Message需要注意4点：</p>
+<ol>
+<li>Message虽然也可以通过new来获取，但是通常使用Message.obtain()或Handler.obtainMessage()方法来从消息池中获得空消息对象，以节省资源；</li>
+<li>如果一个Message只需要携带简单的int型数据，应优先使用arg1和arg2属性来传递数据，这样比Bundle节省内存；</li>
+<li>尽可能使用Message.what来标识信息，以便用不同的方式处理Message。</li>
+<li>如果需要从工作线程返回很多数据信息，可以借助Bundle对象将这些数据集中到一起，然后存放到obj属性中，再返回到主线程。</li>
+</ol>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
   </div>
+  
+</article>
 
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
 
-      
 
-      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image"
-                src="/images/avatar.gif"
-                alt="Pu Ming" />
-            
-              <p class="site-author-name" itemprop="name">Pu Ming</p>
-              <p class="site-description motion-element" itemprop="description">Ming blogs</p>
-          </div>
 
-          <nav class="site-state motion-element">
 
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/archives/">
-              
-                  <span class="site-state-item-count">3</span>
-                  <span class="site-state-item-name">日志</span>
-                </a>
-              </div>
-            
 
-            
-
-            
-
-          </nav>
-
-          
-
-          <div class="links-of-author motion-element">
-            
-          </div>
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-
-      
-
+  
+    <article id="post-BroadcastReceiver" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/10/08/BroadcastReceiver/" class="article-date">
+  	<time datetime="2015-10-08T02:36:28.000Z" itemprop="datePublished">2015-10-08</time>
+</a>
     </div>
-  </aside>
-
-
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
         
-      </div>
-    </main>
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/10/08/BroadcastReceiver/">
+        BroadcastReceiver
+        
+      </a>
+    </h1>
+  
 
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Pu Ming</span>
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一-广播简介："><a href="#一-广播简介：" class="headerlink" title="一.广播简介："></a>一.广播简介：</h1><h2 id="（一）、广播传播机制："><a href="#（一）、广播传播机制：" class="headerlink" title="（一）、广播传播机制："></a>（一）、广播传播机制：</h2><p>广播接收器，也被称为全局事件，或系统事件。</p>
+<p>在Android中，有一些操作完成以后，会发送广播，比如说发出一条短信，或打出一个电话，如果某个程序接收了这个广播，就会做相应的处理。这个广播跟我们传统意义中的电台广播有些相似之处。之所以叫做广播，就是因为它只负责“说”而不管你“听不听”，也就是不管你接收方如何处理。另外，广播可以被不只一个应用程序所接收，当然也可能不被任何应用程序所接收。<br>广播机制最大的特点就是发送方并不关心接收方是否接到数据，也不关心接收方是如何处理数据的。<br>Android中广播的是操作系统中产生的各种各样的事件。例如，收到一条短信就会产生一个收到短信息的事件。而Android操作系统一旦内部产生了这些事件，就会向所有的广播接收器对象来广播这些事件。</p>
+<h2 id="（二）、广播机制的三要素："><a href="#（二）、广播机制的三要素：" class="headerlink" title="（二）、广播机制的三要素："></a>（二）、广播机制的三要素：</h2><p>Android广播机制包含三个基本要素：<br>1、广播(Broadcast) - 用于发送广播；<br>2、广播接收器(BroadcastReceiver) - 用于接收广播；<br>3、意图内容(Intent)-用于保存广播相关信息的媒介。<br>Broadcast是一种广泛运用的在应用程序之间传输信息的机制。而BroadcastReceiver是对发送出来的Broadcast进行过滤接受并响应的一类组件。</p>
+<h2 id="（三）、广播的生命周期："><a href="#（三）、广播的生命周期：" class="headerlink" title="（三）、广播的生命周期："></a>（三）、广播的生命周期：</h2><p>1、广播接收器仅在它执行这个方法时处于活跃状态。当onReceive()返回后，它即为失活状态。<br>2、拥有一个活跃状态的广播接收器的进程被保护起来而不会被杀死，但仅拥有失活状态组件的进程则会在其它进程需要它所占有的内存的时候随时被杀掉。<br>3、如果响应一个广播信息需要很长的一段时间，一般会将其纳入一个衍生的线程中去完成，而不是在主线程内完成它，从而保证用户交互过程的流畅。</p>
+<h1 id="二、-广播接收器BroadcastReceiver："><a href="#二、-广播接收器BroadcastReceiver：" class="headerlink" title="二、 广播接收器BroadcastReceiver："></a>二、 广播接收器BroadcastReceiver：</h1><h2 id="（一）、概念："><a href="#（一）、概念：" class="headerlink" title="（一）、概念："></a>（一）、概念：</h2><p>BroadcastReceiver(广播接收器)是为了实现系统广播而提供的一种组件，并且广播事件处理机制是系统级别的。比如，我们可以发出一种广播来测试是否收到短信，这时候就可以定义一个BraodcastReceiver来接受广播，当收到短信时提示用户。我们既可以用Intent来启动一个组件，也可以用sendBroadcast()方法发起一个系统级别的事件广播来传递消息。<br>我们也可以在自己的应用程序中开发BroadcastReceiver，然后把广播接收器这个类或者对象注册到Android操作系统上去，让操作系统知道现在有这样一个广播接收器正在等待接收Android操作系统的广播，即在自己的应用程序中实现BroadcastReceiver来监听和响应广播的Intent。<br>当有广播事件产生时，Android操作系统首先告诉注册到其上面的广播接收器产生了一个怎么样的事件，每个接收器首先判断是不是我这个接收器需要的事件，如果是它所需要的事件，再进行相应的处理。<br>例子，我们把骚扰电话的黑名单放到数据库中去，当接到电话时会产生一个接电话事件，事先在Android操作系统中注册一个BroadcastReceiver的对象，当产生事件的时候，会通知我们的广播接收器对象，接收器对象接收到消息之后，就会到数据库里面去取所有黑名单电话和接到的这个电话号码进行比较，如果匹配就直接挂掉。</p>
+<h2 id="（二）、-注册BroadcastReceiver的方法"><a href="#（二）、-注册BroadcastReceiver的方法" class="headerlink" title="（二）、 注册BroadcastReceiver的方法"></a>（二）、 注册BroadcastReceiver的方法</h2><p>BroadcastReceiver用于监听被广播的事件（Intent），为了达到这个目的，BroadcastReceiver必须进行注册，注册的方法有以下两种：</p>
+<p>1、静态注册：<br>静态注册方式是在AndroidManifest.xml的application里面定义receiver并设置要接收的action。<br>静态注册方式的特点：不管该应用程序是否处于活动状态，都会进行监听。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;receiver </div><div class="line">    android:name=&quot;.CallReceiver&quot;</div><div class="line">    android:enabled=&quot;true&quot;&gt;</div><div class="line">    &lt;intent-filter &gt;</div><div class="line">        &lt;action android:name=&quot;android.intent.action.PHONE_STATE&quot;/&gt;</div><div class="line">    &lt;/intent-filter&gt;</div><div class="line">&lt;/receiver&gt;</div></pre></td></tr></table></figure>
+<p>其中，MyReceiver为继承BroadcastReceiver的类，重写了onReceiver方法，并在onReceiver方法中对广播进行处理。<intent-filter>标签设置过滤器，接收指定action广播。</intent-filter></p>
+<p>2、动态注册：<br>动态注册方式是在activity里面调用当前上下文对象的registerReceiver() 方法 来注册，和静态的内容差不多。一个形参是receiver对象，另一个是IntentFilter对象。而IntentFilter构造方法的参数是要接收的action。<br>动态注册方式特点：在代码中进行注册后，当应用程序关闭后，就不再进行监听。</p>
+<p>MyReceiver receiver = new MyReceiver();<br>//创建过滤器，并指定action，使之用于接收同action的广播<br>IntentFilter filter = new IntentFilter(“android.intent.action.PHONE_STATE”);<br>//注册广播接收器<br>registerReceiver(receiver, filter);</p>
+<h2 id="三-、广播接收器的优先级："><a href="#三-、广播接收器的优先级：" class="headerlink" title="( 三 )、广播接收器的优先级："></a>( 三 )、广播接收器的优先级：</h2><h2 id="四-、发送广播："><a href="#四-、发送广播：" class="headerlink" title="( 四 )、发送广播："></a>( 四 )、发送广播：</h2><p>// 指定广播目标Action<br>Intent intent = new Intent(“MyReceiver_Action”);<br>// 可通过Intent携带消息<br>intent.putExtra(“msg”, “发送广播”);<br>// 发送广播消息<br>sendBroadcast(intent);</p>
+<h2 id="（五）、注销BroadcastReceiver："><a href="#（五）、注销BroadcastReceiver：" class="headerlink" title="（五）、注销BroadcastReceiver："></a>（五）、注销BroadcastReceiver：</h2><p>1、一般在onStart中注册BroadcastReceiver，在onStop中取消BroadcastReceiver。<br>2、一个BroadcastReceiver 对象只有在被调用onReceive(Context, Intent)时才有效，当从该函数返回后，该对象就无效的了，结束生命周期。</p>
+<p>//注销广播接收器<br>unregisterReceiver(receiver);</p>
+<h1 id="三、接收系统广播："><a href="#三、接收系统广播：" class="headerlink" title="三、接收系统广播："></a>三、接收系统广播：</h1><p>广播接收器最大的用途就是接受系统发出的消息。例如：截获短信，截获来电等等。</p>
+<ol>
+<li>（一）、短信拦截：</li>
+<li>（二）、来去电拦截：</li>
+<li>（三）、截获屏幕休眠与唤醒：</li>
+<li>（四）、开机自动运行：</li>
+<li>（五）、手机电池当前电量：</li>
+</ol>
+<h1 id="四-BroadcastReceiver所对应的广播分两类：普通广播和有序广播。"><a href="#四-BroadcastReceiver所对应的广播分两类：普通广播和有序广播。" class="headerlink" title="四.BroadcastReceiver所对应的广播分两类：普通广播和有序广播。"></a>四.BroadcastReceiver所对应的广播分两类：普通广播和有序广播。</h1><p>1、普通广播通过Context.sendBroadcast()方法来发送。它是完全异步的。<br>      所有的receivers接收器的执行顺序不确定。因此，所有的receivers接收器接收broadcast的顺序不确定。<br>     这种方式效率更高。但是BroadcastReceiver无法使用setResult系列，getResult系列及abort系列API。</p>
+<p>2、有序广播是通过Context.sendOrderedBroadcast来发送。所有的receiver依次执行。<br>      BroadcastReceiver可以使用setResult系列函数来将结果传给下一个BroadcastReceiver，通过getResult系列函数来取得上个BroadcastReceiver返回的结果，并可以用abort系列函数来让系统丢弃该广播，使该广播不再传送到别的BroadcastReceiver。<br>      可以通过在intent-filter中设置android:priority属性来设置receiver的优先级。优先级相同的receiver其执行顺序不确定。<br>      如果BroadcastReceiver是代码中注册的话，且其intent-filter拥有相同android:priority属性的话，先注册的将先收到广播。<br>      有序广播，即从优先级别最高的广播接收器开始接收，接收完了如果没有丢弃，就下传给下一个次高优先级别的广播接收器进行处理，依次类推，直到最后。</p>
+<p>3、实例</p>
+<p>程序效果：点击按钮，两个Receiver接收同一条广播，在logcat中打印出数据（按照Receiver的优先顺序，Receiver2先，Receiver1后）  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">//1,Manifest.xml</div><div class="line"></div><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;  </div><div class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;  </div><div class="line">    	...  </div><div class="line">    	&lt;application  </div><div class="line">        	android:icon=&quot;@drawable/ic_launcher&quot;  </div><div class="line">        	android:label=&quot;@string/app_name&quot; &gt;  </div><div class="line">        	... </div><div class="line">        	&lt;receiver android:name=&quot;.MyReceiver1&quot;&gt;  </div><div class="line">            	&lt;intent-filter android:priority=&quot;200&quot;&gt;  </div><div class="line">                	&lt;action android:name=&quot;com.song.123&quot;/&gt;  </div><div class="line">            	&lt;/intent-filter&gt;  </div><div class="line">        	&lt;/receiver&gt;  </div><div class="line"></div><div class="line">        	&lt;receiver android:name=&quot;.MyReceiver2&quot;&gt;  </div><div class="line">            	&lt;intent-filter android:priority=&quot;1000&quot;&gt;  </div><div class="line">                	&lt;action android:name=&quot;com.song.123&quot;/&gt;  </div><div class="line">            	&lt;/intent-filter&gt;  </div><div class="line">        	&lt;/receiver&gt;  </div><div class="line">    	&lt;/application&gt;    </div><div class="line">&lt;/manifest&gt;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">//2,主Activity  </div><div class="line"></div><div class="line">public class C48_BroadcastActivity extends Activity &#123;  </div><div class="line">    	/** Called when the activity is first created. */  </div><div class="line">    	Button button;  </div><div class="line">    	@Override  </div><div class="line">    	public void onCreate(Bundle savedInstanceState) &#123;  </div><div class="line">        	super.onCreate(savedInstanceState);  </div><div class="line">        	setContentView(R.layout.main);  </div><div class="line">        	button=(Button)findViewById(R.id.button);  </div><div class="line">        	button.setOnClickListener(new OnClickListener() &#123;  </div><div class="line">              </div><div class="line">            	@Override  </div><div class="line">            	public void onClick(View v) &#123;            </div><div class="line">                	Intent intent=new Intent(&quot;com.song.123&quot;);  </div><div class="line">                	Bundle bundle=new Bundle();  </div><div class="line">                	bundle.putString(&quot;a&quot;, &quot;aaa&quot;);  </div><div class="line">                	intent.putExtras(bundle);  </div><div class="line">                	//有序广播  </div><div class="line">                	sendOrderedBroadcast(intent, null);  </div><div class="line">            	&#125;  </div><div class="line">        	&#125;);            </div><div class="line">    	&#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//3,Receiver2</div><div class="line"></div><div class="line">public class MyReceiver2 extends BroadcastReceiver&#123;    </div><div class="line">    	@Override  </div><div class="line">    	public void onReceive(Context context, Intent intent) &#123;  </div><div class="line">        	System.out.println(&quot;receiver2&quot;);  </div><div class="line">//      context.getSystemService(name);  </div><div class="line">        	Bundle bundle=intent.getExtras();  </div><div class="line">        	bundle.putString(&quot;b&quot;, &quot;bbb&quot;);  </div><div class="line">        	System.out.println(&quot;a=&quot;+bundle.get(&quot;a&quot;));  </div><div class="line">        	setResultExtras(bundle);  </div><div class="line">        	//终止广播  </div><div class="line">//      abortBroadcast();  </div><div class="line">    	&#125;   </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">//4,Receiver1</div><div class="line">public class MyReceiver1 extends BroadcastReceiver&#123;  </div><div class="line">  </div><div class="line">    	@Override  </div><div class="line">    	public void onReceive(Context context, Intent intent) &#123;  </div><div class="line">        </div><div class="line">        	System.out.println(&quot;receiver1&quot;);  </div><div class="line">        	//要不要接受上一个广播接收器receiver2传来的的数据  </div><div class="line">        	Bundle bundle=getResultExtras(true);  </div><div class="line">        	System.out.println(&quot;a=&quot;+bundle.getString(&quot;a&quot;)+&quot;,b=&quot;+bundle.getString(&quot;b&quot;));  </div><div class="line">    	&#125; </div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<hr>
+<p>//4,结果</p>
+<p>receiver2<br>a=aaa<br>receiver1<br>a=aaa,b=bbb</p>
+<h1 id="五、参考：【Android系统广播大全】"><a href="#五、参考：【Android系统广播大全】" class="headerlink" title="五、参考：【Android系统广播大全】"></a>五、参考：【Android系统广播大全】</h1><ul>
+<li>String ADD_SHORTCUT_ACTION 动作：在系统中添加一个快捷方式。 </li>
+<li>String ALL_APPS_ACTION 动作：列举所有可用的应用。输入：无。 </li>
+<li>String ALTERNATIVE_CATEGORY 类别：说明 activity 是用户正在浏览的数据的一个可选操作。 </li>
+<li>String ANSWER_ACTION 动作：处理拨入的电话。 </li>
+<li>String BATTERY_CHANGED_ACTION 广播：充电状态，或者电池的电量发生变化。 </li>
+<li>String BOOT_COMPLETED_ACTION 广播：在系统启动后，这个动作被广播一次（只有一次）。 </li>
+<li>String BROWSABLE_CATEGORY 类别：能够被浏览器安全使用的 activities 必须支持这个类别。 </li>
+<li>String BUG_REPORT_ACTION 动作：显示 activity 报告错误。 </li>
+<li>String CALL_ACTION 动作：拨打电话，被呼叫的联系人在数据中指定。 </li>
+<li>String CALL_FORWARDING_STATE_CHANGED_ACTION 广播：语音电话的呼叫转移状态已经改变。 </li>
+<li>String CLEAR_CREDENTIALS_ACTION 动作：清除登陆凭证 (credential)。 </li>
+<li>String CONFIGURATION_CHANGED_ACTION 广播：设备的配置信息已经改变，参见 Resources.Configuration.<br>Creator CREATOR 无 无 </li>
+<li>String DATA_ACTIVITY_STATE_CHANGED_ACTION 广播：电话的数据活动(data activity)状态（即收发数据的状态）已经改变。 </li>
+<li>String DATA_CONNECTION_STATE_CHANGED_ACTION 广播：电话的数据连接状态已经改变。 </li>
+<li>String DATE_CHANGED_ACTION 广播：日期被改变。 </li>
+<li>String DEFAULT_ACTION 动作：和 VIEW_ACTION 相同，是在数据上执行的标准动作。 </li>
+<li>String DEFAULT_CATEGORY 类别：如果 activity 是对数据执行确省动作（点击, center press）的一个选项，需要设置这个类别。 </li>
+<li>String DELETE_ACTION 动作：从容器中删除给定的数据。 </li>
+<li>String DEVELOPMENT_PREFERENCE_CATEGORY 类别：说明 activity 是一个设置面板 (development preference panel). </li>
+<li>String DIAL_ACTION 动作：拨打数据中指定的电话号码。 </li>
+<li>String EDIT_ACTION 动作：为制定的数据显示可编辑界面。 </li>
+<li>String EMBED_CATEGORY 类别：能够在上级（父）activity 中运行。 </li>
+<li>String EMERGENCY_DIAL_ACTION 动作：拨打紧急电话号码。<br>int FORWARD_RESULT_LAUNCH 启动标记：如果这个标记被设置，而且被一个已经存在的 activity 用来启动新的 activity，已有 activity 的回复目标 (reply target) 会被转移给新的 activity。 </li>
+<li>String FOTA_CANCEL_ACTION 广播：取消所有被挂起的 (pending) 更新下载。 </li>
+<li>String FOTA_INSTALL_ACTION 广播：更新已经被确认，马上就要开始安装。 </li>
+<li>String FOTA_READY_ACTION 广播：更新已经被下载，可以开始安装。 </li>
+<li>String FOTA_RESTART_ACTION 广播：恢复已经停止的更新下载。 </li>
+<li>String FOTA_UPDATE_ACTION 广播：通过 OTA 下载并安装操作系统更新。 </li>
+<li>String FRAMEWORK_INSTRUMENTATION_TEST_CATEGORY 类别：To be used as code under test for framework instrumentation tests. </li>
+<li>String GADGET_CATEGORY 类别：这个 activity 可以被嵌入宿主 activity (activity that is hosting gadgets)。 </li>
+<li>String GET_CONTENT_ACTION 动作：让用户选择数据并返回。 </li>
+<li>String HOME_CATEGORY 类别：主屏幕 (activity)，设备启动后显示的第一个 activity。 </li>
+<li>String INSERT_ACTION 动作：在容器中插入一个空项 (item)。 </li>
+<li>String INTENT_EXTRA 附加数据：和 PICK_ACTIVITY_ACTION 一起使用时，说明用户选择的用来显示的 activity；和 ADD_SHORTCUT_ACTION 一起使用的时候，描述要添加的快捷方式。 </li>
+<li>String LABEL_EXTRA 附加数据：大写字母开头的字符标签，和 ADD_SHORTCUT_ACTION 一起使用。 </li>
+<li>String LAUNCHER_CATEGORY 类别：Activity 应该被显示在顶级的 launcher 中。 </li>
+<li>String LOGIN_ACTION 动作：获取登录凭证。 </li>
+<li>String MAIN_ACTION 动作：作为主入口点启动，不需要数据。 </li>
+<li>String MEDIABUTTON_ACTION 广播：用户按下了“Media Button”。 </li>
+<li>String MEDIA_BAD_REMOVAL_ACTION 广播：扩展介质（扩展卡）已经从 SD 卡插槽拔出，但是挂载点 (mount point) 还没解除 (unmount)。 </li>
+<li>String MEDIA_EJECT_ACTION 广播：用户想要移除扩展介质（拔掉扩展卡）。 </li>
+<li>String MEDIA_MOUNTED_ACTION 广播：扩展介质被插入，而且已经被挂载。 </li>
+<li>String MEDIA_REMOVED_ACTION 广播：扩展介质被移除。 </li>
+<li>String MEDIA_SCANNER_FINISHED_ACTION 广播：已经扫描完介质的一个目录。 </li>
+<li>String MEDIA_SCANNER_STARTED_ACTION 广播：开始扫描介质的一个目录。 </li>
+<li>String MEDIA_SHARED_ACTION 广播：扩展介质的挂载被解除 (unmount)，因为它已经作为 USB 大容量存储被共享。 </li>
+<li>String MEDIA_UNMOUNTED_ACTION 广播：扩展介质存在，但是还没有被挂载 (mount)。 </li>
+<li>String MESSAGE_WAITING_STATE_CHANGED_ACTION 广播：电话的消息等待（语音邮件）状态已经改变。<br>int MULTIPLE_TASK_LAUNCH 启动标记：和 NEW_TASK_LAUNCH 联合使用，禁止将已有的任务改变为前景任务 (foreground)。 </li>
+<li>String NETWORK_TICKLE_RECEIVED_ACTION 广播：设备收到了新的网络 “tickle” 通知。<br>int NEW_TASK_LAUNCH 启动标记：设置以后，activity 将成为历史堆栈中的第一个新任务（栈顶）。<br>int NO_HISTORY_LAUNCH 启动标记：设置以后，新的 activity 不会被保存在历史堆栈中。 </li>
+<li>String PACKAGE_ADDED_ACTION 广播：设备上新安装了一个应用程序包。 </li>
+<li>String PACKAGE_REMOVED_ACTION 广播：设备上删除了一个应用程序包。 </li>
+<li>String PHONE_STATE_CHANGED_ACTION 广播：电话状态已经改变。 </li>
+<li>String PICK_ACTION 动作：从数据中选择一个项目 (item)，将被选中的项目返回。 </li>
+<li>String PICK_ACTIVITY_ACTION 动作：选择一个 activity，返回被选择的 activity 的类（名）。 </li>
+<li>String PREFERENCE_CATEGORY 类别：activity是一个设置面板 (preference panel)。 </li>
+<li>String PROVIDER_CHANGED_ACTION 广播：更新将要（真正）被安装。 </li>
+<li>String PROVISIONING_CHECK_ACTION 广播：要求 polling of provisioning service 下载最新的设置。 </li>
+<li>String RUN_ACTION 动作：运行数据（指定的应用），无论它（应用）是什么。 </li>
+<li>String SAMPLE_CODE_CATEGORY 类别：To be used as an sample code example (not part of the normal user experience). </li>
+<li>String SCREEN_OFF_ACTION 广播：屏幕被关闭。 </li>
+<li>String SCREEN_ON_ACTION 广播：屏幕已经被打开。 </li>
+<li>String SELECTED_ALTERNATIVE_CATEGORY 类别：对于被用户选中的数据，activity 是它的一个可选操作。 </li>
+<li>String SENDTO_ACTION 动作：向 data 指定的接收者发送一个消息。 </li>
+<li>String SERVICE_STATE_CHANGED_ACTION 广播：电话服务的状态已经改变。 </li>
+<li>String SETTINGS_ACTION 动作：显示系统设置。输入：无。 </li>
+<li>String SIGNAL_STRENGTH_CHANGED_ACTION 广播：电话的信号强度已经改变。<br>int SINGLE_TOP_LAUNCH 启动标记：设置以后，如果 activity 已经启动，而且位于历史堆栈的顶端，将不再启动（不重新启动） activity。 </li>
+<li>String STATISTICS_REPORT_ACTION 广播：要求 receivers 报告自己的统计信息。 </li>
+<li>String STATISTICS_STATE_CHANGED_ACTION 广播：统计信息服务的状态已经改变。 </li>
+<li>String SYNC_ACTION 动作：执行数据同步。 </li>
+<li>String TAB_CATEGORY 类别：这个 activity 应该在 TabActivity 中作为一个 tab 使用。 </li>
+<li>String TEMPLATE_EXTRA 附加数据：新记录的初始化模板。 </li>
+<li>String TEST_CATEGORY 类别：作为测试目的使用，不是正常的用户体验的一部分。 </li>
+<li>String TIMEZONE_CHANGED_ACTION 广播：时区已经改变。 </li>
+<li>String TIME_CHANGED_ACTION 广播：时间已经改变（重新设置）。 </li>
+<li>String TIME_TICK_ACTION 广播：当前时间已经变化（正常的时间流逝）。 </li>
+<li>String UMS_CONNECTED_ACTION 广播：设备进入 USB 大容量存储模式。 </li>
+<li>String UMS_DISCONNECTED_ACTION 广播：设备从 USB 大容量存储模式退出。 </li>
+<li>String UNIT_TEST_CATEGORY 类别：应该被用作单元测试（通过 test harness 运行）。 </li>
+<li>String VIEW_ACTION 动作：向用户显示数据。 </li>
+<li>String WALLPAPER_CATEGORY 类别：这个 activity 能过为设备设置墙纸。 </li>
+<li>String WALLPAPER_CHANGED_ACTION 广播：系统的墙纸已经改变。 </li>
+<li>String WALLPAPER_SETTINGS_ACTION 动作：显示选择墙纸的设置界面。输入：无。 </li>
+<li>String WEB_SEARCH_ACTION 动作：执行 web 搜索。 </li>
+<li>String XMPP_CONNECTED_ACTION 广播：XMPP 连接已经被建立。 </li>
+<li>String XMPP_DISCONNECTED_ACTION 广播：XMPP 连接已经被断开。</li>
+</ul>
 
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-Service" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/10/02/Service/" class="article-date">
+  	<time datetime="2015-10-02T12:30:24.000Z" itemprop="datePublished">2015-10-02</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/10/02/Service/">
+        Service
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一、Service："><a href="#一、Service：" class="headerlink" title="一、Service："></a>一、Service：</h1><h2 id="（一）、Service-简介："><a href="#（一）、Service-简介：" class="headerlink" title="（一）、Service 简介："></a>（一）、Service 简介：</h2><p>1、何谓“Service”？<br>“Service” 意思即“服务”的意思， 像 Windows 上面的服务一样，服务是在后台上运行，承担着静悄悄的不为人所注意的工作。Service运行在后台，它是不可见的、无界面的程序。<br>Service可以在很多场合的应用中使用，比如播放多媒体的时候用户启动了其他Activity，这个时候程序要在后台继续播放；比如检测SD卡上文件的变化；再或者在后台记录用户的地理信息位置的改变；或者启动一个服务来运行并一直监听某种动作等等。</p>
+<p>2、Service概念的总结：<br>Service在后台运行，不可以与用户直接交互；<br>一个服务不是一个单独的进程。服务对象本身并不意味着它是在自己的进程中运行，除非另有规定，否则它与运行程序是同在一个进程中；<br>一个服务不是一个单独的线程。Service和其他组件一样，默认情况下，Service中的所有代码都是运行在主线程中；<br>Service存在的价值虽然不如Activity那么清晰。但是一般都让Service执行耗时较长的操作。例如：播放音乐、下载文件、上传文件等等。但是因为Service默认运行在主线程中，因此不能直接用它来做耗时的请求或者动作，最好在Service中启动新线程来运行耗时的任务；<br>需要通过某一个Activity或其他Context对象来启动Service。context.startService() 或 context.bindService()；<br>Service很大程度上充当了应用程序后台线程管理器的角色。（如果Activity中新开启一个线程，当该Acitivity关闭后，该线程依然在工作，但是与开启它的Activity失去联系。也就是说此时的这个线程处于失去管理的状态。但是使用Service，则可以对后台运行的线程有效地管理。）</p>
+<p>3、为什么不使用后台线程而使用Service？<br>1、Service可以放在独立的进程中，所以更安全；<br>2、使用Service可以依赖现有的binder机制，不需要在应用层面上处理线程同步的繁杂工作；<br>3、系统可以重新启动异常死去的Service。<br>4、Service 与 Activity 的相同点与不同点：<br>不同点：Activity是与用户交互的组件，即可以看到UI界面，而Service是在后台运行、无需界面；<br>相同点：使用Activity 时我们需要在配置文件中声明<activity>标签，同样的使用Service 也需要在配置文件中声明<service>标签。都具有一定的生命周期。</service></activity></p>
+<h2 id="（二）、服务的分类："><a href="#（二）、服务的分类：" class="headerlink" title="（二）、服务的分类："></a>（二）、服务的分类：</h2><p>1、本地服务Local Service：<br>Local Service 用于应用程序内部。用于实现应用程序自己的一些耗时任务，比如查询升级信息，并不占用应用程序比如Activity所属线程，而是单开线程后台执行，这样用户体验比较好。</p>
+<p>启动service有两种方法：<br>1）、  Context.startService()<br>                    调用者与服务之间没有关联，即使调用者退出，服务仍可运行<br>2）、  Context.bindService()<br>                    调用者与服务绑定在一起，调用者一旦退出，服务也就终止</p>
+<p>A、根据启动方式将本地服务分为：启动服务Started Service和绑定服务Bound  Service。【重点】</p>
+<ul>
+<li><p>Started Service：被启动的服务</p>
+<pre><code>- 被启动的服务是由其它组件调用startService()方法而启动的，该方法会导致被启动服务的生命周期方法onStartCommand()被回调。当服务是被启动状态后，其生命周期与启动它的组件无关，即使启动服务的组件（Activity，BroadcastReceiver）已经被销毁，该服务还可以在后台无限期运行。除非调用stopSelf()或stopService()来停止该服务。
+</code></pre></li>
+<li><p>Bound  Service：被绑定的服务</p>
+<pre><code>- 绑定服务是允许其它应用程序绑定并且与之交互的Service的实现类。为了提供绑定，必须实现onBind()回调方法。该方法返回IBinder对象，它定义了服务类与Activity交互的程序接口。
+- Activity通过bindService()方法绑定到服务类，同时Activity必须提供ServiceConnection接口的实现类，它监视Activity与服务类之间的连接。在重写ServiceConnection接口的onServiceConnected()方法时，实现了将服务类顺利赋值到了Activity中，实现了在Activity中使用该服务类并执行其中的方法。
+</code></pre></li>
+</ul>
+<p>B、根据onStartCommand()回调方法的返回值，将Service分为粘性Service和非粘性Service：<br>onStartCommand()方法有三种返回值：</p>
+<ul>
+<li>START_STICKY（常量值：1）：sticky的意思是“粘性的”。使用这个返回值时，我们启动的服务跟应用程序”粘”在一起，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务。当再次启动服务时，传入的第一个参数将为null;</li>
+<li>START_NOT_STICKY（常量值：2）：“非粘性的”。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统不会自动重启该服务。</li>
+<li>START_REDELIVER_INTENT（常量值：3）：重传Intent。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。</li>
+</ul>
+<p>【备注：】<br>以上三种情况，可以理解为发生车祸后的人：<br>START_STICKY：（常量值：1）车祸后自己苏醒，但是失忆；<br>START_NOT_STICKY：（常量值：2）车祸后再也没有苏醒；<br>START_REDELIVER_INTENT：（常量值：3）车祸后自己苏醒，依然保持记忆。<br>2、远程服务Remote Service：<br>Remote Service 用于android系统内部的应用程序之间。可以定义接口并把接口暴露出来，以便其他应用进行操作。可被其他应用程序复用，比如天气预报服务，其他应用程序不需要再写这样的服务，调用已有的即可。</p>
+<h2 id="（三）、Service的生命周期："><a href="#（三）、Service的生命周期：" class="headerlink" title="（三）、Service的生命周期："></a>（三）、Service的生命周期：</h2><p>1、Started Service的生命周期：</p>
+<ul>
+<li>onCreate()：创建服务</li>
+<li>onStartCommand()：服务开始运行（在2.0以前版本中，使用onStart()回调方法）</li>
+<li>onDestroy() ：服务被停止</li>
+</ul>
+<p>【详细说明：】<br>在程序中调用：context.startService() 会触发执行Service生命周期中的onCreate()、onStartCommand()回调方法，此时服务就开始正式运行；<br>如果Service还没有运行，则android先调用onCreate()然后调用onStartCommand()；如果Service已经运行，则只调用onStartCommand()，所以一个Service的onStartCommand方法可能会重复调用多次；<br>如果在程序中调用：context.stopService()会触发执行Service生命周期中的onDestroy()回调方法，会让服务停止；<br>stopService()的时候直接onDestroy，如果是调用者自己直接退出而没有调用stopService()的话，Service会一直在后台运行。该Service的调用者再启动该Service后可以通过stopService关闭Service；stopSelf()<br>所以StartService的生命周期为：onCreate –&gt; onStartCommand(可多次调用) –&gt; onDestroy。</p>
+<p>2、Bound Service的生命周期：</p>
+<ul>
+<li>onCreate()：创建服务</li>
+<li>onBind()：绑定服务，服务开始运行</li>
+<li>onUnbind()：取消绑定</li>
+<li>onDestroy() ：服务被停止</li>
+</ul>
+<p>【详细说明：】<br>在程序中调用：context.bindService()会触发执行Service生命周期中的onCreate()、onBind()回调方法，此时服务开始运行；<br>onBind将返回给客户端一个IBind接口实例，IBind允许客户端回调服务的方法，比如得到Service运行的状态或其他操作。此后调用者（Context，例如Activity）会和Service绑定在一起；<br>如果调用Service的调用者Context退出了，那么会依次调用Service生命周期中的onUnbind()、onDestroy()回调方法，会让服务停止；<br>所以BindService的生命周期为：onCreate –&gt; onBind(只一次，不可多次绑定) –&gt; onUnbind –&gt; onDestory。</p>
+<p> 【备注：】<br>Service是不能自己启动的，只有通过 Context 对象调用startService() 和bindService() 方法来启动。<br>在Service每一次的开启关闭过程中，只有onStartCommand()可被多次调用(通过多次startService调用)，其他onCreate()、onBind()、onUnbind()、onDestory()在一个生命周期中只能被调用一次。</p>
+<p>Service可以在和多场合的应用中使用，比如播放多媒体的时候用户启动了其他Activity这个时候程序要在后台继续播放，比如检测SD卡上文件的变化，再或者在后台记录你地理信息位置的改变等等，总之服务总是藏在后头的。</p>
+<p>Service和Thread的区别:</p>
+<ul>
+<li>Thread：Thread 是程序执行的最小单元，可以用 Thread 来执行一些异步的操作。</li>
+<li>Service：Service 是android的一种机制，当它运行的时候如果是Local Service，那么对应的 Service 是运行在主进程的 main 线程上的。如果是Remote Service，那么对应的 Service 则是运行在独立进程的 main 线程上。<pre><code>Thread 的运行是独立的，也就是说当一个 Activity 被 finish 之后，如果没有主动停止 Thread 或者 Thread 里的 run 方法没有执行完毕的话，Thread 也会一直执行。因此这里会出现一个问题：当 Activity 被 finish 之后，不再持有该 Thread 的引用，也就是不能再控制该Thread。另一方面，没有办法在不同的 Activity 中对同一 Thread 进行控制。
+例如：如果 一个Thread 需要每隔一段时间连接服务器校验数据，该Thread需要在后台一直运行。这时候如果创建该Thread的Activity被结束了而该Thread没有 停止，那么将没有办法再控制该Thread，除非kill掉该程序的进程。这时候如果创建并启动一个 Service ，在 Service 里面创建、运行并控制该 Thread，这样便解决了该问题(因为任何 Activity 都可以控制同一个Service，而系统也只会创建一个对应 Service 的实例)。
+因此可以把 Service 想象成一种消息服务，可以在任何有 Context 的地方调用 Context.startService、Context.stopService、Context.bindService、 Context.unbindService来控制它，也可以在 Service 里注册 BroadcastReceiver，通过发送 broadcast 来达到控制的目的，这些都是 Thread 做不到的。
+</code></pre></li>
+</ul>
+<h1 id="二、本地Service："><a href="#二、本地Service：" class="headerlink" title="二、本地Service："></a>二、本地Service：</h1><h2 id="（一）、Started-Service启动MediaPlayer播放音乐："><a href="#（一）、Started-Service启动MediaPlayer播放音乐：" class="headerlink" title="（一）、Started Service启动MediaPlayer播放音乐："></a>（一）、Started Service启动MediaPlayer播放音乐：</h2><p>1、操作步骤：<br>1、写xml布局文件；<br>2、写MainActivity文件，通过按钮点击事件启动Service；<br>3、写继承于Service的StartService类文件：重写onCreate()/onStartCommand()/onDestroy()回调方法。</p>
+<p>2、XML布局文件核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">&lt;LinearLayoutxmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:layout_width=&quot;fill_parent&quot;</div><div class="line">    android:layout_height=&quot;fill_parent&quot;</div><div class="line">    android:orientation=&quot;vertical&quot;&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_play&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;播放音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_pause&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;暂停音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_stop&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;停止音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_exit&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;关闭当前窗体&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_stopservice&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;停止服务&quot;/&gt;</div><div class="line"></div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure>
+<p>3、MainActivty核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">publicclass MainActivity extends Activity &#123;</div><div class="line">privatestaticfinal String TAG = &quot;MainActivity&quot;;</div><div class="line">private Intent intent = null;</div><div class="line">   @Override</div><div class="line">protectedvoid onCreate(Bundle savedInstanceState) &#123;</div><div class="line">           Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate(savedInstanceState);</div><div class="line">           setContentView(R.layout.activity_main);</div><div class="line">intent = new Intent(this, StartServicePlayMusic.class);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">protectedvoid onDestroy() &#123;</div><div class="line">           Log.i (&quot;MainActivty&quot;, &quot;==onDestroy()&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (intent != null) &#123;</div><div class="line">                // 停止服务可以通过stopService(intent)来停止，也可以intent到Service程序中，通过stopSelf()来停止。</div><div class="line">                stopService(intent);</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid clickButton(View view) &#123;</div><div class="line">int type = 0;</div><div class="line">switch (view.getId()) &#123;</div><div class="line">case R.id.button_main_play:</div><div class="line">                   type = 1;</div><div class="line">break;</div><div class="line">case R.id.button_main_pause:</div><div class="line">                   type = 2;</div><div class="line">break;</div><div class="line">case R.id.button_main_stop:</div><div class="line">                   type = 3;</div><div class="line">break;</div><div class="line">case R.id.button_main_exit:</div><div class="line">                   finish();</div><div class="line">break;</div><div class="line">case R.id.button_main_stopservice:</div><div class="line">                    // 停止服务可以通过stopService(intent)来停止，也可以intent到Service程序中，通过stopSelf()来停止</div><div class="line">                    // stopService(intent);</div><div class="line">                    // finish();</div><div class="line">                   type = 4;</div><div class="line">break;</div><div class="line">           &#125;</div><div class="line">           Bundle bundle = new Bundle();</div><div class="line">           bundle.putInt(&quot;type&quot;, type);</div><div class="line">intent.putExtras(bundle);</div><div class="line">           startService(intent);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>4、StartServicePlayMusic核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">publicclass StartServicePlayMusic extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;StartServicePlayMusic&quot;;</div><div class="line">private MediaPlayer mediaPlayer;</div><div class="line"></div><div class="line">   @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">           Log.i (TAG, &quot;==onBind执行&quot;);</div><div class="line">returnnull;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">           Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate();</div><div class="line">if (mediaPlayer == null) &#123;</div><div class="line">mediaPlayer = MediaPlayer.create(this, R.raw.hitta);</div><div class="line">mediaPlayer.setLooping(false);</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicint onStartCommand(Intent intent, int flags, int startId) &#123;</div><div class="line">           Log.i (TAG, &quot;==onStartCommand执行&quot;);</div><div class="line">if (intent != null) &#123;</div><div class="line">                   Bundle bundle = intent.getExtras();</div><div class="line">int type = bundle.getInt(&quot;type&quot;);</div><div class="line">switch (type) &#123;</div><div class="line">case 1:</div><div class="line">                           play();</div><div class="line">break;</div><div class="line">case 2:</div><div class="line">                           pause();</div><div class="line">break;</div><div class="line">case 3:</div><div class="line">                           stop();</div><div class="line">break;</div><div class="line">case 4:</div><div class="line">                           stopSelf();</div><div class="line">break;</div><div class="line">                   &#125;</div><div class="line">           &#125;</div><div class="line">              returnSTART_STICKY;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">             Log.i (TAG, &quot;==onDestroy执行&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">mediaPlayer.release();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid play() &#123;</div><div class="line">if (!mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.start();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid pause() &#123;</div><div class="line">if (mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.pause();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid stop() &#123;</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>5、Manifest清单配置文件核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;service </div><div class="line"></div><div class="line">android:name=&quot;.StartServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=&quot;com.steven.startservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line">android:name=&quot;.StartServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=&quot;com.steven.startservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div></pre></td></tr></table></figure>
+<p>6、Started  Service总结：<br>Activity页面中需要startService(intent) 和 stopService(intent)两个方法来启动Service和停止Service;<br>继承于Service类的自定义子类——MyStartService类中，生命周期回调方法有：onCreate() 、onStartCommand() 、onDestroy()；<br>如果停止服务，可以在Activity中调用stopService(intent)，也可以intent到Service中执行stopSelf()方法；<br>执行停止服务方法，会回调Service生命周期中的onDestroy()方法；<br>如果希望关闭Activity窗体，服务也停止，那么在Activity的onDestroy()方法中执行stopService()方法。如果希望关闭窗体后，服务还继续，那么Activity的onDestroy()中不执行停止服务即可；<br>在StartService中不会回调onBind()方法；<br>在停止服务后，如果再次点击“播放”，可以重新启动StartService。</p>
+<p>7、IntentService与Service：</p>
+<p>不管是何种Service，它默认都是在应用程序的主线程（亦即UI线程）中运行的。所以，如果你的Service将要运行非常耗时或者可能被阻塞的操作时，你的应用程序将会被挂起，甚至会出现ANR错误。为了避免这一问题，你应该在Service中重新启动一个新的线程来进行这些操作。现有两种方法大家参考：</p>
+<ol>
+<li><p>直接在Service的onStartCommand()方法中新建一个线程来执行;</p>
+</li>
+<li><p>Android SDK 中为我们提供了一个现成的Service类来实现这个功能，它就是IntentService，它主要负责以下几个方面：<br>Creates a default worker thread that executes all intents delivered to onStartCommand() separate from your application’s main thread.<br> 生成一个默认的且与主线程互相独立的工作者线程来执行所有传送至 onStartCommand() 方法的Intetnt<br>Creates a work queue that passes one intent at a time to your onHandleIntent() implementation, so you never have to worry about multi-threading.<br> 生成一个工作队列来传送Intent对象给你的onHandleIntent()方法，同一时刻只传送一个Intent对象，这样一来，你就不必担心多线程的问题。<br>Stops the service after all start requests have been handled, so you never have to call stopSelf().<br> 在所有的请求(Intent)都被执行完以后会自动停止服务，所以，你不需要自己去调用stopSelf()方法来停止该服务<br>Provides default implementation of onBind() that returns null.<br> 提供了一个onBind()方法的默认实现，它返回null<br>Provides a default implementation of onStartCommand() that sends the intent to the work queue and then to your onHandleIntent() implementation<br> 提供了一个onStartCommand()方法的默认实现，它将Intent先传送至工作队列，然后从工作队列中每次取出一个传送至onHandleIntent()方法，在该方法中对Intent对相应的处理</p>
+</li>
+</ol>
+<p>IntentService使用队列的方式将请求的Intent加入队列，然后开启一个worker thread(线程)来处理队列中的Intent，对于异步的startService请求，IntentService会处理完成一个之后再处理第二个，每一个请求都会在一个单独的worker thread中处理，不会阻塞应用程序的主线程。<br>这里就给我们提供了一个思路，如果有耗时的操作可以在Service里面开启新线程，也可以使用IntentService来处理耗时操作。 但你若是想在Service中让多个线程并发的话，就得使用第一种方法，在Service内部起多个线程，但是这样的话，你可要处理好线程的同步。</p>
+<p>（1）、Service实现加载图片的核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">publicclass DownloadService extends IntentService &#123;</div><div class="line">privatestaticfinal String TAG = &quot;DownloadService&quot;;</div><div class="line">private String urlString = &quot;https://www.google.com.hk/images/srpr/logo11w.png&quot;;</div><div class="line">private NotificationCompat.Builder builder = null;</div><div class="line">private NotificationManager manager = null;</div><div class="line"></div><div class="line">public DownloadService() &#123;</div><div class="line">super(&quot;&quot;);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">protectedvoid onHandleIntent(Intent intent) &#123;</div><div class="line">manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">builder = new NotificationCompat.Builder(getApplicationContext());</div><div class="line">builder.setSmallIcon(R.drawable.ic_launcher);</div><div class="line">builder.setContentTitle(&quot;提示：&quot;);</div><div class="line">builder.setContentText(&quot;图片加载完成，请点击查看！&quot;);</div><div class="line">builder.setTicker(&quot;图片加载完成&quot;);</div><div class="line">builder.setAutoCancel(true);</div><div class="line">             Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);</div><div class="line">             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</div><div class="line">             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent2,</div><div class="line">                             PendingIntent.FLAG_ONE_SHOT);</div><div class="line">builder.setContentIntent(pIntent);</div><div class="line"></div><div class="line">byte[] data = HttpClientHelper.loadByteFromURL(urlString);</div><div class="line">boolean flag = SDCardHelper.saveFileToSDCard(data, &quot;Download&quot;, &quot;logo11w.png&quot;);</div><div class="line">            </div><div class="line">if (flag) &#123;</div><div class="line">manager.notify(1, builder.build());</div><div class="line">             &#125;</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>（2）、IntentService实现加载图片的核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">publicclass DownloadService extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;DownloadService&quot;;</div><div class="line">private String urlString = &quot;https://www.google.com.hk/images/srpr/logo11w.png&quot;;</div><div class="line">private NotificationCompat.Builder builder = null;</div><div class="line">private NotificationManager manager = null;</div><div class="line">     @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">returnnull;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">super.onCreate();</div><div class="line">manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">builder = new NotificationCompat.Builder(getApplicationContext());</div><div class="line">builder.setSmallIcon(R.drawable.ic_launcher);</div><div class="line">builder.setContentTitle(&quot;提示：&quot;);</div><div class="line">builder.setContentText(&quot;图片加载完成，请点击查看！&quot;);</div><div class="line">builder.setTicker(&quot;图片加载完成&quot;);</div><div class="line">builder.setAutoCancel(true);</div><div class="line">             Intent intent = new Intent(getApplicationContext(), MainActivity.class);</div><div class="line">             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</div><div class="line">             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent,</div><div class="line">             PendingIntent.FLAG_ONE_SHOT);</div><div class="line">builder.setContentIntent(pIntent);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicint onStartCommand(Intent intent, int flags, int startId) &#123;</div><div class="line">new Thread(new Runnable() &#123;</div><div class="line">                    @Override</div><div class="line">publicvoid run() &#123;</div><div class="line">byte[] data = HttpClientHelper.loadByteFromURL(urlString);</div><div class="line">boolean flag = SDCardHelper.saveFileToSDCard(data, &quot;Download&quot;,&quot;logo11w.png&quot;);</div><div class="line">if (flag) &#123;</div><div class="line">manager.notify(1, builder.build());</div><div class="line">                                     stopSelf();</div><div class="line">                             &#125;</div><div class="line">                     &#125;</div><div class="line">             &#125;).start();</div><div class="line">returnSTART_STICKY;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">super.onDestroy();</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="（二）、Bound-Service启动MediaPlayer播放音乐："><a href="#（二）、Bound-Service启动MediaPlayer播放音乐：" class="headerlink" title="（二）、Bound Service启动MediaPlayer播放音乐："></a>（二）、Bound Service启动MediaPlayer播放音乐：</h2><p>1、操作步骤：<br>1、写xml布局文件；<br>2、写MainActivity文件，构建ServiceConnection对象，重写其中的抽象方法onServiceDisconnected()和onServiceConnected()；<br>3、写继承于Service的BindService类文件，定义继承于Binder的内部类MyBinder，在其中定义方法getService()；<br>4、BindService类中重写onCreate()方法、重写onBind()回调方法，onBind()方法返回MyBinder对象，重写onDestroy()方法；</p>
+<p>2、XML布局文件：同上</p>
+<p>3、MainActivty核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line">publicclass MainActivity extends Activity &#123;</div><div class="line">privatestaticfinal String TAG = &quot;MainActivity&quot;;</div><div class="line">private Intent intent;</div><div class="line">private ServiceConnection conn = null;</div><div class="line">private BindServicePlayMusic musicService;</div><div class="line"></div><div class="line"> @Override</div><div class="line">protectedvoid onCreate(Bundle savedInstanceState) &#123;</div><div class="line">          Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate(savedInstanceState);</div><div class="line"></div><div class="line">          setContentView(R.layout.activity_main);</div><div class="line">          // 启动服务有多种写法：</div><div class="line">          // 可以通过new Intent(action字符串)来实现;</div><div class="line">          // intent = new Intent(&quot;com.steven.bindservice.playmusic&quot;);</div><div class="line">intent = new Intent(this, BindServicePlayMusic.class);</div><div class="line">conn = new ServiceConnection() &#123;</div><div class="line"> @Override</div><div class="line">publicvoid onServiceDisconnected(ComponentName name) &#123;</div><div class="line">                            musicService = null;</div><div class="line">                  &#125;</div><div class="line"></div><div class="line">                 @Override</div><div class="line">publicvoid onServiceConnected(ComponentName name, IBinder service) &#123;</div><div class="line">musicService = ((BindServicePlayMusic.MyBinder) service).getService();</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.play();</div><div class="line">                          &#125;</div><div class="line">                  &#125;</div><div class="line">          &#125;;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">publicvoid clickButton(View view) &#123;</div><div class="line">switch (view.getId()) &#123;</div><div class="line">case R.id.button_main_play:</div><div class="line">if (musicService == null) &#123;</div><div class="line">                           bindService(intent, conn, Context.BIND_AUTO_CREATE);</div><div class="line">                   &#125; else &#123;</div><div class="line">musicService.play();</div><div class="line">                   &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_pause:</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.pause();</div><div class="line">                  &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_stop:</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.stop();</div><div class="line">                  &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_exit:</div><div class="line">                  finish();</div><div class="line">break;</div><div class="line">case R.id.button_main_stopservice:</div><div class="line">                  // BindService中stopService(intent)不起作用，要通过undbindService来停止服务</div><div class="line">                  // stopService(intent);</div><div class="line">                  // musicService = null的目的是如果停止服务后，再次”播放“，可以正常执行。</div><div class="line">                  // 如果不将musicService设置为null，再次播放时，将直接执行musicService.play()，</div><div class="line"> //而不执行bindService()，那么会导致异常</div><div class="line">                      musicService = null;</div><div class="line">                      unbindService(conn);</div><div class="line">break;</div><div class="line">          &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>4、BindServicePlayMusic核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">publicclass BindServicePlayMusic extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;BindServicePlayMusic&quot;;</div><div class="line">private MediaPlayer mediaPlayer;</div><div class="line">private IBinder binder = null;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">              Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate();</div><div class="line">if (mediaPlayer == null) &#123;</div><div class="line">mediaPlayer = MediaPlayer.create(this, R.raw.heavencity);</div><div class="line">mediaPlayer.setLooping(false);</div><div class="line">              &#125;</div><div class="line">binder = new MyBinder();</div><div class="line">      &#125;</div><div class="line"></div><div class="line">class MyBinder extends Binder &#123;</div><div class="line">public BindServicePlayMusic getService() &#123;</div><div class="line">return BindServicePlayMusic.this;</div><div class="line">              &#125;</div><div class="line">      &#125;;</div><div class="line"></div><div class="line">     @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">              Log.i (TAG, &quot;==onBind执行&quot;);</div><div class="line">              play();</div><div class="line">returnbinder;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicboolean onUnbind(Intent intent) &#123;</div><div class="line">              Log.i (TAG, &quot;==onUnbind执行&quot;);</div><div class="line">returnsuper.onUnbind(intent);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">              Log.i (TAG, &quot;==onDestroy执行&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">mediaPlayer.release();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid play() &#123;</div><div class="line">if (!mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.start();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid pause() &#123;</div><div class="line">if (mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.pause();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid stop() &#123;</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>5、Manifest清单配置文件核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;service </div><div class="line"></div><div class="line">android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line"></div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line"></div><div class="line">           &lt;service android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line">           &lt;service android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div></pre></td></tr></table></figure>
+<p>6、Bound Service总结：</p>
+<h1 id="三、-拓展知识（进程和生命周期）："><a href="#三、-拓展知识（进程和生命周期）：" class="headerlink" title="三、 拓展知识（进程和生命周期）："></a>三、 拓展知识（进程和生命周期）：</h1><p>Android操作系统尝试尽可能长时间保持应用的进程，但当可用内存很低时要移走一部分进程。哪些程序可以运行，哪些要被销毁？答案是：重要级别低的进程可能被淘汰。<br>按照重要性排列，一共可以分成5级：</p>
+<p>1、前台运行进程：<br>用户此时需要处理和显示的进程。符合下列条件任何一个，这个进程就被认为是前台运行进程。<br>与用户正发生交互；<br>它控制一个与用户交互的必须的基本的服务；<br>一个正在调用生命周期回调方法的ervice（如onCreate()、onStar()、onDestroy()）；<br>一个正在运行onReceive()方法的广播接收对象。<br>销毁前台运行进程是系统万不得已的、最后的选择——当内存不够系统继续运行下去时，杀掉一些前台进程来保证能够响应用户的需求。</p>
+<p>2、可用进程：<br>一个可用进程没有任何前台组件，但它仍然可以影响到用户的界面。下面情况发生时，可以称该进程为可用进程。<br>        它是一个非前台的activity，但对用户仍然可用（onPause()方法已经被调用）。例如：前台的activity是一个允许上一个activity可见的对话框。也就是说当前activity中是一个对话框，对话框之外的地方能看到前一个activity的界面。</p>
+<p>3、服务进程：<br>服务进程是一个通过调用startService()方法启动的服务，并且不属于前两种情况。尽管服务进程没有直接被用户看到，但他们确实是用户所关心的，比如后台播放音乐或网络下载数据，所以系统保证他们的运行。</p>
+<p>4、后台进程：<br>一个后台进程就是非当前正在运行的activity（activity的onStop()方法已经被调用），他们不会对用户体验造成直接的影响，当没有足够内存来运行前台可见程序时，他们将会被终止。<br>通常，后台进程会有很多个在运行，LRU最近使用程序列表来保证经常运行的activity能最后一个被终止。</p>
+<p>5、空线程：<br>一个空线程没有运行任何可用应用程序，保留他们的唯一原因是为了设立一个缓存机制，来加快组件启动的时间。系统经常杀死这些内存来平衡系统的整个系统的资源，进程缓存和基本核心缓存之间的资源。</p>
+<h1 id="四、AIDL实现挂断电话："><a href="#四、AIDL实现挂断电话：" class="headerlink" title="四、AIDL实现挂断电话："></a>四、AIDL实现挂断电话：</h1><p>（一）、核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">publicclass InCallReceiver extends BroadcastReceiver &#123;</div><div class="line">private TelephonyManager manager = null;</div><div class="line"></div><div class="line">       @Override</div><div class="line">publicvoid onReceive(Context context, Intent intent) &#123;</div><div class="line">manager = (TelephonyManager) context .getSystemService(Service.TELEPHONY_SERVICE);</div><div class="line">              </div><div class="line">switch (manager.getCallState()) &#123;</div><div class="line">case TelephonyManager.CALL_STATE_RINGING:</div><div class="line">                       String incomingNumber = intent.getStringExtra(&quot;incoming_number&quot;);</div><div class="line">if (&quot;12345678&quot;.equals(incomingNumber)) &#123;</div><div class="line">try &#123;</div><div class="line">                                    // 获得TelephonyManager的class对象</div><div class="line">                                       Class&lt;TelephonyManager&gt; telephonyManagerClass = TelephonyManager.class;</div><div class="line">                                    // 获得TelephonyManager.getITelephony方法的Method对象</div><div class="line">                                       Method telephonyMethod = telephonyManagerClass</div><div class="line">                                                       .getDeclaredMethod(&quot;getITelephony&quot;, (Class[]) null);</div><div class="line">                                    // 允许访问私有的方法</div><div class="line">                                       telephonyMethod.setAccessible(true);</div><div class="line">                                    // 调用getITelephony()方法返回ITelephony对象</div><div class="line">                        ITelephony telephony = (com.android.internal.telephony.ITelephony) telephonyMethod</div><div class="line">                                                       .invoke(manager, (Object[]) null);</div><div class="line">                                    // 挂断电话</div><div class="line">                                       telephony.endCall();</div><div class="line">                               &#125; catch (Exception e) &#123;</div><div class="line">                                       Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();</div><div class="line">                               &#125;</div><div class="line">                       &#125;</div><div class="line">break;</div><div class="line">               &#125;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
   
 </div>
-
-
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-        
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+      <div class="footer-left">
+        &copy; 2017 Pu Ming
       </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
+        <div class="footer-right">
+          <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/smackgg/hexo-theme-smackdown" target="_blank">Smackdown</a>
+        </div>
+    </div>
   </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
 
-  
 
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: true,
+		isPost: false,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="/js/main.js"></script>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
 </script>
 
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js"></script>
 
 
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
-
-
-
-  
-  
-
-  
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-  
-
-  
-
-  
-
-  
-
+  </div>
 </body>
 </html>
