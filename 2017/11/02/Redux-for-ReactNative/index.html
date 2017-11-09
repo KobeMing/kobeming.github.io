@@ -272,7 +272,7 @@
 <blockquote>
 <p>总结connect函数的功能：连接 React 组件与 Redux store。<br>连接操作不会改变原来的组件类，反而返回一个新的已与 Redux store 连接的组件类</p>
 </blockquote>
-<p>下面分析Redux源码，Redux提供５个api方法：createStore,combineReducers,bindActionCreators,applyMiddleware,compose</p>
+<p><strong>下面分析Redux源码，Redux提供５个api方法：createStore,combineReducers,bindActionCreators,applyMiddleware,compose</strong></p>
 <h2 id="3-createStore"><a href="#3-createStore" class="headerlink" title="3.createStore"></a>3.createStore</h2><blockquote>
 <p>创建一个 Redux store 来以存放应用中所有的 state。</p>
 </blockquote>
@@ -287,46 +287,44 @@
 </li>
 </ul>
 <h4 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h4><p>(Store对象): 保存了应用所有 state 的对象。改变 state 的惟一方法是 dispatch action。你也可以 subscribe 监听 state 的变化，然后更新 UI。</p>
-<h2 id="4-Store的方法"><a href="#4-Store的方法" class="headerlink" title="4.Store的方法"></a>4.Store的方法</h2><ul>
-<li>getState()</li>
-</ul>
-<blockquote>
+<h2 id="4-Store的方法"><a href="#4-Store的方法" class="headerlink" title="4.Store的方法"></a>4.Store的方法</h2><h4 id="getState"><a href="#getState" class="headerlink" title="getState()"></a>getState()</h4><blockquote>
 <p>返回应用当前的 state 树。<br>它与 store 的最后一个 reducer 返回值相同。</p>
 </blockquote>
-<h4 id="返回值：-1"><a href="#返回值：-1" class="headerlink" title="返回值："></a>返回值：</h4><p>(any): 应用当前的 state 树。</p>
-<ul>
-<li>dispatch(action)</li>
-</ul>
-<blockquote>
+<p><strong>返回值</strong>：</p>
+<p>(any): 应用当前的 state 树。</p>
+<hr>
+<h4 id="dispatch-action"><a href="#dispatch-action" class="headerlink" title="dispatch(action)"></a>dispatch(action)</h4><blockquote>
 <p>分发 action。这是触发 state 变化的惟一途径。</p>
 <p>会使用当前 getState() 的结果和传入的 action 以同步方式的调用 store 的 reduce 函数。返回值会被作为下一个 state。从现在开始，这就成为了 getState() 的返回值，同时变化监听器(change listener)会被触发。</p>
 </blockquote>
-<h4 id="参数：-1"><a href="#参数：-1" class="headerlink" title="参数："></a>参数：</h4><ol>
+<p><strong>参数：</strong></p>
+<ol>
 <li>action (Object†): 描述应用变化的普通对象。</li>
 </ol>
-<h4 id="返回值：-2"><a href="#返回值：-2" class="headerlink" title="返回值："></a>返回值：</h4><p>(Object): 要 dispatch 的 action。</p>
-<ul>
-<li>subscribe(listener)</li>
-</ul>
-<blockquote>
+<p><strong>返回值</strong>：</p>
+<p>(Object): 要 dispatch 的 action。</p>
+<hr>
+<h4 id="subscribe-listener"><a href="#subscribe-listener" class="headerlink" title="subscribe(listener)"></a>subscribe(listener)</h4><blockquote>
 <p>添加一个变化监听器。每当 dispatch action 的时候就会执行，state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。</p>
 <p>这是一个底层 API。多数情况下，你不会直接使用它，会使用一些 React（或其它库）的绑定。如果你想让回调函数执行的时候使用当前的 state，你可以 把 store 转换成一个 Observable 或者写一个定制的 observeStore 工具。</p>
 <p>如果需要解绑这个变化监听器，执行 subscribe 返回的函数即可。</p>
 </blockquote>
-<h4 id="参数：-2"><a href="#参数：-2" class="headerlink" title="参数："></a>参数：</h4><ol>
-<li>listener (Function): 每当 dispatch action 的时候都会执行的回调。state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。store 的 reducer 应该是纯函数，因此你可能需要对 state 树中的引用做深度比较来确定它的值是否有变化。<h4 id="返回值：-3"><a href="#返回值：-3" class="headerlink" title="返回值："></a>返回值：</h4></li>
+<p><strong>参数</strong>：</p>
+<ol>
+<li>listener (Function): 每当 dispatch action 的时候都会执行的回调。state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。store 的 reducer 应该是纯函数，因此你可能需要对 state 树中的引用做深度比较来确定它的值是否有变化。</li>
 </ol>
+<p><strong>返回值</strong>：</p>
 <p>(Function): 一个可以解绑变化监听器的函数</p>
-<ul>
-<li>replaceReducer(nextReducer)</li>
-</ul>
-<blockquote>
+<hr>
+<h4 id="replaceReducer-nextReducer"><a href="#replaceReducer-nextReducer" class="headerlink" title="replaceReducer(nextReducer)"></a>replaceReducer(nextReducer)</h4><blockquote>
 <p>替换 store 当前用来计算 state 的 reducer。</p>
 <p>这是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。</p>
 </blockquote>
-<h4 id="参数：-3"><a href="#参数：-3" class="headerlink" title="参数："></a>参数：</h4><ol>
+<p><strong>参数</strong>：</p>
+<ol>
 <li>reducer (Function) store 会使用的下一个 reducer。</li>
 </ol>
+<hr>
 <h2 id="5-applyMiddleware"><a href="#5-applyMiddleware" class="headerlink" title="5.applyMiddleware"></a>5.applyMiddleware</h2><blockquote>
 <p>使用包含自定义功能的 middleware 来扩展 Redux 是一种推荐的方式。Middleware 可以让你包装 store 的 dispatch 方法来达到你想要的目的。同时， middleware 还拥有“可组合”这一关键特性。多个 middleware 可以被组合到一起使用，形成 middleware 链。其中，每个 middleware 都不需要关心链中它前后的 middleware 的任何信息。</p>
 </blockquote>

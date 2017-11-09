@@ -9,17 +9,17 @@
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="navigation在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:navigate, goBack, state, setParams, dispatch, 可以在组件下console.log一下this.props就能看到.  this.props.navigation.navigate(‘Two’, { name: ‘two’">
+  <meta name="description" content="StackNavigatorStackNavigator用来解决屏幕跳转，用它的效果页面导航效果|类似于栈，新启动的页面覆盖在原先的页面上。 函数原型：1234export default (  routeConfigMap: NavigationRouteConfigMap,  stackConfig: StackNavigatorConfig = &amp;#123;&amp;#125;) =&amp;gt; &amp;#1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ReactNavigation">
 <meta property="og:url" content="http://yoursite.com/2017/11/02/ReactNavigation/index.html">
 <meta property="og:site_name" content="Ming">
-<meta property="og:description" content="navigation在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:navigate, goBack, state, setParams, dispatch, 可以在组件下console.log一下this.props就能看到.  this.props.navigation.navigate(‘Two’, { name: ‘two’">
+<meta property="og:description" content="StackNavigatorStackNavigator用来解决屏幕跳转，用它的效果页面导航效果|类似于栈，新启动的页面覆盖在原先的页面上。 函数原型：1234export default (  routeConfigMap: NavigationRouteConfigMap,  stackConfig: StackNavigatorConfig = &amp;#123;&amp;#125;) =&amp;gt; &amp;#1">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2017-11-02T08:37:44.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ReactNavigation">
-<meta name="twitter:description" content="navigation在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:navigate, goBack, state, setParams, dispatch, 可以在组件下console.log一下this.props就能看到.  this.props.navigation.navigate(‘Two’, { name: ‘two’">
+<meta name="twitter:description" content="StackNavigatorStackNavigator用来解决屏幕跳转，用它的效果页面导航效果|类似于栈，新启动的页面覆盖在原先的页面上。 函数原型：1234export default (  routeConfigMap: NavigationRouteConfigMap,  stackConfig: StackNavigatorConfig = &amp;#123;&amp;#125;) =&amp;gt; &amp;#1">
   
     <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
   
@@ -204,7 +204,314 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="navigation"><a href="#navigation" class="headerlink" title="navigation"></a>navigation</h1><p>在StackNavigator中注册后的组件都有navigation这个属性. navigation又有5个参数:<strong>navigate</strong>, <strong>goBack</strong>, <strong>state</strong>, <strong>setParams</strong>, <strong>dispatch</strong>, 可以在组件下console.log一下this.props就能看到.</p>
+        <h1 id="StackNavigator"><a href="#StackNavigator" class="headerlink" title="StackNavigator"></a>StackNavigator</h1><p>StackNavigator用来解决屏幕跳转，用它的效果页面导航效果|类似于栈，新启动的页面覆盖在原先的页面上。</p>
+<h4 id="函数原型："><a href="#函数原型：" class="headerlink" title="函数原型："></a>函数原型：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">export default (</div><div class="line">  routeConfigMap: NavigationRouteConfigMap,</div><div class="line">  stackConfig: StackNavigatorConfig = &#123;&#125;</div><div class="line">) =&gt; &#123;//...&#125;</div></pre></td></tr></table></figure>
+<p>这个函数接受2个对象作为参数，routeConfigMap和stackConfig，其中routeConfigMap配置路由参数，定义组件的导航状态，后文的TabNavigator，DrawerNavigator的这个参数也都一样。stackConfig可以省略，如果省略，则默认选择routeConfigMap中定义的第一个路由。</p>
+<h4 id="定义属性的相关源码："><a href="#定义属性的相关源码：" class="headerlink" title="定义属性的相关源码："></a>定义属性的相关源码：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">//StackNavigatorConfig的属性</div><div class="line">export type NavigationStackRouterConfig = &#123;</div><div class="line">  initialRouteName?: string,</div><div class="line">  initialRouteParams?: NavigationParams,</div><div class="line">  paths?: NavigationPathsConfig,</div><div class="line">  navigationOptions?: NavigationScreenConfig&lt;NavigationStackScreenOptions&gt;,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">export type NavigationStackViewConfig = &#123;</div><div class="line">  mode?: &apos;card&apos; | &apos;modal&apos;,</div><div class="line">  headerMode?: HeaderMode,</div><div class="line">  cardStyle?: Style,</div><div class="line">  transitionConfig?: () =&gt; TransitionConfig,</div><div class="line">  onTransitionStart?: () =&gt; void,</div><div class="line">  onTransitionEnd?: () =&gt; void,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//navigationOptions的属性</div><div class="line">export type NavigationScreenOptions = &#123;</div><div class="line">  title?: string,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">export type NavigationStackScreenOptions = NavigationScreenOptions &amp; &#123;</div><div class="line">  header?: ?(React.Element&lt;*&gt; | (HeaderProps =&gt; React.Element&lt;*&gt;)),</div><div class="line">  headerTitle?: string | React.Element&lt;*&gt;,</div><div class="line">  headerTitleStyle?: Style,</div><div class="line">  headerTintColor?: string,</div><div class="line">  headerLeft?: React.Element&lt;*&gt;,</div><div class="line">  headerBackTitle?: string,</div><div class="line">  headerTruncatedBackTitle?: string,</div><div class="line">  headerBackTitleStyle?: Style,</div><div class="line">  headerPressColorAndroid?: string,</div><div class="line">  headerRight?: React.Element&lt;*&gt;,</div><div class="line">  headerStyle?: Style,</div><div class="line">  gesturesEnabled?: boolean,</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h4 id="属性总结"><a href="#属性总结" class="headerlink" title="属性总结:"></a>属性总结:</h4><ul>
+<li>initialRouteName：<blockquote>
+<p>设置初始化路由名称</p>
+</blockquote>
+</li>
+<li>initialRouteParams：<blockquote>
+<p>设置初始化路由的参数</p>
+</blockquote>
+</li>
+<li>paths：<blockquote>
+<p>map结构，覆盖在路由配置中的path</p>
+</blockquote>
+</li>
+<li>headerMode：<blockquote>
+<p>指定如何渲染头部，可以设置为float,screen,none。如果设置为none,则不会有头部；如果设置为float, 页面跳转时，header是一直在顶部，而且如果header变化了的话，会有动画，有点像android的共享动画；设置成screen的话，头部是跟随这新的页面重新出现。</p>
+</blockquote>
+</li>
+<li>mode：<blockquote>
+<p>定义渲染的和跳转动画的风格，可以设置为card,modal。默认为card。modal可以使界面跳转的而动画是从底部逐渐显示到整个屏幕，这个只对ios有效，因为android,默认转场动画就是从底部逐渐显示到真个屏幕</p>
+</blockquote>
+</li>
+<li>cardStyle：<blockquote>
+<p>可以给页面设置style</p>
+</blockquote>
+</li>
+<li>transitionConfig：<blockquote>
+<p>函数类型，可以用来配置转厂动画</p>
+</blockquote>
+</li>
+<li>onTransitionStart：<blockquote>
+<p>函数类型，动画开始后的回调</p>
+</blockquote>
+</li>
+<li>onTransitionEnd：<blockquote>
+<p>函数类型，动画结束时的回调</p>
+</blockquote>
+</li>
+<li>navigationOptions：<blockquote>
+<p>屏幕导航参数，每个屏幕都可以配置。这个属性的value是一个对象，下面介绍navigationOptions的属性。</p>
+</blockquote>
+</li>
+</ul>
+<h5 id="navigationOptions属性"><a href="#navigationOptions属性" class="headerlink" title="navigationOptions属性"></a>navigationOptions属性</h5><ul>
+<li>title:<blockquote>
+<p>string类型，如果设置了它，如果headerTitle或tabBarBabel没有设置的话，将默认会使用这个值</p>
+</blockquote>
+</li>
+<li>header：<blockquote>
+<p>React Eelement或 是一个参数是HeaderProps返回Rect Element类型的函数类型。它用来显示为header,设置null的话，可以隐藏header</p>
+</blockquote>
+</li>
+<li>headerTitle：<blockquote>
+<p>string 或者 React Element类型，用来设置header,默认显示的 title</p>
+</blockquote>
+</li>
+<li>headerTitleStyle：<blockquote>
+<p>用来设置title组件的样式</p>
+</blockquote>
+</li>
+<li>headerTintColor：<blockquote>
+<p>用来设置header的颜色</p>
+</blockquote>
+</li>
+<li>headerLeft：<blockquote>
+<p>React Element类型，用来在Header左边添加控件</p>
+</blockquote>
+</li>
+<li>headerBackTitle：<blockquote>
+<p>string 类型，用来设置在ios上显示黑色按钮，设置null不显示，默认是title</p>
+</blockquote>
+</li>
+<li>headerTruncatedBackTitle：<blockquote>
+<p>string 类型， 用来设置黑色按钮，当headerBackTitle没有充满屏幕的时候。</p>
+</blockquote>
+</li>
+<li>headerBackTitleStyle：<blockquote>
+<p>用来设置黑色Title的样式</p>
+</blockquote>
+</li>
+<li>headerPressColorAndroid：<blockquote>
+<p>用来设置涟漪效果的颜色，android&gt;5.0有效</p>
+</blockquote>
+</li>
+<li>headerRight：<blockquote>
+<p>React Element类型，用来在Header右边添加控件</p>
+</blockquote>
+</li>
+<li>headerStyle：<blockquote>
+<p>设置header的样式</p>
+</blockquote>
+</li>
+<li>gesturesEnabled：<blockquote>
+<p>开启的话，你可以用手势 关闭页面，ios默认是true,Android默认是false。</p>
+</blockquote>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>navigationOptions也可以在具体的某一屏设置,但是在routeConfigMap中设置的有优先级较高。如下：</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Detail extends Component &#123;</div><div class="line">  static navigationOptions = &#123;</div><div class="line">    title: &apos;详情页&apos;,</div><div class="line">  &#125;;</div><div class="line">  render() &#123;</div><div class="line">    return null;</div><div class="line">  &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h4 id="使用例子："><a href="#使用例子：" class="headerlink" title="使用例子："></a>使用例子：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">const NavigationRouteConfigMap = &#123;</div><div class="line">  Tabs: &#123;</div><div class="line">    //Tabs可以是一个React组件，也可以是TabNavigator，DrawerNavigator。它将成为屏幕的主要内容。</div><div class="line">    //当StackNavigator加载Tabs时，它将会被赋予一个“navigation”属性。</div><div class="line">    screen: Tabs,</div><div class="line">    //这是一个可选属性</div><div class="line">    path: &apos;&apos;,</div><div class="line">    //这是一个可选属性，如果配置会覆盖屏幕 static navigationOptions的设置</div><div class="line">    navigationOptions: &#123;</div><div class="line">      title: &quot;导航&quot;,</div><div class="line">      header: null,</div><div class="line">      cardStack: &#123;</div><div class="line">        gesturesEnabled: false,</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  Detail: &#123;</div><div class="line">    screen: Detail,</div><div class="line">  &#125;,</div><div class="line">  VideoView: &#123;screen: VideoView&#125;,</div><div class="line">&#125;;</div><div class="line">const StackNavigatorConfig = &#123;</div><div class="line">  navigationOptions: &#123;</div><div class="line">    headerTitle: &quot;全局配置&quot;,</div><div class="line">    headerBackTitle: null,</div><div class="line">    headerTintColor: &apos;&apos;,</div><div class="line">    showIcon: true</div><div class="line">  &#125;,</div><div class="line">  modal: &apos;card&apos;,</div><div class="line">  headerMode: &apos;screen&apos;,</div><div class="line">  transitionConfig: () =&gt; (&#123;</div><div class="line">    screenInterpolator: CardStackStyleInterpolator.forHorizontal,</div><div class="line">  &#125;)</div><div class="line">&#125;;</div><div class="line">const AppNavigator = StackNavigator(NavigationRouteConfigMap,StackNavigatorConfig);</div></pre></td></tr></table></figure>
+<h1 id="TabNavigator"><a href="#TabNavigator" class="headerlink" title="TabNavigator"></a>TabNavigator</h1><p>用这个可以实现几个屏幕之间相互切换，（类似于android原生，TabLayout+Fragment 页面切换那种效果）。</p>
+<h4 id="函数原型"><a href="#函数原型" class="headerlink" title="函数原型:"></a>函数原型:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">const TabNavigator = (</div><div class="line">  routeConfigs: NavigationRouteConfigMap,</div><div class="line">  config: TabNavigatorConfig = &#123;&#125;</div><div class="line">) =&gt; &#123;//...&#125;</div></pre></td></tr></table></figure>
+<p>同样，这个函数接受2个对象作为参数，routeConfigMap和config，其中routeConfigMap与StackNavigator中一样。</p>
+<h4 id="定义属性的相关源码：-1"><a href="#定义属性的相关源码：-1" class="headerlink" title="定义属性的相关源码："></a>定义属性的相关源码：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div></pre></td><td class="code"><pre><div class="line">//TabNavigatorConfig的所有属性</div><div class="line">export type NavigationTabRouterConfig = &#123;</div><div class="line">  initialRouteName?: string,</div><div class="line">  paths?: NavigationPathsConfig,</div><div class="line">  navigationOptions?: NavigationScreenConfig&lt;NavigationTabScreenOptions&gt;,</div><div class="line">  order?: Array&lt;string&gt;, // todo: type these as the real route names rather than &apos;string&apos;</div><div class="line">  // Does the back button cause the router to switch to the initial tab</div><div class="line">  backBehavior?: &apos;none&apos; | &apos;initialRoute&apos;, // defaults `initialRoute`</div><div class="line">&#125;;</div><div class="line"></div><div class="line">export type TabViewConfig = &#123;</div><div class="line">  tabBarComponent?: ReactClass&lt;*&gt;,</div><div class="line">  tabBarPosition?: &apos;top&apos; | &apos;bottom&apos;,</div><div class="line">  tabBarOptions?: &#123;&#125;,</div><div class="line">  swipeEnabled?: boolean,</div><div class="line">  animationEnabled?: boolean,</div><div class="line">  lazy?: boolean,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//navigationOptions的属性</div><div class="line">export type NavigationScreenOptions = &#123;</div><div class="line">  title?: string,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">export type NavigationTabScreenOptions = NavigationScreenOptions &amp; &#123;</div><div class="line">  tabBarIcon?:</div><div class="line">    | React.Element&lt;*&gt;</div><div class="line">    | ((options: &#123; tintColor: ?string, focused: boolean &#125;) =&gt; ?React.Element&lt;</div><div class="line">      *</div><div class="line">    &gt;),</div><div class="line">  tabBarLabel?:</div><div class="line">    | string</div><div class="line">    | React.Element&lt;*&gt;</div><div class="line">    | ((options: &#123; tintColor: ?string, focused: boolean &#125;) =&gt; ?React.Element&lt;</div><div class="line">      *</div><div class="line">    &gt;),</div><div class="line">  tabBarVisible?: boolean,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//tabBarOptions的属性</div><div class="line">//TabBarTop.js tabBarPosition的值为top时的属性</div><div class="line">type Props = &#123;</div><div class="line">  activeTintColor: string,</div><div class="line">  inactiveTintColor: string,</div><div class="line">  showIcon: boolean,</div><div class="line">  showLabel: boolean,</div><div class="line">  upperCaseLabel: boolean,</div><div class="line">  position: Animated.Value,</div><div class="line">  navigation: NavigationScreenProp&lt;NavigationState, NavigationAction&gt;,</div><div class="line">  getLabel: (scene: TabScene) =&gt; ?(React.Element&lt;*&gt; | string),</div><div class="line">  renderIcon: (scene: TabScene) =&gt; React.Element&lt;*&gt;,</div><div class="line">  labelStyle?: Style,</div><div class="line">  iconStyle?: Style,</div><div class="line">&#125;;</div><div class="line">//TabBarBottom.js tabBarPosition的值为bottom时的属性</div><div class="line">type Props = &#123;</div><div class="line">  activeTintColor: string,</div><div class="line">  activeBackgroundColor: string,</div><div class="line">  inactiveTintColor: string,</div><div class="line">  inactiveBackgroundColor: string,</div><div class="line">  position: Animated.Value,</div><div class="line">  navigation: NavigationScreenProp&lt;NavigationState, NavigationAction&gt;,</div><div class="line">  jumpToIndex: (index: number) =&gt; void,</div><div class="line">  getLabel: (scene: TabScene) =&gt; ?(React.Element&lt;*&gt; | string),</div><div class="line">  renderIcon: (scene: TabScene) =&gt; React.Element&lt;*&gt;,</div><div class="line">  showLabel: boolean,</div><div class="line">  style?: Style,</div><div class="line">  labelStyle?: Style,</div><div class="line">  showIcon: boolean,</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h4 id="属性总结："><a href="#属性总结：" class="headerlink" title="属性总结："></a>属性总结：</h4><ul>
+<li>initialRouteName:<blockquote>
+<p>初始化路由的名称</p>
+</blockquote>
+</li>
+<li>paths:<blockquote>
+<p>提供一个map,可以路由对应的path</p>
+</blockquote>
+</li>
+<li>navigationOptions: <blockquote>
+<p>与StackNavigator中一样，他的value是一个对象，后文介绍其属性</p>
+</blockquote>
+</li>
+<li>order:<blockquote>
+<p>路由名称数组</p>
+</blockquote>
+</li>
+<li>backBehavior:<blockquote>
+<p>如果设置为true,那么this.props.navigation.goBack()’不会起作用</p>
+</blockquote>
+</li>
+<li>tabBarComponent:<blockquote>
+<p>用来设置tabBar的组件，ios默认是TabBarBottom，android默认是TabBarTop</p>
+</blockquote>
+</li>
+<li>tabBarPosition:<blockquote>
+<p>用来设置tabBar的位置，可以为 ‘top’ 或者’bottom’</p>
+</blockquote>
+</li>
+<li>tabBarOptions:<blockquote>
+<p>用来设置tabBar的一些属性，颜色、样式等等，后文介绍tabBarOptions的属性</p>
+</blockquote>
+</li>
+<li>swipeEnabled:<blockquote>
+<p>用来设置是否可以滑动切换</p>
+</blockquote>
+</li>
+<li>animationEnabled:<blockquote>
+<p>用来设置是否有动画效果</p>
+</blockquote>
+</li>
+<li>lazy:<blockquote>
+<p>用来设置是否“懒渲染”tabBar</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>tabBarOptions属性</strong></p>
+<ul>
+<li>activeTintColor<blockquote>
+<p>激活的tab的tint 颜色，tint颜色值，icon和Label的颜色</p>
+</blockquote>
+</li>
+<li>activeBackgroundColor<blockquote>
+<p>激活tab的背景颜色</p>
+</blockquote>
+</li>
+<li>inactiveTintColor<blockquote>
+<p>没被激活的tint颜色</p>
+</blockquote>
+</li>
+<li>inactiveBackgroundColor<blockquote>
+<p>没被激活的tab的背景色</p>
+</blockquote>
+</li>
+<li>showLabel<blockquote>
+<p>是否显示label，默认是true</p>
+</blockquote>
+</li>
+<li>showIcon<blockquote>
+<p>是否显示icon,默认是false</p>
+</blockquote>
+</li>
+<li>upperCaseLabel<blockquote>
+<p>是否开启大写转换，默认是true</p>
+</blockquote>
+</li>
+<li>pressColor<blockquote>
+<p>按压颜色，涟漪效果，andorid&gt;5.0有效</p>
+</blockquote>
+</li>
+<li>pressOpacity<blockquote>
+<p>压颜色，透明度变换，android&lt;5.0 和ios可用。</p>
+</blockquote>
+</li>
+<li>scrollEnabled<blockquote>
+<p>tabs是够可以滑动</p>
+</blockquote>
+</li>
+<li>style</li>
+<li>tabStyle</li>
+<li>labelStyle</li>
+<li>iconStyle</li>
+<li>indicatorStyle<blockquote>
+<p>底部指示器的样式</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>navigationOptions属性</strong></p>
+<ul>
+<li>title<blockquote>
+<p>标题，如果headerTitle,和tabBarLabel,不设置的话，就默认是title</p>
+</blockquote>
+</li>
+<li>tabBarVisible<blockquote>
+<p>决定隐藏还是显示tabBar</p>
+</blockquote>
+</li>
+<li>tabBarIcon<blockquote>
+<p>可以是一个React Eclement，或者是一个参数为{focused:boolean,tintColor:string}返回Rect Element的函数，用来显示在Tab Bar上</p>
+</blockquote>
+</li>
+<li>tabBarLabel<blockquote>
+<p>string类型，或者React Element类型，或者是参数为{focused:boolean,tintColor:string}返回React Element的函数</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="使用例子：-1"><a href="#使用例子：-1" class="headerlink" title="使用例子："></a>使用例子：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">const NavigationRouteConfigMap = &#123;</div><div class="line">  Home: &#123;</div><div class="line">    screen: Home,</div><div class="line">    navigationOptions: &#123;</div><div class="line">      tabBarLabel: &apos;首页&apos;,</div><div class="line">      tabBarIcon: (&#123;tintColor&#125;) =&gt;</div><div class="line">        &lt;Image</div><div class="line">          style=&#123;[styles.tabBarImage, /*&#123;tintColor: tintColor&#125;*/]&#125;</div><div class="line">          source=&#123;require(&apos;../images/mode.png&apos;)&#125;</div><div class="line">        /&gt;,</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line"></div><div class="line">  Find: &#123;</div><div class="line">    screen: Find,</div><div class="line">    navigationOptions: &#123;</div><div class="line">      tabBarLabel: &apos;发现&apos;,</div><div class="line">      tabBarIcon: (&#123;tintColor&#125;) =&gt;</div><div class="line">        &lt;Image</div><div class="line">          style=&#123;[styles.tabBarImage,]&#125;</div><div class="line">          source=&#123;require(&apos;../images/mode.png&apos;)&#125;</div><div class="line">        /&gt;,</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line"></div><div class="line">  Message: &#123;</div><div class="line">    screen: Message,</div><div class="line">    navigationOptions: &#123;</div><div class="line">      tabBarLabel: &apos;消息&apos;,</div><div class="line">      tabBarIcon: (&#123;tintColor&#125;) =&gt;</div><div class="line">        &lt;Image</div><div class="line">          style=&#123;[styles.tabBarImage,]&#125;</div><div class="line">          source=&#123;require(&apos;../images/mode.png&apos;)&#125;</div><div class="line">        /&gt;,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">  &#125;,</div><div class="line"></div><div class="line">  Me: &#123;</div><div class="line">    screen: Me,</div><div class="line">    navigationOptions: &#123;</div><div class="line">      title: &quot;hello&quot;,</div><div class="line">      tabBarVisible: false,</div><div class="line">      tabBarLabel: &apos;我的&apos;,</div><div class="line">      tabBarIcon: (&#123;tintColor&#125;) =&gt;</div><div class="line">        &lt;Image</div><div class="line">          style=&#123;[styles.tabBarImage,]&#125;</div><div class="line">          source=&#123;require(&apos;../images/mode.png&apos;)&#125;</div><div class="line">        /&gt;,</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line">const TabNavigatorConfig = &#123;</div><div class="line">  initialRouteName: &apos;Home&apos;,</div><div class="line">  animationEnabled: true,</div><div class="line">  tabBarPosition: &apos;bottom&apos;,</div><div class="line">  swipeEnabled: true,</div><div class="line">  backBehavior: &apos;none&apos;,</div><div class="line">  tabBarOptions: &#123;</div><div class="line">    activeTintColor: &apos;orange&apos;,</div><div class="line">    inactiveTintColor: &apos;gray&apos;,</div><div class="line">    inactiveBackgroundColor: &apos;#9eff5b&apos;,</div><div class="line">    activeBackgroundColor: &apos;#ffaeb5&apos;,</div><div class="line">    showIcon: true,</div><div class="line">    showLabel: true,</div><div class="line">    upperCaseLabel: false,</div><div class="line">    style: &#123;</div><div class="line">      backgroundColor: &apos;white&apos;,</div><div class="line">    &#125;,</div><div class="line">    tabStyle: &#123;</div><div class="line">      height: 56,</div><div class="line">    &#125;,</div><div class="line">    labelStyle: &#123;</div><div class="line">      fontSize: 12,</div><div class="line">      marginBottom: 8,</div><div class="line">      marginTop: 6,</div><div class="line">    &#125;,</div><div class="line">    iconStyle: &#123;</div><div class="line">      height: 32,</div><div class="line">    &#125;,</div><div class="line">    indicatorStyle: &#123;</div><div class="line">      height: 0,</div><div class="line">    &#125;,</div><div class="line">    pressColor: &apos;gray&apos;,</div><div class="line">    pressOpacity: 0.8,</div><div class="line">  &#125;,</div><div class="line"></div><div class="line">&#125;;</div><div class="line">const Tabs = TabNavigator(NavigationRouteConfigMap, TabNavigatorConfig);</div></pre></td></tr></table></figure>
+<h1 id="DrawerNavigator"><a href="#DrawerNavigator" class="headerlink" title="DrawerNavigator"></a>DrawerNavigator</h1><p>这个导航是个抽屉效果</p>
+<h4 id="函数原型-1"><a href="#函数原型-1" class="headerlink" title="函数原型:"></a>函数原型:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">const DrawerNavigator = (</div><div class="line">  routeConfigs: NavigationRouteConfigMap,</div><div class="line">  config: DrawerNavigatorConfig</div><div class="line">) =&gt; &#123;</div></pre></td></tr></table></figure>
+<p>routeConfigs和StackNavigator，TabNavigator中的第一个参数一样。</p>
+<h4 id="定义属性的相关源码：-2"><a href="#定义属性的相关源码：-2" class="headerlink" title="定义属性的相关源码："></a>定义属性的相关源码：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">//DrawerNavigatorConfig的所有属性</div><div class="line">export type NavigationTabRouterConfig = &#123;</div><div class="line">  initialRouteName?: string,</div><div class="line">  paths?: NavigationPathsConfig,</div><div class="line">  navigationOptions?: NavigationScreenConfig&lt;NavigationTabScreenOptions&gt;,</div><div class="line">  order?: Array&lt;string&gt;, // todo: type these as the real route names rather than &apos;string&apos;</div><div class="line">  // Does the back button cause the router to switch to the initial tab</div><div class="line">  backBehavior?: &apos;none&apos; | &apos;initialRoute&apos;, // defaults `initialRoute`</div><div class="line">&#125;;</div><div class="line"></div><div class="line">export type DrawerViewConfig = &#123;</div><div class="line">  drawerWidth: number,</div><div class="line">  drawerPosition: &apos;left&apos; | &apos;right&apos;,</div><div class="line">  contentComponent: ReactClass&lt;*&gt;,</div><div class="line">  contentOptions?: &#123;&#125;,</div><div class="line">  style?: Style,</div><div class="line">&#125;;</div><div class="line"></div><div class="line">//navigationOptions的属性与TabNavigator一样</div><div class="line"></div><div class="line">//contentOptions的属性</div><div class="line">type Props = &#123;</div><div class="line">  navigation: NavigationScreenProp&lt;NavigationState, NavigationAction&gt;,</div><div class="line">  items: Array&lt;NavigationRoute&gt;,</div><div class="line">  activeItemKey?: string,</div><div class="line">  activeTintColor?: string,</div><div class="line">  activeBackgroundColor?: string,</div><div class="line">  inactiveTintColor?: string,</div><div class="line">  inactiveBackgroundColor?: string,</div><div class="line">  getLabel: (scene: DrawerScene) =&gt; ?(React.Element&lt;*&gt; | string),</div><div class="line">  renderIcon: (scene: DrawerScene) =&gt; ?React.Element&lt;*&gt;,</div><div class="line">  onItemPress: (info: DrawerItem) =&gt; void,</div><div class="line">  style?: Style,</div><div class="line">  labelStyle?: Style,</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h4 id="属性总结：-1"><a href="#属性总结：-1" class="headerlink" title="属性总结："></a>属性总结：</h4><ul>
+<li>initialRouteName:</li>
+<li>paths:</li>
+<li>navigationOptions:</li>
+<li>order:</li>
+<li>backBehavior:<blockquote>
+<p>以上几个属性与TabNavigator一样</p>
+</blockquote>
+</li>
+<li>drawerWidth:<blockquote>
+<p>抽屉的宽度</p>
+</blockquote>
+</li>
+<li>drawerPosition:<blockquote>
+<p>枚举值可以为‘left’或’rigt’表示抽屉是在左边还是右边</p>
+</blockquote>
+</li>
+<li>contentComponent:<blockquote>
+<p>可以自定义显示drawer item的组件，默认是实现是DrawerItem</p>
+</blockquote>
+</li>
+<li>contentOptions:<blockquote>
+<p>drawer 内容的一些设置，背景颜色，tint颜色等等，下文将介绍contentOptions的属性</p>
+</blockquote>
+</li>
+<li>style:</li>
+</ul>
+<p><strong>contentOptions属性</strong></p>
+<ul>
+<li>items:<blockquote>
+<p>路由的数组</p>
+</blockquote>
+</li>
+<li>activeItemKey:<blockquote>
+<p>正在活动的路由的key</p>
+</blockquote>
+</li>
+<li>activeTintColor:<blockquote>
+<p>正在活动的 item tint 颜色</p>
+</blockquote>
+</li>
+<li>activeBackgroundColor:<blockquote>
+<p>正在活动的item的 背景颜色</p>
+</blockquote>
+</li>
+<li>inactiveTintColor:<blockquote>
+<p>不在活动的item的 tint颜色</p>
+</blockquote>
+</li>
+<li>inactiveBackgroundColor:<blockquote>
+<p>不在活动的item 的背景颜色</p>
+</blockquote>
+</li>
+<li>getLabel: (scene: DrawerScene) =&gt; ?(React.Element&lt;*&gt; | string),</li>
+<li>renderIcon: (scene: DrawerScene) =&gt; ?React.Element&lt;*&gt;,</li>
+<li>onItemPress: (info: DrawerItem) =&gt; void,<blockquote>
+<p>Item被按下时的回调</p>
+</blockquote>
+</li>
+<li>style:</li>
+<li>labelStyle:</li>
+</ul>
+<p><strong>navigationOptions属性</strong></p>
+<blockquote>
+<p>navigationOptions属性与TabNavigator一样</p>
+</blockquote>
+<h4 id="使用例子：-2"><a href="#使用例子：-2" class="headerlink" title="使用例子："></a>使用例子：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">const Drawer = DrawerNavigator(</div><div class="line">  //NavigationRouteConfigMap</div><div class="line">  &#123;</div><div class="line">    Main: &#123;</div><div class="line">      screen: Tabs,</div><div class="line">      navigationOptions: &#123;</div><div class="line">        drawerLabel: &apos;Main&apos;,</div><div class="line">        drawerIcon: (&#123;tintColor, focused&#125;) =&gt; (</div><div class="line">          &lt;Ionicons</div><div class="line">            name=&#123;focused ? &apos;ios-home&apos; : &apos;ios-home-outline&apos;&#125;</div><div class="line">            size=&#123;26&#125;</div><div class="line">            style=&#123;&#123;color: tintColor&#125;&#125;</div><div class="line">          /&gt;</div><div class="line">        ),</div><div class="line">      &#125;,</div><div class="line">    &#125;,</div><div class="line">    Profile: &#123;</div><div class="line">      screen: ProfileScreen,</div><div class="line">      navigationOptions: &#123;</div><div class="line">        drawerLabel: &apos;Profile&apos;,</div><div class="line">        drawerIcon: (&#123;tintColor, focused&#125;) =&gt; (</div><div class="line">          &lt;Ionicons</div><div class="line">            name=&#123;focused ? &apos;ios-person&apos; : &apos;ios-person-outline&apos;&#125;</div><div class="line">            size=&#123;26&#125;</div><div class="line">            style=&#123;&#123;color: tintColor&#125;&#125;</div><div class="line">          /&gt;</div><div class="line">        ),</div><div class="line">      &#125;,</div><div class="line">    &#125;,</div><div class="line">  &#125;,</div><div class="line">  //DrawerNavigatorConfig</div><div class="line">  &#123;</div><div class="line">    initialRouteName: &quot;Main&quot;,</div><div class="line">    drawerWidth: 200,</div><div class="line">    contentOptions:&#123;</div><div class="line">      activeTintColor:&quot;#7dd2ff&quot;,</div><div class="line">      activeBackgroundColor:&quot;#ffc31b&quot;,</div><div class="line">      style:&#123;backgroundColor: &quot;#6d1025&quot;&#125;</div><div class="line">    &#125;</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+<h1 id="navigation"><a href="#navigation" class="headerlink" title="navigation"></a>navigation</h1><p>使用ReactNavigation的应用中的每一个屏幕都有navigation和screenProps属性. navigation又有5个参数:<strong>navigate</strong>, <strong>goBack</strong>, <strong>state</strong>, <strong>setParams</strong>, <strong>dispatch</strong>。<br>如果想从外部给屏幕组件传入扩展的属性，可以使用<strong>screenProps</strong>，可以在组件下console.log一下this.props就能看到.</p>
 <ul>
 <li>this.props.navigation.navigate(‘Two’, { name: ‘two’ }): push下一个页面</li>
 </ul>
@@ -223,12 +530,17 @@
 <ul>
 <li><p>this.props.navigation.setParams: 该方法允许界面更改router中的参数，可以用来动态的更改导航栏的内容</p>
 </li>
-<li><p>this.props.navigation.dispatch: 可以dispatch一些action，主要支持的action有：</p>
+<li><p>this.props.navigation.dispatch: 可以dispatch一些action，主要支持的<strong>action</strong>有：</p>
 <h6 id="1-navigate"><a href="#1-navigate" class="headerlink" title="1. navigate"></a>1. navigate</h6></li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const navigationAction = NavigationActions.navigate(&#123;</div><div class="line">    routeName: &apos;Profile&apos;,</div><div class="line">    params: &#123;&#125;,</div><div class="line"></div><div class="line">    // navigate can have a nested navigate action that will be run inside the child router</div><div class="line">    action: NavigationActions.navigate(&#123; routeName: &apos;SubProfileRoute&apos;&#125;)</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(navigationAction)。</div></pre></td></tr></table></figure>
 <h6 id="2-reset"><a href="#2-reset" class="headerlink" title="2. reset"></a>2. reset</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const resetAction = NavigationActions.reset(&#123;</div><div class="line">    index: 0,</div><div class="line">    actions: [</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Profile&apos;&#125;),</div><div class="line">      NavigationActions.navigate(&#123; routeName: &apos;Two&apos;&#125;)</div><div class="line">    ]</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(resetAction)</div></pre></td></tr></table></figure>
 <h6 id="3-setParams"><a href="#3-setParams" class="headerlink" title="3. setParams"></a>3. setParams</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">  const setParamsAction = NavigationActions.setParams(&#123;</div><div class="line">    params: &#123;&#125;, // these are the new params that will be merged into the existing route params</div><div class="line">    // The key of the route that should get the new params</div><div class="line">    key: &apos;screen-123&apos;,</div><div class="line">  &#125;)</div><div class="line">  this.props.navigation.dispatch(setParamsAction)</div></pre></td></tr></table></figure>
+<h6 id="4-back"><a href="#4-back" class="headerlink" title="4. back"></a>4. back</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">import &#123; NavigationActions &#125; from &apos;react-navigation&apos;</div><div class="line"></div><div class="line">const backAction = NavigationActions.back(&#123;</div><div class="line">  key: &apos;Profile&apos;</div><div class="line">&#125;)</div><div class="line">this.props.navigation.dispatch(backAction)</div></pre></td></tr></table></figure>
+<h1 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ yarn add react-navigation 或者 npm install --save react-navigation</div></pre></td></tr></table></figure>
+<p><a href="https://reactnavigation.org/docs/" target="_blank" rel="external">官方文档</a></p>
+<p><a href="http://blog.csdn.net/a992036795/article/details/73322782" target="_blank" rel="external">参考</a></p>
+<p><a href="https://github.com/RN-TV/Redux" target="_blank" rel="external">Demo</a></p>
 
       
     </div>
