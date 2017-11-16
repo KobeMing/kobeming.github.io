@@ -881,6 +881,167 @@
 
 
   
+    <article id="post-React组件生命周期" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/10/11/React组件生命周期/" class="article-date">
+  	<time datetime="2017-10-11T08:37:44.000Z" itemprop="datePublished">2017-10-11</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/11/React组件生命周期/">
+        React组件生命周期
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h1><ul>
+<li>在React中，组件只是一种状态机，整个UI的渲染可以算做是状态驱动的。你更新一个组件的状态，然后根据新的状态渲染UI，React会以一种最效率的方式来更新DOM</li>
+<li>大多数组件只需要根据传入的props里面的数据进行渲染，props是在组件初始化之后就从父级组件带入到组件内部。我们无法在使用的过程中对组件的props进行修改。但是当需要对用户输入，时间的流逝，服务端请求作出反应时，需要用state来进行状态记录，state是实际上组件中使用的数据，它可以被修改</li>
+<li>在React中，通过调用setState(data, callback)来告诉它数据变动了，这个方法将data合并进this.state，之后告诉组件状态变动了需要进行重新渲染，callback会在重新渲染完毕后被调用。注意setState()这个方法是异步的，同步的多个setState方法只会触发一次实际render</li>
+</ul>
+<h2 id="生命周期图："><a href="#生命周期图：" class="headerlink" title="生命周期图："></a>生命周期图：</h2><p><img src="http://upload-images.jianshu.io/upload_images/5684685-2a8f06ecbfb533a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h2 id="生命周期回调函数："><a href="#生命周期回调函数：" class="headerlink" title="生命周期回调函数："></a>生命周期回调函数：</h2><p>组件在实例化之后就开始了它的生命周期过程。它的整个生命周期主要由以下几个部分组成</p>
+<ul>
+<li>getDefaultProps():在组件类创建的时候调用一次，然后返回值被缓存下来, 它返回的任何复杂对象用于设置默认的props, 并且这些将会在实例间共享，而不是每个实例拥有一份拷贝。注意只能在子组件或组件树上调用setProps。别调用this.setProps或者直接修改this.props。可以通PropTypes对props的类型进行验证。（现在已经被<strong>static propTypes</strong>替代）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">static propTypes = &#123;</div><div class="line">   title: PropTypes.string.isRequired,</div><div class="line">   color: ColorPropType,</div><div class="line">  &#125;;</div></pre></td></tr></table></figure>
+<ul>
+<li>getInitialState():在组件挂载之前调用一次。返回值将会作为 this.state的初始值。这个方法执行时已经可以访问组件的props。注意state是每个组件自带的，而props是所有实例共享的。（现在已经被<strong>构造方法</strong>替代）</li>
+<li>componentWillMount():在组件创建，并初始化了状态之后，初始化渲染执行之前立刻调用，且只调用一次，这是渲染前最后修改state的机会。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void componentWillMount()</div></pre></td></tr></table></figure>
+<ul>
+<li>render():render方法返回的结果并不是真正的DOM元素，而是一个虚拟的表现，类似于一个DOM tree的结构的对象。它是唯一一个必须的方法。在这个方法中，会检测this.props和this.state，返回一个单子级组件,当然也可以返回null或者false。render函数不应该修改state,操作DOM或者与浏览器交互</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void render()</div></pre></td></tr></table></figure>
+<ul>
+<li>componentDidMount():在初始化渲染执行之后立刻调用一次,在生命周期中的这个时间点，组件拥有一个DOM展现[即虚拟DOM构建完毕]，你可以通过this.getDOMNode()来获取相应DOM节点。当需要从组件获取真实DOM的节点，可以使用ref属性。注意在RN中，是先调用子组件的componentDidMount()，然后调用父组件的函数。这个函数之后，就进入了稳定运行状态，等待事件触发。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void componentDidMount()</div></pre></td></tr></table></figure>
+<ul>
+<li>componentWillReceiveProps():用此函数可以作为react在props传入之后，render()渲染之前更新state的机会,新的props是传入的,老的props可以通过this.props来获取。注意在该函数中调用this.setState()将不会引起额外的二次渲染。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">void componentWillReceiveProps(  </div><div class="line">  object nextProps</div><div class="line">)</div></pre></td></tr></table></figure>
+<p>例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">componentWillReceiveProps: function(nextProps) &#123;</div><div class="line">	this.setState(&#123;</div><div class="line">	    likesIncreasing: nextProps.likeCount &gt; this.props.likeCount</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>shouldComponentUpdate():在接收到新的props或者state,将要渲染之前调用。如果shouldComponentUpdate返回false,则render()将不会执行,直到下一次state改变。(通过此函数可以提高性能)，默认返回true。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">boolean shouldComponentUpdate(  </div><div class="line">  object nextProps, object nextState</div><div class="line">)</div></pre></td></tr></table></figure>
+<ul>
+<li>componentWillUpdate():和componentWillMount类似,在组件接收到了新的props或者state即将进行重新渲染前调用,注意你不能在该方法中使用this.setState()。如果需要更新state来响应某个prop的改变,请使用componentWillReceiveProps。紧接着这个函数，就会调用render()来更新界面了。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">void componentWillUpdate(  </div><div class="line">  object nextProps, object nextState</div><div class="line">)</div></pre></td></tr></table></figure>
+<ul>
+<li>componentDidUpdate():和componentDidMount类似,使用该方法可以在组件更新之后操作DOM元素,因为到这里已经完成了属性和状态的更新了，此函数的输入参数变成了 prevProps 和 prevState。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">void componentDidUpdate(  </div><div class="line">  object prevProps, object prevState</div><div class="line">)</div></pre></td></tr></table></figure>
+<ul>
+<li>componentWillUnmount():当组件从DOM中移除的时候立刻调用来完成所有的清理和销毁工作,在conponentDidMount中添加的任务都需要再该方法中撤销,如创建的定时器或事件监听器。函数原型如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">void componentWillUnmount()</div></pre></td></tr></table></figure>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><table>
+<thead>
+<tr>
+<th>生命周期</th>
+<th>调用次数</th>
+<th>能否使用 setSate()</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>static propTypes</td>
+<td>１　</td>
+<td>否</td>
+</tr>
+<tr>
+<td>构造函数</td>
+<td>１</td>
+<td>否</td>
+</tr>
+<tr>
+<td>componentWillMount</td>
+<td>１</td>
+<td>是</td>
+</tr>
+<tr>
+<td>render</td>
+<td>&gt;=１</td>
+<td>否</td>
+</tr>
+<tr>
+<td>componentDidMount</td>
+<td>１</td>
+<td>是</td>
+</tr>
+<tr>
+<td>componentWillReceiveProps</td>
+<td>&gt;=0</td>
+<td>　是</td>
+</tr>
+<tr>
+<td>shouldComponentUpdate</td>
+<td>&gt;=0</td>
+<td>　否</td>
+</tr>
+<tr>
+<td>componentWillUpdate</td>
+<td>&gt;=0</td>
+<td>　否</td>
+</tr>
+<tr>
+<td>componentDidUpdate</td>
+<td>&gt;=0</td>
+<td>　否</td>
+</tr>
+<tr>
+<td>componentWillUnmount</td>
+<td>１</td>
+<td>否</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
     <article id="post-Annotation" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
