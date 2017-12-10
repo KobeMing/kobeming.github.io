@@ -170,6 +170,128 @@
 </nav>
       <div class="body-wrap">
   
+    <article id="post-Android加载ReactNative页面流程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/12/04/Android加载ReactNative页面流程/" class="article-date">
+  	<time datetime="2017-12-04T12:37:44.000Z" itemprop="datePublished">2017-12-04</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/04/Android加载ReactNative页面流程/">
+        Android加载ReactNative页面流程
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="ReactNative页面加载过程"><a href="#ReactNative页面加载过程" class="headerlink" title="ReactNative页面加载过程"></a>ReactNative页面加载过程</h1><p>Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。</p>
+<h2 id="加载index-android-bundle的过程"><a href="#加载index-android-bundle的过程" class="headerlink" title="加载index.android.bundle的过程"></a>加载index.android.bundle的过程</h2><p>Android加载index.android.bundle途径有三种：</p>
+<ol>
+<li>从node服务器远程调用（debug调试，也就是Debug JS Remotely开关打开）</li>
+<li>应用程序assets目录 </li>
+<li>本地文件（包括内部存储，外部存储）</li>
+</ol>
+<blockquote>
+<p>注意：开发阶段，reload时是先从node服务器把ReactNativeDevBundle.js文件缓存到内部存储（dada/data/包名/files/ReactNativeDevBundle.js），然后从内部存储加载。</p>
+</blockquote>
+<p>相关源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//com.facebook.react.devsupport.DevSupportManagerImpl.java</div><div class="line"> //...</div><div class="line">   private static final String JS_BUNDLE_FILE_NAME = &quot;ReactNativeDevBundle.js&quot;;</div><div class="line"> //...</div><div class="line"> // TODO(6418010): Fix readers-writers problem in debug reload from HTTP server</div><div class="line">    mJSBundleTempFile = new File(applicationContext.getFilesDir(), JS_BUNDLE_FILE_NAME);</div></pre></td></tr></table></figure>
+<p>三种方式的加载其实只是bundle文件来源的path不同，最终都是由JSBundleLoader完成加载。下面把整个加载过程分为bundle文件path赋值过程和JSBundleLoader执行加载两部分进行分析。</p>
+<h4 id="JSBundleLoader执行加载过程："><a href="#JSBundleLoader执行加载过程：" class="headerlink" title="JSBundleLoader执行加载过程："></a>JSBundleLoader执行加载过程：</h4><p>整个JSBundleLoader源码非常简单，创建了4个加载器：</p>
+<ul>
+<li>createAssetLoader<blockquote>
+<p>加载assets目录下的bundle</p>
+</blockquote>
+</li>
+<li>createFileLoader<blockquote>
+<p>加载本地文件的bundle</p>
+</blockquote>
+</li>
+<li>createCachedBundleFromNetworkLoader<blockquote>
+<p>加载data/data/package-name/filses/ReactNativeDevBundle.js</p>
+</blockquote>
+</li>
+<li>createRemoteDebuggerBundleLoader<blockquote>
+<p>加载本地node服务器的bundle</p>
+</blockquote>
+</li>
+</ul>
+<p>真正完成加载功能是在CatalystInstanceImpl中，用JNI实现。源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">private native void jniSetSourceURL(String sourceURL);</div><div class="line"></div><div class="line">private native void jniLoadScriptFromAssets(AssetManager assetManager, String assetURL, boolean loadSynchronously);</div><div class="line"></div><div class="line">private native void jniLoadScriptFromFile(String fileName, String sourceURL, boolean loadSynchronously);</div></pre></td></tr></table></figure>
+<h4 id="bundle文件path赋值过程："><a href="#bundle文件path赋值过程：" class="headerlink" title="bundle文件path赋值过程："></a>bundle文件path赋值过程：</h4><p>我们在Application中实现或重写的ReactNativeHost相关方法就是初始化赋值，其中：</p>
+<ul>
+<li>getJSMainModuleName</li>
+<li>getJSBundleFile</li>
+<li>getBundleAssetName</li>
+</ul>
+<p>最终都会传递到ReactInstanceManagerBuilder中，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">protected ReactInstanceManager createReactInstanceManager() &#123;</div><div class="line">    ReactInstanceManagerBuilder builder = ReactInstanceManager.builder()</div><div class="line">      .setApplication(mApplication)</div><div class="line">      .setJSMainModuleName(getJSMainModuleName())</div><div class="line">      .setUseDeveloperSupport(getUseDeveloperSupport())</div><div class="line">      .setRedBoxHandler(getRedBoxHandler())</div><div class="line">      .setUIImplementationProvider(getUIImplementationProvider())</div><div class="line">      .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);</div><div class="line"></div><div class="line">    for (ReactPackage reactPackage : getPackages()) &#123;</div><div class="line">      builder.addPackage(reactPackage);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    String jsBundleFile = getJSBundleFile();</div><div class="line">    if (jsBundleFile != null) &#123;</div><div class="line">      builder.setJSBundleFile(jsBundleFile);</div><div class="line">    &#125; else &#123;</div><div class="line">      builder.setBundleAssetName(Assertions.assertNotNull(getBundleAssetName()));</div><div class="line">    &#125;</div><div class="line">    return builder.build();</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>从源码中可以看出，首先从本地文件加载bundle文件，如果本地文件不存在bundle文件从assets目录加载。</p>
+<p>然后ReactInstanceManagerBuilder构建ReactInstanceManager时把JSBundleLoader传递给ReactInstanceManager，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">new ReactInstanceManager(</div><div class="line">      mApplication,</div><div class="line">      mCurrentActivity,</div><div class="line">      mDefaultHardwareBackBtnHandler,</div><div class="line">      (mJSBundleLoader == null &amp;&amp; mJSBundleAssetUrl != null) ?</div><div class="line">        JSBundleLoader.createAssetLoader(mApplication, mJSBundleAssetUrl, false /*Asynchronous*/) :</div><div class="line">        mJSBundleLoader,</div><div class="line">      mJSMainModuleName,</div><div class="line">      mPackages,</div><div class="line">      mUseDeveloperSupport,</div><div class="line">      mBridgeIdleDebugListener,</div><div class="line">      Assertions.assertNotNull(mInitialLifecycleState, &quot;Initial lifecycle state was not set&quot;),</div><div class="line">      mUIImplementationProvider,</div><div class="line">      mNativeModuleCallExceptionHandler,</div><div class="line">      mJSCConfig,</div><div class="line">      mRedBoxHandler,</div><div class="line">      mLazyNativeModulesEnabled,</div><div class="line">      mLazyViewManagersEnabled,</div><div class="line">      mSetupReactContextInBackground,</div><div class="line">      mUseSeparateUIBackgroundThread,</div><div class="line">      mMinNumShakes);</div></pre></td></tr></table></figure>
+<p>在构建ReactInstanceManager过程中，首先判断JSBundleLoader是否为空，如果为空，调用JSBundleLoader内部方法创建对应的加载器（上文介绍的4个加载器）。如果不为空直接传递给ReactInstanceManager。</p>
+<p>以上JSBundleLoader只能加载本地文件或assets目录的bundle文件，那么远程bundle和缓存中的ReactNativeDevBundle.js的加载器是直接在ReactInstanceManager内部创建的，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">@ThreadConfined(UI)</div><div class="line">private void onReloadWithJSDebugger(JavaJSExecutor.Factory jsExecutorFactory) &#123;</div><div class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onReloadWithJSDebugger()&quot;);</div><div class="line">  recreateReactContextInBackground(</div><div class="line">      new ProxyJavaScriptExecutor.Factory(jsExecutorFactory),</div><div class="line">      //创建远程加载bundle文件的加载器（debug调试）</div><div class="line">      JSBundleLoader.createRemoteDebuggerBundleLoader(</div><div class="line">          mDevSupportManager.getJSBundleURLForRemoteDebugging(),</div><div class="line">          mDevSupportManager.getSourceUrl()));</div><div class="line">&#125;</div><div class="line"></div><div class="line">@ThreadConfined(UI)</div><div class="line">private void onJSBundleLoadedFromServer() &#123;</div><div class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onJSBundleLoadedFromServer()&quot;);</div><div class="line">  recreateReactContextInBackground(</div><div class="line">      mJavaScriptExecutorFactory,</div><div class="line">      //创建加载缓存目录ReactNativeDevBundle.js的加载器</div><div class="line">      JSBundleLoader.createCachedBundleFromNetworkLoader(</div><div class="line">          mDevSupportManager.getSourceUrl(), mDevSupportManager.getDownloadedJSBundleFile()));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="一张图总结："><a href="#一张图总结：" class="headerlink" title="一张图总结："></a>一张图总结：</h4><p><img src="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h2 id="图片加载过程"><a href="#图片加载过程" class="headerlink" title="图片加载过程"></a>图片加载过程</h2><h4 id="ReactNative加载图片的几种方式"><a href="#ReactNative加载图片的几种方式" class="headerlink" title="ReactNative加载图片的几种方式"></a>ReactNative加载图片的几种方式</h4><h6 id="1-通过uri加载图片"><a href="#1-通过uri加载图片" class="headerlink" title="1.通过uri加载图片"></a>1.通过uri加载图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> source=&#123;&#123;uri: &quot;file://&quot; + path&#125;&#125;/&gt;</div><div class="line"> //或</div><div class="line">source=&#123;&#123;uri: &quot;http://&quot; + location&#125;&#125;/&gt;</div></pre></td></tr></table></figure>
+<h6 id="2-加载本地图片"><a href="#2-加载本地图片" class="headerlink" title="2.加载本地图片"></a>2.加载本地图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;Image source=&#123;require(&quot;../../images/mode.png&quot;)&#125;/&gt;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>最终加载的是被打包到drawable-mdpi下的图片，形如：images_mode.png</p>
+</blockquote>
+<h6 id="3-加载Native端资源图片"><a href="#3-加载Native端资源图片" class="headerlink" title="3.加载Native端资源图片"></a>3.加载Native端资源图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//导入 nativeImageSource函数</div><div class="line">let nativeImageSource = require(&apos;nativeImageSource&apos;);</div><div class="line"></div><div class="line"> let spec = &#123;</div><div class="line">        android: &apos;mipmap/ic_launcher&apos;,</div><div class="line">        width: 72,</div><div class="line">        height: 72</div><div class="line">      &#125;;</div><div class="line">      </div><div class="line">&lt;Image source=&#123;nativeImageSource(spec)&#125;/&gt;</div></pre></td></tr></table></figure>
+<p>以上几种加载图片的方式只是为Image组件的source属性赋值不同，最终都是resolveAssetSource.js中实现。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * `source` is either a number (opaque type returned by require(&apos;./foo.png&apos;))</div><div class="line"> * or an `ImageSource` like &#123; uri: &apos;&lt;http location || file path&gt;&apos; &#125;</div><div class="line"> */</div><div class="line">function resolveAssetSource(source: any): ?ResolvedAssetSource &#123;</div><div class="line">  if (typeof source === &apos;object&apos;) &#123;</div><div class="line">    return source;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  var asset = AssetRegistry.getAssetByID(source);</div><div class="line">  if (!asset) &#123;</div><div class="line">    return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const resolver = new AssetSourceResolver(getDevServerURL(), getBundleSourcePath(), asset);</div><div class="line">  if (_customSourceTransformer) &#123;</div><div class="line">    return _customSourceTransformer(resolver);</div><div class="line">  &#125;</div><div class="line">  return resolver.defaultAsset();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上三种加载图片的方式中，<strong>通过uri加载图片</strong>和<strong>加载Native端资源图片</strong>赋值给source的值其实就是object。从源码可以看出，如果通过这两种方式加载图片直接就把这个对象返回了。</p>
+<p>后面的处理逻辑都是在处理通过<strong>加载本地图片</strong>的方式的流程，具体实现在AssetSourceResolver.js中。如果应用有热更新需求，那么热更新图片就只需要处理这种加载方式的问题。建议有热更新功能的应用尽量都把图片放在服务器，然后通过第一种方式加载。</p>
+<h4 id="本地图片加载过程"><a href="#本地图片加载过程" class="headerlink" title="本地图片加载过程"></a>本地图片加载过程</h4><p>本地图片加载其实就是加载的被打包到drawable-mdpi中的图片，实现源码如下：</p>
+<blockquote>
+<p>node_modules / react-native / Libraries / Image /AssetSourceResolver.js</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">defaultAsset(): ResolvedAssetSource &#123;  </div><div class="line">  if (this.isLoadedFromServer()) &#123;  </div><div class="line">    return this.assetServerURL();  </div><div class="line">  &#125;  </div><div class="line">  </div><div class="line">  if (Platform.OS === &apos;android&apos;) &#123;  </div><div class="line">    return this.isLoadedFromFileSystem() ?  </div><div class="line">      this.drawableFolderInBundle() :  </div><div class="line">      this.resourceIdentifierWithoutScale();  </div><div class="line">  &#125; else &#123;  </div><div class="line">    return this.scaledAssetPathInBundle();  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>drawableFolderInBundle方法为在存在离线bundle文件时，从bundle文件所在目录加载图片。</p>
+<p>resourceIdentifierWithoutScale方法从asset资源目录下加载。</p>
+</blockquote>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
     <article id="post-Android-Multidex原理" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -259,6 +381,296 @@
 </blockquote>
 <p><img src="http://upload-images.jianshu.io/upload_images/5684685-9802565baf02e7a1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
 <h4 id="MultiDex关键代码"><a href="#MultiDex关键代码" class="headerlink" title="MultiDex关键代码"></a>MultiDex关键代码</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 将DexClassLoader的Element[]追加到PathClassLoader中</div><div class="line"> */</div><div class="line">private static void install(ClassLoader loader, List&lt;File&gt; additionalClassPathEntries, File optimizedDirectory) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException &#123;</div><div class="line">    </div><div class="line"> /* The patched class loader is expected to be a descendant of</div><div class="line">    * dalvik.system.BaseDexClassLoader. We modify its</div><div class="line">    * dalvik.system.DexPathList pathList field to append additional DEX</div><div class="line">    * file entries.</div><div class="line">    */</div><div class="line">    Field pathListField = MultiDex.findField(loader, &quot;pathList&quot;);</div><div class="line">    Object dexPathList = pathListField.get(loader);</div><div class="line">    ArrayList suppressedExceptions = new ArrayList();</div><div class="line">    MultiDex.expandFieldArray(dexPathList, &quot;dexElements&quot;, makeDexElements(dexPathList, new ArrayList(additionalClassPathEntries), optimizedDirectory, suppressedExceptions));</div><div class="line"></div><div class="line">    // ...</div><div class="line">&#125;</div><div class="line"></div><div class="line">/**</div><div class="line"> * 数组复制过程</div><div class="line"> */</div><div class="line">private static void expandFieldArray(Object instance, String fieldName, Object[] extraElements) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException &#123;</div><div class="line">    Field jlrField = findField(instance, fieldName);</div><div class="line">    Object[] original = (Object[])((Object[])jlrField.get(instance));</div><div class="line">    Object[] combined = (Object[])((Object[])Array.newInstance(original.getClass().getComponentType(), original.length + extraElements.length));</div><div class="line">    System.arraycopy(original, 0, combined, 0, original.length);</div><div class="line">    System.arraycopy(extraElements, 0, combined, original.length, extraElements.length);</div><div class="line">    jlrField.set(instance, combined);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-结构性模式-代理模式" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/11/11/结构性模式-代理模式/" class="article-date">
+  	<time datetime="2017-11-11T12:37:44.000Z" itemprop="datePublished">2017-11-11</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/11/结构性模式-代理模式/">
+        结构性模式-代理模式
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近研究ReactNative,发现ReactNative在跨越平台性和热更新方面的确有一定优势，但是性能依旧差原生太多。所以就学习了滴滴开源的插件化库<a href="https://github.com/didi/VirtualAPK/" target="_blank" rel="external">VirtualAPK</a>。学习中发现<a href="https://github.com/didi/VirtualAPK/" target="_blank" rel="external">VirtualAPK</a>库中使用了动态代理，因此需要先巩固一下代理模式的基础知识。以此篇文章作为学习笔记。</p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>为其他对象提供一种代理以控制对这个对象的访问。在某些情况下，一个对象不适合或者不能直接引用另一个对象，而代理对象可以在客户端和目标对象之间起到中介的作用。</p>
+<h1 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h1><p><img src="http://upload-images.jianshu.io/upload_images/5684685-b618faa0551f5471.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h1 id="类图说明"><a href="#类图说明" class="headerlink" title="类图说明"></a>类图说明</h1><ul>
+<li>Subject:<blockquote>
+<p>该类的主要职责是声明目标类与代理类的共同接口方法，该类既可以是抽象类也可以是接口。</p>
+</blockquote>
+</li>
+<li>RealSubject:<blockquote>
+<p>该类被称为目标类或者被代理类。该类定义了代理所表示的真实对象，由 其执行具体的业务逻辑方法，而客户类则通过代理类间接的调用目标类中的方法。</p>
+</blockquote>
+</li>
+<li><p>ProxySubject</p>
+<blockquote>
+<p>该类被称为代理类。该类持有一个目标类的引用，在其所实现的接口方法中调用目标类的相应接口方法，以此达到代理作用。一个代理对象可以代理多个实现了抽象主题的目标对象。</p>
+</blockquote>
+</li>
+<li><p>Client：</p>
+</li>
+</ul>
+<p>客户端调用案例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class Client &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        RealSubject target = new RealSubject();</div><div class="line">        ProxySubject proxy = new ProxySubject(target);</div><div class="line">        proxy.method1();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="代理模式分类"><a href="#代理模式分类" class="headerlink" title="代理模式分类"></a>代理模式分类</h1><h2 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h2><p>静态代理指的是代理对象的代码是已经生成好了的固定代码，然后对其代码进行编译。也就是说在代码运行前代理类的class文件已经存在。</p>
+<h2 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h2><p>动态代理指的是通过反射机制动态的生成代理者的对象，不存在代理类的字节码文件。代理类和委托类的关系是在程序运行时确定。 而Java也给我们提供了便捷的动态代理API。</p>
+<h4 id="Java-API"><a href="#Java-API" class="headerlink" title="Java API"></a>Java API</h4><ul>
+<li>java.lang.reflect.Proxy</li>
+<li>java.lang.reflect.InvocationHandler</li>
+</ul>
+<p>下面是滴滴VirtualAPK框架动态代理部分代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public class IContentProviderProxy implements InvocationHandler &#123;</div><div class="line"></div><div class="line">    private IContentProvider mBase;//被代理的类引用</div><div class="line">    private Context mContext;</div><div class="line"></div><div class="line">    private IContentProviderProxy(Context context, IContentProvider iContentProvider) &#123;</div><div class="line">        mBase = iContentProvider;</div><div class="line">        mContext = context;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //动态构造一个代理者</div><div class="line">    public static IContentProvider newInstance(Context context, IContentProvider iContentProvider) &#123;</div><div class="line">        return (IContentProvider) Proxy.newProxyInstance(iContentProvider.getClass().getClassLoader(),</div><div class="line">                new Class[] &#123; IContentProvider.class &#125;, new IContentProviderProxy(context, iContentProvider));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">        //在这个方法中调用具体被代理的方法</div><div class="line">        wrapperUri(method, args);</div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            return method.invoke(mBase, args);</div><div class="line">        &#125; catch (InvocationTargetException e) &#123;</div><div class="line">            throw e.getTargetException();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-Redux-for-ReactNative" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/11/02/Redux-for-ReactNative/" class="article-date">
+  	<time datetime="2017-11-02T08:37:44.000Z" itemprop="datePublished">2017-11-02</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/02/Redux-for-ReactNative/">
+        Redux for ReactNative
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="基本理论"><a href="#基本理论" class="headerlink" title="基本理论"></a>基本理论</h1><h2 id="1-官网定义："><a href="#1-官网定义：" class="headerlink" title="1.官网定义："></a>1.官网定义：</h2><p>Redux 是 JavaScript 状态容器，提供可预测化的状态管理。可以让你构建一致化的应用，运行于不同的环境（客户端、服务器、原生应用），并且易于测试。不仅于此，它还提供 超爽的开发体验，Redux 除了和 React 一起用外，还支持其它界面库。</p>
+<p>Redux就是一个state管理的库，它好比Android中的MVP架构一样，使得复杂的业务逻辑和视图状态变得简单、清晰。</p>
+<h2 id="2-三个原则："><a href="#2-三个原则：" class="headerlink" title="2.三个原则："></a>2.三个原则：</h2><ul>
+<li><strong>单一数据源</strong>：整个应用的state被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个<strong>store</strong>。</li>
+<li><strong>State 是只读的</strong>：惟一改变 state 的方法就是触发 <strong>action</strong>，action 是一个用于描述已发生事件的普通对象。</li>
+<li><strong>使用纯函数来执行修改</strong>：在改变state tree时，用到action，同时也需要编写对应的<strong>reducers</strong>才能完成state改变操作。</li>
+</ul>
+<h2 id="3-Action-Reducers-Store的职责："><a href="#3-Action-Reducers-Store的职责：" class="headerlink" title="3.Action,Reducers,Store的职责："></a>3.Action,Reducers,Store的职责：</h2><h4 id="Action"><a href="#Action" class="headerlink" title="Action:"></a>Action:</h4><p>Action 是把数据从应用传到 store 的有效载荷。它是 store 数据的唯一来源。一般来说你会通过 store的dispatch() 将 action 传到 store。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">dispatch(&#123;type: TYPES.FETCH_MOVE_LIST, move: data&#125;);</div></pre></td></tr></table></figure>
+<p>Action 本质上是 JavaScript 普通对象。我们约定，action 内必须使用一个字符串类型的 type 字段来表示将要执行的动作。多数情况下，type 会被定义成字符串常量。当应用规模越来越大时，建议使用单独的模块或文件来存放 action。</p>
+<p>Action一般由++action创建函数++生成，在 Redux 中的 action 创建函数只是简单的返回一个 action</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">export const addList = (data) =&gt; &#123;</div><div class="line">	return &#123;</div><div class="line">		type: TYPES.FETCH_MOVE_LIST,</div><div class="line">		data</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Action 创建函数可以根据自己的业务逻辑定义，也可以使用<a href="https://github.com/reduxactions/redux-actions" target="_blank" rel="external">redux-actions</a></p>
+<p>store 里可以直接通过 store.dispatch() 调用 dispatch() 方法，但是实际项目中使用 <a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a> 提供的 connect() 将Redux Store与容器组件相连接。bindActionCreators() 可以自动把多个 action 创建函数 绑定到 dispatch() 方法上。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">export default connect(</div><div class="line">  state =&gt; (&#123;</div><div class="line">    moves: state.home.data,</div><div class="line">  &#125;),</div><div class="line">  dispatch =&gt; bindActionCreators(&#123;fetchListAction: fetchList&#125;, dispatch)</div><div class="line">)(Home);</div><div class="line">//触发Action</div><div class="line">this.props.fetchListAction();</div></pre></td></tr></table></figure>
+<h4 id="Reducers"><a href="#Reducers" class="headerlink" title="Reducers:"></a>Reducers:</h4><p>Reducer 就是一个纯函数，接收旧的 state 和 action，返回新的 state。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">const initialState = &#123;</div><div class="line">  isFetch: false,</div><div class="line">  data: [],</div><div class="line">  status: null,</div><div class="line">&#125;;</div><div class="line">const defaultAction = &#123;&#125;;</div><div class="line"></div><div class="line">export default function getNewState(state = initialState, action = defaultAction) &#123;</div><div class="line">  switch (action.type) &#123;</div><div class="line">    case TYPES.FETCH_MOVE_LIST:</div><div class="line">      return Object.assign(&#123;&#125;, state, &#123;</div><div class="line">        isFetch: true,</div><div class="line">        data: action.move,</div><div class="line">        status: &apos;done&apos;</div><div class="line">      &#125;);</div><div class="line">    case TYPES.FETCH_FIND_LIST:</div><div class="line">      return &#123;</div><div class="line">        ...state,</div><div class="line">        isFetch: false,</div><div class="line">        data: [],</div><div class="line">        status: null</div><div class="line">      &#125;;</div><div class="line">    default:</div><div class="line">      return state;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在实际项目中我们应该把各个模块的action分开，这样每一个action都应该对应有一个reducer,最后，Redux 提供了 combineReducers()把各个reducer合成为rootReducer</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">export default function getRootReducer() &#123;</div><div class="line">  return combineReducers(&#123;</div><div class="line">    home: HomeReducer,</div><div class="line">    nav: NavReducer,</div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>combineReducers() 所做的只是生成一个函数，这个函数来调用你的一系列 reducer，每个 reducer 根据它们的 key 来筛选出 state 中的一部分数据并处理，然后这个生成的函数再将所有 reducer 的结果合并成一个大的对象。</p>
+<h4 id="Store"><a href="#Store" class="headerlink" title="Store:"></a>Store:</h4><p>Store中负责Action和Reducer的交互，并记录Reducer处理的最新State</p>
+<p>Store有一下职责：</p>
+<ul>
+<li>维持应用的 state；</li>
+<li>提供 getState() 方法获取 state；</li>
+<li>提供 dispatch(action) 方法更新 state；</li>
+<li>通过 subscribe(listener) 注册监听器;</li>
+<li>通过 subscribe(listener) 返回的函数注销监听器。</li>
+</ul>
+<p>我们用createStore()函数生成一个store</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import thunk from &apos;redux-thunk&apos;;</div><div class="line">import &#123;createStore, applyMiddleware, compose &#125; from &apos;redux&apos;;</div><div class="line">import rootReducer from &apos;../reducers&apos;;</div><div class="line"></div><div class="line">const middleware = applyMiddleware(thunk);</div><div class="line">let store = createStore(rootReducer(), undefined, middleware);</div><div class="line"></div><div class="line">export default store;</div></pre></td></tr></table></figure>
+<p>最后我们用<a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a>提供的Provider包装整个视图结构。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider store=&#123;store&#125;&gt;</div><div class="line">        &lt;AppNavigation/&gt;</div><div class="line">      &lt;/Provider&gt;</div><div class="line">    )</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>用户行为触发Action的分发；Reducer接收Action和旧的State，并根据行为类型进行相应的逻辑处理，并返回最新State；Store中负责Action和Reducer的交互，并记录Reducer处理的最新State。并且还可以应用中间件等；此时可利用<strong>react-redux</strong>将状态与视图绑定利用<strong>redux-actions</strong>生成action和reducer利用<strong>redux-promise</strong>或<strong>redux-thunk</strong>实现异步。</p>
+<h2 id="4-redux状态管理的流程"><a href="#4-redux状态管理的流程" class="headerlink" title="4.redux状态管理的流程"></a>4.redux状态管理的流程</h2><p><img src="http://upload-images.jianshu.io/upload_images/5684685-626d8bd4e4f596fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h1 id="源码简单分析"><a href="#源码简单分析" class="headerlink" title="源码简单分析"></a>源码简单分析</h1><p>首先分析视图绑定库<a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a>的源码。react-redux提供Provider, createProvider, connectAdvanced, connect这四个api,重点分析Provider，connect。</p>
+<h2 id="1-Provider"><a href="#1-Provider" class="headerlink" title="1.Provider"></a>1.Provider</h2><blockquote>
+<p>Provider本质就是一个普通的Component</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">export function createProvider(storeKey = &apos;store&apos;, subKey) &#123;</div><div class="line">    //...</div><div class="line">    class Provider extends Component &#123;</div><div class="line">        getChildContext() &#123;</div><div class="line">          return &#123; [storeKey]: this[storeKey], [subscriptionKey]: null &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        constructor(props, context) &#123;</div><div class="line">          super(props, context)</div><div class="line">          this[storeKey] = props.store;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        render() &#123;</div><div class="line">          return Children.only(this.props.children)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    Provider.propTypes = &#123;</div><div class="line">        store: storeShape.isRequired,</div><div class="line">        children: PropTypes.element.isRequired,</div><div class="line">    &#125;</div><div class="line">    return Provider</div><div class="line">&#125;</div><div class="line"></div><div class="line">export default createProvider()</div></pre></td></tr></table></figure>
+<p>Provider是createProvider()函数的返回值，就是一个普通Component。有两个属性：store，children<br>所以使用Provider形式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider</div><div class="line">        store=&#123;store&#125;</div><div class="line">        children=&#123;&lt;AppNavigation/&gt;</div><div class="line">        &#125;/&gt;</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">  //或者</div><div class="line">  </div><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider store=&#123;store&#125;&gt;</div><div class="line">        &lt;AppNavigation/&gt;</div><div class="line">      &lt;/Provider&gt;</div><div class="line">    )</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-connect"><a href="#2-connect" class="headerlink" title="2.connect"></a>2.connect</h2><blockquote>
+<p>connect函数原型function connect(mapStateToProps,mapDispatchToProps,mergeProps,{})</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">export function createConnect(&#123;</div><div class="line">  connectHOC = connectAdvanced,</div><div class="line">  mapStateToPropsFactories = defaultMapStateToPropsFactories,</div><div class="line">  mapDispatchToPropsFactories = defaultMapDispatchToPropsFactories,</div><div class="line">  mergePropsFactories = defaultMergePropsFactories,</div><div class="line">  selectorFactory = defaultSelectorFactory</div><div class="line">&#125; = &#123;&#125;) &#123;</div><div class="line">  return function connect(</div><div class="line">    mapStateToProps,</div><div class="line">    mapDispatchToProps,</div><div class="line">    mergeProps,</div><div class="line">    &#123;</div><div class="line">      pure = true,</div><div class="line">      areStatesEqual = strictEqual,</div><div class="line">      areOwnPropsEqual = shallowEqual,</div><div class="line">      areStatePropsEqual = shallowEqual,</div><div class="line">      areMergedPropsEqual = shallowEqual,</div><div class="line">      ...extraOptions</div><div class="line">    &#125; = &#123;&#125;</div><div class="line">  ) &#123;</div><div class="line">  //...</div><div class="line">  return connectHOC()</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">export default createConnect()</div></pre></td></tr></table></figure>
+<p>connect是createConnect()函数的返回值，connect也是一个函数，一共有四个参数：mapStateToProps，mapDispatchToProps，mergeProps，options。返回另一个函数：function wrapWithConnect(WrappedComponent) {}</p>
+<h4 id="参数："><a href="#参数：" class="headerlink" title="参数："></a>参数：</h4><ul>
+<li>[mapStateToProps(state, [ownProps]): stateProps] (Function): 如果定义该参数，组件将会监听 Redux store 的变化。任何时候，只要 Redux store 发生改变，mapStateToProps 函数就会被调用。该回调函数必须返回一个纯对象，这个对象会与组件的 props 合并。如果你省略了这个参数，你的组件将不会监听 Redux store。如果指定了该回调函数中的第二个参数 ownProps，则该参数的值为传递到组件的 props，而且只要组件接收到新的 props，mapStateToProps 也会被调用。</li>
+<li>[mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function): 如果传递的是一个对象，那么每个定义在该对象的函数都将被当作 Redux action creator，而且这个对象会与 Redux store 绑定在一起，其中所定义的方法名将作为属性名，合并到组件的 props 中。如果传递的是一个函数，该函数将接收一个 dispatch 函数，然后由你来决定如何返回一个对象，这个对象通过 dispatch 函数与 action creator 以某种方式绑定在一起（提示：你也许会用到 Redux 的辅助函数 bindActionCreators()）。如果你省略这个 mapDispatchToProps 参数，默认情况下，dispatch 会注入到你的组件 props 中。如果指定了该回调函数中第二个参数 ownProps，该参数的值为传递到组件的 props，而且只要组件接收到新 props，mapDispatchToProps 也会被调用。</li>
+<li>[mergeProps(stateProps, dispatchProps, ownProps): props] (Function): 如果指定了这个参数，mapStateToProps() 与 mapDispatchToProps() 的执行结果和组件自身的 props 将传入到这个回调函数中。该回调函数返回的对象将作为 props 传递到被包装的组件中。你也许可以用这个回调函数，根据组件的 props 来筛选部分的 state 数据，或者把 props 中的某个特定变量与 action creator 绑定在一起。如果你省略这个参数，默认情况下返回 Object.assign({}, ownProps, stateProps, dispatchProps) 的结果。</li>
+<li><p>[options] (Object) 如果指定这个参数，可以定制 connector 的行为。</p>
+<p>  <strong>1.</strong>[pure = true] (Boolean): 如果为 true，connector 将执行 shouldComponentUpdate 并且浅对比 mergeProps 的结果，避免不必要的更新，前提是当前组件是一个“纯”组件，它不依赖于任何的输入或 state 而只依赖于 props 和 Redux store 的 state。默认值为 true。</p>
+<p>  <strong>2.</strong>[withRef = false] (Boolean): 如果为 true，connector 会保存一个对被包装组件实例的引用，该引用通过 getWrappedInstance() 方法获得。默认值为 false</p>
+</li>
+</ul>
+<h4 id="返回值："><a href="#返回值：" class="headerlink" title="返回值："></a>返回值：</h4><p>从源码中可以看出connect函数最后执行了connectHOC()这个函数，connectHOC是connectAdvanced所赋的值，下面是connectAdvanced函数的源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">export default function connectAdvanced(</div><div class="line">  selectorFactory,</div><div class="line">  &#123;</div><div class="line">    getDisplayName = name =&gt; `ConnectAdvanced($&#123;name&#125;)`,</div><div class="line"></div><div class="line">    methodName = &apos;connectAdvanced&apos;,</div><div class="line"></div><div class="line">    renderCountProp = undefined,</div><div class="line"></div><div class="line">    shouldHandleStateChanges = true,</div><div class="line"></div><div class="line">    storeKey = &apos;store&apos;,</div><div class="line"></div><div class="line">    withRef = false,</div><div class="line">    </div><div class="line">    ...connectOptions</div><div class="line">  &#125; = &#123;&#125;</div><div class="line">) &#123;</div><div class="line">    //...</div><div class="line">     return function wrapWithConnect(WrappedComponent) &#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从源码中可以看出最后返回了wrapWithConnect函数。那么wrapWithConnect函数就是connect最后的返回值。</p>
+<p>下面继续看一下wrapWithConnect函数的源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">function wrapWithConnect(WrappedComponent) &#123;</div><div class="line">    //...</div><div class="line">     class Connect extends Component &#123;</div><div class="line">         //...</div><div class="line">     &#125;</div><div class="line">     //...</div><div class="line">     return hoistStatics(Connect, WrappedComponent)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从源码可以看出，wrapWithConnect函数有一个参数：WrappedComponent。这个参数其实就是一个Component，最后返回的是一个新的已与 Redux store 连接的Component。所以connect函数使用形式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">export default connect(</div><div class="line">  state =&gt; (&#123;</div><div class="line">    moves: state.home.data,</div><div class="line">  &#125;),</div><div class="line">  dispatch =&gt; bindActionCreators(&#123;fetchListAction: fetchList, fetchMore&#125;, dispatch),</div><div class="line">)(Home);</div><div class="line">//这里省略了第三参数，默认情况下返回 Object.assign(&#123;&#125;, ownProps, stateProps, dispatchProps) 的结果。</div></pre></td></tr></table></figure>
+<blockquote>
+<p>总结connect函数的功能：连接 React 组件与 Redux store。<br>连接操作不会改变原来的组件类，反而返回一个新的已与 Redux store 连接的组件类</p>
+</blockquote>
+<p><strong>下面分析Redux源码，Redux提供５个api方法：createStore,combineReducers,bindActionCreators,applyMiddleware,compose</strong></p>
+<h2 id="3-createStore"><a href="#3-createStore" class="headerlink" title="3.createStore"></a>3.createStore</h2><blockquote>
+<p>创建一个 Redux store 来以存放应用中所有的 state。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">export default function createStore(reducer, preloadedState, enhancer) &#123;</div><div class="line">    //...</div><div class="line">    function getState() &#123;</div><div class="line">    return currentState</div><div class="line">  &#125;</div><div class="line">   //...</div><div class="line">  function subscribe(listener) &#123;</div><div class="line">    //...</div><div class="line">  &#125;</div><div class="line">   //...</div><div class="line">  function dispatch(action) &#123;</div><div class="line">    //...</div><div class="line">    return action</div><div class="line">   &#125;</div><div class="line">   //...</div><div class="line">    function replaceReducer(nextReducer) &#123;</div><div class="line">    if (typeof nextReducer !== &apos;function&apos;) &#123;</div><div class="line">      throw new Error(&apos;Expected the nextReducer to be a function.&apos;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    currentReducer = nextReducer</div><div class="line">    dispatch(&#123; type: ActionTypes.INIT &#125;)</div><div class="line">  &#125;</div><div class="line">  //...</div><div class="line">  return &#123;</div><div class="line">    dispatch,</div><div class="line">    subscribe,</div><div class="line">    getState,</div><div class="line">    replaceReducer,</div><div class="line">    [$$observable]: observable</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从源码中可以看出createStore函数接收三个参数返回一个store对象。store对象又有５个方法： dispatch,subscribe,getState,replaceReducer,[$$observable]: observable</p>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul>
+<li><p>reducer (Function): 接收两个参数，分别是当前的 state 树和要处理的 action，返回新的 state 树。</p>
+</li>
+<li><p>[initialState] (any): 初始时的 state。 如果你使用 combineReducers 创建 reducer，它必须是一个普通对象，与传入的 keys 保持同样的结构。否则，你可以自由传入任何 reducer 可理解的内容。</p>
+</li>
+<li><p>enhancer (Function): Store enhancer 是一个组合 store creator 的高阶函数，返回一个新的强化过的 store creator。这与 middleware 相似，它也允许你通过复合函数改变 store 接口。一般是applyMiddleware函数的返回值。</p>
+</li>
+</ul>
+<h4 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h4><p>(Store对象): 保存了应用所有 state 的对象。改变 state 的惟一方法是 dispatch action。你也可以 subscribe 监听 state 的变化，然后更新 UI。</p>
+<h2 id="4-Store的方法"><a href="#4-Store的方法" class="headerlink" title="4.Store的方法"></a>4.Store的方法</h2><h4 id="getState"><a href="#getState" class="headerlink" title="getState()"></a>getState()</h4><blockquote>
+<p>返回应用当前的 state 树。<br>它与 store 的最后一个 reducer 返回值相同。</p>
+</blockquote>
+<p><strong>返回值</strong>：</p>
+<p>(any): 应用当前的 state 树。</p>
+<hr>
+<h4 id="dispatch-action"><a href="#dispatch-action" class="headerlink" title="dispatch(action)"></a>dispatch(action)</h4><blockquote>
+<p>分发 action。这是触发 state 变化的惟一途径。</p>
+<p>会使用当前 getState() 的结果和传入的 action 以同步方式的调用 store 的 reduce 函数。返回值会被作为下一个 state。从现在开始，这就成为了 getState() 的返回值，同时变化监听器(change listener)会被触发。</p>
+</blockquote>
+<p><strong>参数：</strong></p>
+<ol>
+<li>action (Object†): 描述应用变化的普通对象。</li>
+</ol>
+<p><strong>返回值</strong>：</p>
+<p>(Object): 要 dispatch 的 action。</p>
+<hr>
+<h4 id="subscribe-listener"><a href="#subscribe-listener" class="headerlink" title="subscribe(listener)"></a>subscribe(listener)</h4><blockquote>
+<p>添加一个变化监听器。每当 dispatch action 的时候就会执行，state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。</p>
+<p>这是一个底层 API。多数情况下，你不会直接使用它，会使用一些 React（或其它库）的绑定。如果你想让回调函数执行的时候使用当前的 state，你可以 把 store 转换成一个 Observable 或者写一个定制的 observeStore 工具。</p>
+<p>如果需要解绑这个变化监听器，执行 subscribe 返回的函数即可。</p>
+</blockquote>
+<p><strong>参数</strong>：</p>
+<ol>
+<li>listener (Function): 每当 dispatch action 的时候都会执行的回调。state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。store 的 reducer 应该是纯函数，因此你可能需要对 state 树中的引用做深度比较来确定它的值是否有变化。</li>
+</ol>
+<p><strong>返回值</strong>：</p>
+<p>(Function): 一个可以解绑变化监听器的函数</p>
+<hr>
+<h4 id="replaceReducer-nextReducer"><a href="#replaceReducer-nextReducer" class="headerlink" title="replaceReducer(nextReducer)"></a>replaceReducer(nextReducer)</h4><blockquote>
+<p>替换 store 当前用来计算 state 的 reducer。</p>
+<p>这是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。</p>
+</blockquote>
+<p><strong>参数</strong>：</p>
+<ol>
+<li>reducer (Function) store 会使用的下一个 reducer。</li>
+</ol>
+<hr>
+<h2 id="5-applyMiddleware"><a href="#5-applyMiddleware" class="headerlink" title="5.applyMiddleware"></a>5.applyMiddleware</h2><blockquote>
+<p>使用包含自定义功能的 middleware 来扩展 Redux 是一种推荐的方式。Middleware 可以让你包装 store 的 dispatch 方法来达到你想要的目的。同时， middleware 还拥有“可组合”这一关键特性。多个 middleware 可以被组合到一起使用，形成 middleware 链。其中，每个 middleware 都不需要关心链中它前后的 middleware 的任何信息。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">export default function applyMiddleware(...middlewares) &#123;</div><div class="line">  return (createStore) =&gt; (reducer, preloadedState, enhancer) =&gt; &#123;</div><div class="line">    const store = createStore(reducer, preloadedState, enhancer)</div><div class="line">    let dispatch = store.dispatch</div><div class="line">    let chain = []</div><div class="line"></div><div class="line">    const middlewareAPI = &#123;</div><div class="line">      getState: store.getState,</div><div class="line">      dispatch: (action) =&gt; dispatch(action)</div><div class="line">    &#125;</div><div class="line">    chain = middlewares.map(middleware =&gt; middleware(middlewareAPI))</div><div class="line">    dispatch = compose(...chain)(store.dispatch)</div><div class="line"></div><div class="line">    return &#123;</div><div class="line">      ...store,</div><div class="line">      dispatch</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><ul>
+<li>…middlewares (arguments): 遵循 Redux middleware API 的函数。每个 middleware 接受 Store 的 dispatch 和 getState 函数作为命名参数，并返回一个函数。该函数会被传入 被称为 next 的下一个 middleware 的 dispatch 方法，并返回一个接收 action 的新函数，这个函数可以直接调用 next(action)，或者在其他需要的时刻调用，甚至根本不去调用它。调用链中最后一个 middleware 会接受真实的 store 的 dispatch 方法作为 next 参数，并借此结束调用链。所以，middleware 的函数签名是 ({ getState, dispatch }) =&gt; next =&gt; action。</li>
+</ul>
+<h4 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h4><p>(Function) 一个应用了 middleware 后的 store enhancer。这个 store enhancer 就是一个函数，并且需要应用到 createStore。它会返回一个应用了 middleware 的新的 createStore。</p>
+<h2 id="6-combineReducers"><a href="#6-combineReducers" class="headerlink" title="6.combineReducers"></a>6.combineReducers</h2><blockquote>
+<p>随着应用变得复杂，需要对 reducer 函数 进行拆分，拆分后的每一块独立负责管理 state 的一部分。</p>
+<p>combineReducers 辅助函数的作用是，把一个由多个不同 reducer 函数作为 value 的 object，合并成一个最终的 reducer 函数，然后就可以对这个 reducer 调用 createStore。</p>
+<p>合并后的 reducer 可以调用各个子 reducer，并把它们的结果合并成一个 state 对象。state 对象的结构由传入的多个 reducer 的 key 决定。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">export default function combineReducers(reducers) &#123;</div><div class="line">  const reducerKeys = Object.keys(reducers)</div><div class="line">  const finalReducers = &#123;&#125;</div><div class="line">  for (let i = 0; i &lt; reducerKeys.length; i++) &#123;</div><div class="line">    const key = reducerKeys[i]</div><div class="line"></div><div class="line">    if (process.env.NODE_ENV !== &apos;production&apos;) &#123;</div><div class="line">      if (typeof reducers[key] === &apos;undefined&apos;) &#123;</div><div class="line">        warning(`No reducer provided for key &quot;$&#123;key&#125;&quot;`)</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (typeof reducers[key] === &apos;function&apos;) &#123;</div><div class="line">      finalReducers[key] = reducers[key]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  const finalReducerKeys = Object.keys(finalReducers)</div><div class="line"></div><div class="line">  let unexpectedKeyCache</div><div class="line">  if (process.env.NODE_ENV !== &apos;production&apos;) &#123;</div><div class="line">    unexpectedKeyCache = &#123;&#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  let shapeAssertionError</div><div class="line">  try &#123;</div><div class="line">    assertReducerShape(finalReducers)</div><div class="line">  &#125; catch (e) &#123;</div><div class="line">    shapeAssertionError = e</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  return function combination(state = &#123;&#125;, action) &#123;</div><div class="line">    //...</div><div class="line">    return hasChanged ? nextState : state  </div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>从源码看出combineReducers函数接收一个参数：reducers，返回一个函数。</p>
+<h4 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a>参数</h4><ul>
+<li>reducers (Object): 一个对象，它的值（value） 对应不同的 reducer 函数，这些 reducer 函数后面会被合并成一个。</li>
+</ul>
+<h4 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a>返回值</h4><p>(Function)：一个调用 reducers 对象里所有 reducer 的 reducer，并且构造一个与 reducers 对象结构相同的 state 对象。</p>
+<h2 id="7-bindActionCreators"><a href="#7-bindActionCreators" class="headerlink" title="7.bindActionCreators"></a>7.bindActionCreators</h2><blockquote>
+<p>把 action creators 转成拥有同名 keys 的对象，但使用 dispatch 把每个 action creator 包围起来，这样可以直接调用它们。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">export default function bindActionCreators(actionCreators, dispatch) &#123;</div><div class="line">  if (typeof actionCreators === &apos;function&apos;) &#123;</div><div class="line">    return bindActionCreator(actionCreators, dispatch)</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  if (typeof actionCreators !== &apos;object&apos; || actionCreators === null) &#123;</div><div class="line">    throw new Error(</div><div class="line">      `bindActionCreators expected an object or a function, instead received $&#123;actionCreators === null ? &apos;null&apos; : typeof actionCreators&#125;. ` +</div><div class="line">      `Did you write &quot;import ActionCreators from&quot; instead of &quot;import * as ActionCreators from&quot;?`</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const keys = Object.keys(actionCreators)</div><div class="line">  const boundActionCreators = &#123;&#125;</div><div class="line">  for (let i = 0; i &lt; keys.length; i++) &#123;</div><div class="line">    const key = keys[i]</div><div class="line">    const actionCreator = actionCreators[key]</div><div class="line">    if (typeof actionCreator === &apos;function&apos;) &#123;</div><div class="line">      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  return boundActionCreators</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="参数-3"><a href="#参数-3" class="headerlink" title="参数"></a>参数</h4><ul>
+<li><p>actionCreators (Function or Object): 一个 action creator，或者键值是 action creators 的对象。</p>
+</li>
+<li><p>dispatch (Function): 一个 dispatch 函数，由 Store 实例提供。</p>
+</li>
+</ul>
+<h4 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a>返回值</h4><p>(Function or Object): 一个与原对象类似的对象，只不过这个对象中的的每个函数值都可以直接 dispatch action。如果传入的是一个函数，返回的也是一个函数。</p>
+<p><a href="https://github.com/RN-TV/Redux.git" target="_blank" rel="external">Demo</a></p>
+<p><a href="http://redux.js.org/" target="_blank" rel="external">官方文档</a></p>
+<p><a href="http://www.redux.org.cn/" target="_blank" rel="external">中文文档</a></p>
 
       
     </div>
@@ -675,212 +1087,6 @@
 
 
   
-    <article id="post-Redux-for-ReactNative" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/11/02/Redux-for-ReactNative/" class="article-date">
-  	<time datetime="2017-11-02T08:37:44.000Z" itemprop="datePublished">2017-11-02</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/02/Redux-for-ReactNative/">
-        Redux for ReactNative
-        
-      </a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="基本理论"><a href="#基本理论" class="headerlink" title="基本理论"></a>基本理论</h1><h2 id="1-官网定义："><a href="#1-官网定义：" class="headerlink" title="1.官网定义："></a>1.官网定义：</h2><p>Redux 是 JavaScript 状态容器，提供可预测化的状态管理。可以让你构建一致化的应用，运行于不同的环境（客户端、服务器、原生应用），并且易于测试。不仅于此，它还提供 超爽的开发体验，Redux 除了和 React 一起用外，还支持其它界面库。</p>
-<p>Redux就是一个state管理的库，它好比Android中的MVP架构一样，使得复杂的业务逻辑和视图状态变得简单、清晰。</p>
-<h2 id="2-三个原则："><a href="#2-三个原则：" class="headerlink" title="2.三个原则："></a>2.三个原则：</h2><ul>
-<li><strong>单一数据源</strong>：整个应用的state被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个<strong>store</strong>。</li>
-<li><strong>State 是只读的</strong>：惟一改变 state 的方法就是触发 <strong>action</strong>，action 是一个用于描述已发生事件的普通对象。</li>
-<li><strong>使用纯函数来执行修改</strong>：在改变state tree时，用到action，同时也需要编写对应的<strong>reducers</strong>才能完成state改变操作。</li>
-</ul>
-<h2 id="3-Action-Reducers-Store的职责："><a href="#3-Action-Reducers-Store的职责：" class="headerlink" title="3.Action,Reducers,Store的职责："></a>3.Action,Reducers,Store的职责：</h2><h4 id="Action"><a href="#Action" class="headerlink" title="Action:"></a>Action:</h4><p>Action 是把数据从应用传到 store 的有效载荷。它是 store 数据的唯一来源。一般来说你会通过 store的dispatch() 将 action 传到 store。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">dispatch(&#123;type: TYPES.FETCH_MOVE_LIST, move: data&#125;);</div></pre></td></tr></table></figure>
-<p>Action 本质上是 JavaScript 普通对象。我们约定，action 内必须使用一个字符串类型的 type 字段来表示将要执行的动作。多数情况下，type 会被定义成字符串常量。当应用规模越来越大时，建议使用单独的模块或文件来存放 action。</p>
-<p>Action一般由++action创建函数++生成，在 Redux 中的 action 创建函数只是简单的返回一个 action</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">export const addList = (data) =&gt; &#123;</div><div class="line">	return &#123;</div><div class="line">		type: TYPES.FETCH_MOVE_LIST,</div><div class="line">		data</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Action 创建函数可以根据自己的业务逻辑定义，也可以使用<a href="https://github.com/reduxactions/redux-actions" target="_blank" rel="external">redux-actions</a></p>
-<p>store 里可以直接通过 store.dispatch() 调用 dispatch() 方法，但是实际项目中使用 <a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a> 提供的 connect() 将Redux Store与容器组件相连接。bindActionCreators() 可以自动把多个 action 创建函数 绑定到 dispatch() 方法上。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">export default connect(</div><div class="line">  state =&gt; (&#123;</div><div class="line">    moves: state.home.data,</div><div class="line">  &#125;),</div><div class="line">  dispatch =&gt; bindActionCreators(&#123;fetchListAction: fetchList&#125;, dispatch)</div><div class="line">)(Home);</div><div class="line">//触发Action</div><div class="line">this.props.fetchListAction();</div></pre></td></tr></table></figure>
-<h4 id="Reducers"><a href="#Reducers" class="headerlink" title="Reducers:"></a>Reducers:</h4><p>Reducer 就是一个纯函数，接收旧的 state 和 action，返回新的 state。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">const initialState = &#123;</div><div class="line">  isFetch: false,</div><div class="line">  data: [],</div><div class="line">  status: null,</div><div class="line">&#125;;</div><div class="line">const defaultAction = &#123;&#125;;</div><div class="line"></div><div class="line">export default function getNewState(state = initialState, action = defaultAction) &#123;</div><div class="line">  switch (action.type) &#123;</div><div class="line">    case TYPES.FETCH_MOVE_LIST:</div><div class="line">      return Object.assign(&#123;&#125;, state, &#123;</div><div class="line">        isFetch: true,</div><div class="line">        data: action.move,</div><div class="line">        status: &apos;done&apos;</div><div class="line">      &#125;);</div><div class="line">    case TYPES.FETCH_FIND_LIST:</div><div class="line">      return &#123;</div><div class="line">        ...state,</div><div class="line">        isFetch: false,</div><div class="line">        data: [],</div><div class="line">        status: null</div><div class="line">      &#125;;</div><div class="line">    default:</div><div class="line">      return state;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>在实际项目中我们应该把各个模块的action分开，这样每一个action都应该对应有一个reducer,最后，Redux 提供了 combineReducers()把各个reducer合成为rootReducer</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">export default function getRootReducer() &#123;</div><div class="line">  return combineReducers(&#123;</div><div class="line">    home: HomeReducer,</div><div class="line">    nav: NavReducer,</div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>combineReducers() 所做的只是生成一个函数，这个函数来调用你的一系列 reducer，每个 reducer 根据它们的 key 来筛选出 state 中的一部分数据并处理，然后这个生成的函数再将所有 reducer 的结果合并成一个大的对象。</p>
-<h4 id="Store"><a href="#Store" class="headerlink" title="Store:"></a>Store:</h4><p>Store中负责Action和Reducer的交互，并记录Reducer处理的最新State</p>
-<p>Store有一下职责：</p>
-<ul>
-<li>维持应用的 state；</li>
-<li>提供 getState() 方法获取 state；</li>
-<li>提供 dispatch(action) 方法更新 state；</li>
-<li>通过 subscribe(listener) 注册监听器;</li>
-<li>通过 subscribe(listener) 返回的函数注销监听器。</li>
-</ul>
-<p>我们用createStore()函数生成一个store</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">import thunk from &apos;redux-thunk&apos;;</div><div class="line">import &#123;createStore, applyMiddleware, compose &#125; from &apos;redux&apos;;</div><div class="line">import rootReducer from &apos;../reducers&apos;;</div><div class="line"></div><div class="line">const middleware = applyMiddleware(thunk);</div><div class="line">let store = createStore(rootReducer(), undefined, middleware);</div><div class="line"></div><div class="line">export default store;</div></pre></td></tr></table></figure>
-<p>最后我们用<a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a>提供的Provider包装整个视图结构。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider store=&#123;store&#125;&gt;</div><div class="line">        &lt;AppNavigation/&gt;</div><div class="line">      &lt;/Provider&gt;</div><div class="line">    )</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>用户行为触发Action的分发；Reducer接收Action和旧的State，并根据行为类型进行相应的逻辑处理，并返回最新State；Store中负责Action和Reducer的交互，并记录Reducer处理的最新State。并且还可以应用中间件等；此时可利用<strong>react-redux</strong>将状态与视图绑定利用<strong>redux-actions</strong>生成action和reducer利用<strong>redux-promise</strong>或<strong>redux-thunk</strong>实现异步。</p>
-<h2 id="4-redux状态管理的流程"><a href="#4-redux状态管理的流程" class="headerlink" title="4.redux状态管理的流程"></a>4.redux状态管理的流程</h2><p><img src="http://upload-images.jianshu.io/upload_images/5684685-626d8bd4e4f596fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
-<h1 id="源码简单分析"><a href="#源码简单分析" class="headerlink" title="源码简单分析"></a>源码简单分析</h1><p>首先分析视图绑定库<a href="https://github.com/reactjs/react-redux" target="_blank" rel="external">react-redux</a>的源码。react-redux提供Provider, createProvider, connectAdvanced, connect这四个api,重点分析Provider，connect。</p>
-<h2 id="1-Provider"><a href="#1-Provider" class="headerlink" title="1.Provider"></a>1.Provider</h2><blockquote>
-<p>Provider本质就是一个普通的Component</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">export function createProvider(storeKey = &apos;store&apos;, subKey) &#123;</div><div class="line">    //...</div><div class="line">    class Provider extends Component &#123;</div><div class="line">        getChildContext() &#123;</div><div class="line">          return &#123; [storeKey]: this[storeKey], [subscriptionKey]: null &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        constructor(props, context) &#123;</div><div class="line">          super(props, context)</div><div class="line">          this[storeKey] = props.store;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        render() &#123;</div><div class="line">          return Children.only(this.props.children)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    Provider.propTypes = &#123;</div><div class="line">        store: storeShape.isRequired,</div><div class="line">        children: PropTypes.element.isRequired,</div><div class="line">    &#125;</div><div class="line">    return Provider</div><div class="line">&#125;</div><div class="line"></div><div class="line">export default createProvider()</div></pre></td></tr></table></figure>
-<p>Provider是createProvider()函数的返回值，就是一个普通Component。有两个属性：store，children<br>所以使用Provider形式如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider</div><div class="line">        store=&#123;store&#125;</div><div class="line">        children=&#123;&lt;AppNavigation/&gt;</div><div class="line">        &#125;/&gt;</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line">  //或者</div><div class="line">  </div><div class="line">render() &#123;</div><div class="line">    return (</div><div class="line">      &lt;Provider store=&#123;store&#125;&gt;</div><div class="line">        &lt;AppNavigation/&gt;</div><div class="line">      &lt;/Provider&gt;</div><div class="line">    )</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<h2 id="2-connect"><a href="#2-connect" class="headerlink" title="2.connect"></a>2.connect</h2><blockquote>
-<p>connect函数原型function connect(mapStateToProps,mapDispatchToProps,mergeProps,{})</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">export function createConnect(&#123;</div><div class="line">  connectHOC = connectAdvanced,</div><div class="line">  mapStateToPropsFactories = defaultMapStateToPropsFactories,</div><div class="line">  mapDispatchToPropsFactories = defaultMapDispatchToPropsFactories,</div><div class="line">  mergePropsFactories = defaultMergePropsFactories,</div><div class="line">  selectorFactory = defaultSelectorFactory</div><div class="line">&#125; = &#123;&#125;) &#123;</div><div class="line">  return function connect(</div><div class="line">    mapStateToProps,</div><div class="line">    mapDispatchToProps,</div><div class="line">    mergeProps,</div><div class="line">    &#123;</div><div class="line">      pure = true,</div><div class="line">      areStatesEqual = strictEqual,</div><div class="line">      areOwnPropsEqual = shallowEqual,</div><div class="line">      areStatePropsEqual = shallowEqual,</div><div class="line">      areMergedPropsEqual = shallowEqual,</div><div class="line">      ...extraOptions</div><div class="line">    &#125; = &#123;&#125;</div><div class="line">  ) &#123;</div><div class="line">  //...</div><div class="line">  return connectHOC()</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">export default createConnect()</div></pre></td></tr></table></figure>
-<p>connect是createConnect()函数的返回值，connect也是一个函数，一共有四个参数：mapStateToProps，mapDispatchToProps，mergeProps，options。返回另一个函数：function wrapWithConnect(WrappedComponent) {}</p>
-<h4 id="参数："><a href="#参数：" class="headerlink" title="参数："></a>参数：</h4><ul>
-<li>[mapStateToProps(state, [ownProps]): stateProps] (Function): 如果定义该参数，组件将会监听 Redux store 的变化。任何时候，只要 Redux store 发生改变，mapStateToProps 函数就会被调用。该回调函数必须返回一个纯对象，这个对象会与组件的 props 合并。如果你省略了这个参数，你的组件将不会监听 Redux store。如果指定了该回调函数中的第二个参数 ownProps，则该参数的值为传递到组件的 props，而且只要组件接收到新的 props，mapStateToProps 也会被调用。</li>
-<li>[mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function): 如果传递的是一个对象，那么每个定义在该对象的函数都将被当作 Redux action creator，而且这个对象会与 Redux store 绑定在一起，其中所定义的方法名将作为属性名，合并到组件的 props 中。如果传递的是一个函数，该函数将接收一个 dispatch 函数，然后由你来决定如何返回一个对象，这个对象通过 dispatch 函数与 action creator 以某种方式绑定在一起（提示：你也许会用到 Redux 的辅助函数 bindActionCreators()）。如果你省略这个 mapDispatchToProps 参数，默认情况下，dispatch 会注入到你的组件 props 中。如果指定了该回调函数中第二个参数 ownProps，该参数的值为传递到组件的 props，而且只要组件接收到新 props，mapDispatchToProps 也会被调用。</li>
-<li>[mergeProps(stateProps, dispatchProps, ownProps): props] (Function): 如果指定了这个参数，mapStateToProps() 与 mapDispatchToProps() 的执行结果和组件自身的 props 将传入到这个回调函数中。该回调函数返回的对象将作为 props 传递到被包装的组件中。你也许可以用这个回调函数，根据组件的 props 来筛选部分的 state 数据，或者把 props 中的某个特定变量与 action creator 绑定在一起。如果你省略这个参数，默认情况下返回 Object.assign({}, ownProps, stateProps, dispatchProps) 的结果。</li>
-<li><p>[options] (Object) 如果指定这个参数，可以定制 connector 的行为。</p>
-<p>  <strong>1.</strong>[pure = true] (Boolean): 如果为 true，connector 将执行 shouldComponentUpdate 并且浅对比 mergeProps 的结果，避免不必要的更新，前提是当前组件是一个“纯”组件，它不依赖于任何的输入或 state 而只依赖于 props 和 Redux store 的 state。默认值为 true。</p>
-<p>  <strong>2.</strong>[withRef = false] (Boolean): 如果为 true，connector 会保存一个对被包装组件实例的引用，该引用通过 getWrappedInstance() 方法获得。默认值为 false</p>
-</li>
-</ul>
-<h4 id="返回值："><a href="#返回值：" class="headerlink" title="返回值："></a>返回值：</h4><p>从源码中可以看出connect函数最后执行了connectHOC()这个函数，connectHOC是connectAdvanced所赋的值，下面是connectAdvanced函数的源码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">export default function connectAdvanced(</div><div class="line">  selectorFactory,</div><div class="line">  &#123;</div><div class="line">    getDisplayName = name =&gt; `ConnectAdvanced($&#123;name&#125;)`,</div><div class="line"></div><div class="line">    methodName = &apos;connectAdvanced&apos;,</div><div class="line"></div><div class="line">    renderCountProp = undefined,</div><div class="line"></div><div class="line">    shouldHandleStateChanges = true,</div><div class="line"></div><div class="line">    storeKey = &apos;store&apos;,</div><div class="line"></div><div class="line">    withRef = false,</div><div class="line">    </div><div class="line">    ...connectOptions</div><div class="line">  &#125; = &#123;&#125;</div><div class="line">) &#123;</div><div class="line">    //...</div><div class="line">     return function wrapWithConnect(WrappedComponent) &#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>从源码中可以看出最后返回了wrapWithConnect函数。那么wrapWithConnect函数就是connect最后的返回值。</p>
-<p>下面继续看一下wrapWithConnect函数的源码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">function wrapWithConnect(WrappedComponent) &#123;</div><div class="line">    //...</div><div class="line">     class Connect extends Component &#123;</div><div class="line">         //...</div><div class="line">     &#125;</div><div class="line">     //...</div><div class="line">     return hoistStatics(Connect, WrappedComponent)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>从源码可以看出，wrapWithConnect函数有一个参数：WrappedComponent。这个参数其实就是一个Component，最后返回的是一个新的已与 Redux store 连接的Component。所以connect函数使用形式如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">export default connect(</div><div class="line">  state =&gt; (&#123;</div><div class="line">    moves: state.home.data,</div><div class="line">  &#125;),</div><div class="line">  dispatch =&gt; bindActionCreators(&#123;fetchListAction: fetchList, fetchMore&#125;, dispatch),</div><div class="line">)(Home);</div><div class="line">//这里省略了第三参数，默认情况下返回 Object.assign(&#123;&#125;, ownProps, stateProps, dispatchProps) 的结果。</div></pre></td></tr></table></figure>
-<blockquote>
-<p>总结connect函数的功能：连接 React 组件与 Redux store。<br>连接操作不会改变原来的组件类，反而返回一个新的已与 Redux store 连接的组件类</p>
-</blockquote>
-<p><strong>下面分析Redux源码，Redux提供５个api方法：createStore,combineReducers,bindActionCreators,applyMiddleware,compose</strong></p>
-<h2 id="3-createStore"><a href="#3-createStore" class="headerlink" title="3.createStore"></a>3.createStore</h2><blockquote>
-<p>创建一个 Redux store 来以存放应用中所有的 state。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">export default function createStore(reducer, preloadedState, enhancer) &#123;</div><div class="line">    //...</div><div class="line">    function getState() &#123;</div><div class="line">    return currentState</div><div class="line">  &#125;</div><div class="line">   //...</div><div class="line">  function subscribe(listener) &#123;</div><div class="line">    //...</div><div class="line">  &#125;</div><div class="line">   //...</div><div class="line">  function dispatch(action) &#123;</div><div class="line">    //...</div><div class="line">    return action</div><div class="line">   &#125;</div><div class="line">   //...</div><div class="line">    function replaceReducer(nextReducer) &#123;</div><div class="line">    if (typeof nextReducer !== &apos;function&apos;) &#123;</div><div class="line">      throw new Error(&apos;Expected the nextReducer to be a function.&apos;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    currentReducer = nextReducer</div><div class="line">    dispatch(&#123; type: ActionTypes.INIT &#125;)</div><div class="line">  &#125;</div><div class="line">  //...</div><div class="line">  return &#123;</div><div class="line">    dispatch,</div><div class="line">    subscribe,</div><div class="line">    getState,</div><div class="line">    replaceReducer,</div><div class="line">    [$$observable]: observable</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>从源码中可以看出createStore函数接收三个参数返回一个store对象。store对象又有５个方法： dispatch,subscribe,getState,replaceReducer,[$$observable]: observable</p>
-<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul>
-<li><p>reducer (Function): 接收两个参数，分别是当前的 state 树和要处理的 action，返回新的 state 树。</p>
-</li>
-<li><p>[initialState] (any): 初始时的 state。 如果你使用 combineReducers 创建 reducer，它必须是一个普通对象，与传入的 keys 保持同样的结构。否则，你可以自由传入任何 reducer 可理解的内容。</p>
-</li>
-<li><p>enhancer (Function): Store enhancer 是一个组合 store creator 的高阶函数，返回一个新的强化过的 store creator。这与 middleware 相似，它也允许你通过复合函数改变 store 接口。一般是applyMiddleware函数的返回值。</p>
-</li>
-</ul>
-<h4 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h4><p>(Store对象): 保存了应用所有 state 的对象。改变 state 的惟一方法是 dispatch action。你也可以 subscribe 监听 state 的变化，然后更新 UI。</p>
-<h2 id="4-Store的方法"><a href="#4-Store的方法" class="headerlink" title="4.Store的方法"></a>4.Store的方法</h2><h4 id="getState"><a href="#getState" class="headerlink" title="getState()"></a>getState()</h4><blockquote>
-<p>返回应用当前的 state 树。<br>它与 store 的最后一个 reducer 返回值相同。</p>
-</blockquote>
-<p><strong>返回值</strong>：</p>
-<p>(any): 应用当前的 state 树。</p>
-<hr>
-<h4 id="dispatch-action"><a href="#dispatch-action" class="headerlink" title="dispatch(action)"></a>dispatch(action)</h4><blockquote>
-<p>分发 action。这是触发 state 变化的惟一途径。</p>
-<p>会使用当前 getState() 的结果和传入的 action 以同步方式的调用 store 的 reduce 函数。返回值会被作为下一个 state。从现在开始，这就成为了 getState() 的返回值，同时变化监听器(change listener)会被触发。</p>
-</blockquote>
-<p><strong>参数：</strong></p>
-<ol>
-<li>action (Object†): 描述应用变化的普通对象。</li>
-</ol>
-<p><strong>返回值</strong>：</p>
-<p>(Object): 要 dispatch 的 action。</p>
-<hr>
-<h4 id="subscribe-listener"><a href="#subscribe-listener" class="headerlink" title="subscribe(listener)"></a>subscribe(listener)</h4><blockquote>
-<p>添加一个变化监听器。每当 dispatch action 的时候就会执行，state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。</p>
-<p>这是一个底层 API。多数情况下，你不会直接使用它，会使用一些 React（或其它库）的绑定。如果你想让回调函数执行的时候使用当前的 state，你可以 把 store 转换成一个 Observable 或者写一个定制的 observeStore 工具。</p>
-<p>如果需要解绑这个变化监听器，执行 subscribe 返回的函数即可。</p>
-</blockquote>
-<p><strong>参数</strong>：</p>
-<ol>
-<li>listener (Function): 每当 dispatch action 的时候都会执行的回调。state 树中的一部分可能已经变化。你可以在回调函数里调用 getState() 来拿到当前 state。store 的 reducer 应该是纯函数，因此你可能需要对 state 树中的引用做深度比较来确定它的值是否有变化。</li>
-</ol>
-<p><strong>返回值</strong>：</p>
-<p>(Function): 一个可以解绑变化监听器的函数</p>
-<hr>
-<h4 id="replaceReducer-nextReducer"><a href="#replaceReducer-nextReducer" class="headerlink" title="replaceReducer(nextReducer)"></a>replaceReducer(nextReducer)</h4><blockquote>
-<p>替换 store 当前用来计算 state 的 reducer。</p>
-<p>这是一个高级 API。只有在你需要实现代码分隔，而且需要立即加载一些 reducer 的时候才可能会用到它。在实现 Redux 热加载机制的时候也可能会用到。</p>
-</blockquote>
-<p><strong>参数</strong>：</p>
-<ol>
-<li>reducer (Function) store 会使用的下一个 reducer。</li>
-</ol>
-<hr>
-<h2 id="5-applyMiddleware"><a href="#5-applyMiddleware" class="headerlink" title="5.applyMiddleware"></a>5.applyMiddleware</h2><blockquote>
-<p>使用包含自定义功能的 middleware 来扩展 Redux 是一种推荐的方式。Middleware 可以让你包装 store 的 dispatch 方法来达到你想要的目的。同时， middleware 还拥有“可组合”这一关键特性。多个 middleware 可以被组合到一起使用，形成 middleware 链。其中，每个 middleware 都不需要关心链中它前后的 middleware 的任何信息。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">export default function applyMiddleware(...middlewares) &#123;</div><div class="line">  return (createStore) =&gt; (reducer, preloadedState, enhancer) =&gt; &#123;</div><div class="line">    const store = createStore(reducer, preloadedState, enhancer)</div><div class="line">    let dispatch = store.dispatch</div><div class="line">    let chain = []</div><div class="line"></div><div class="line">    const middlewareAPI = &#123;</div><div class="line">      getState: store.getState,</div><div class="line">      dispatch: (action) =&gt; dispatch(action)</div><div class="line">    &#125;</div><div class="line">    chain = middlewares.map(middleware =&gt; middleware(middlewareAPI))</div><div class="line">    dispatch = compose(...chain)(store.dispatch)</div><div class="line"></div><div class="line">    return &#123;</div><div class="line">      ...store,</div><div class="line">      dispatch</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><ul>
-<li>…middlewares (arguments): 遵循 Redux middleware API 的函数。每个 middleware 接受 Store 的 dispatch 和 getState 函数作为命名参数，并返回一个函数。该函数会被传入 被称为 next 的下一个 middleware 的 dispatch 方法，并返回一个接收 action 的新函数，这个函数可以直接调用 next(action)，或者在其他需要的时刻调用，甚至根本不去调用它。调用链中最后一个 middleware 会接受真实的 store 的 dispatch 方法作为 next 参数，并借此结束调用链。所以，middleware 的函数签名是 ({ getState, dispatch }) =&gt; next =&gt; action。</li>
-</ul>
-<h4 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h4><p>(Function) 一个应用了 middleware 后的 store enhancer。这个 store enhancer 就是一个函数，并且需要应用到 createStore。它会返回一个应用了 middleware 的新的 createStore。</p>
-<h2 id="6-combineReducers"><a href="#6-combineReducers" class="headerlink" title="6.combineReducers"></a>6.combineReducers</h2><blockquote>
-<p>随着应用变得复杂，需要对 reducer 函数 进行拆分，拆分后的每一块独立负责管理 state 的一部分。</p>
-<p>combineReducers 辅助函数的作用是，把一个由多个不同 reducer 函数作为 value 的 object，合并成一个最终的 reducer 函数，然后就可以对这个 reducer 调用 createStore。</p>
-<p>合并后的 reducer 可以调用各个子 reducer，并把它们的结果合并成一个 state 对象。state 对象的结构由传入的多个 reducer 的 key 决定。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">export default function combineReducers(reducers) &#123;</div><div class="line">  const reducerKeys = Object.keys(reducers)</div><div class="line">  const finalReducers = &#123;&#125;</div><div class="line">  for (let i = 0; i &lt; reducerKeys.length; i++) &#123;</div><div class="line">    const key = reducerKeys[i]</div><div class="line"></div><div class="line">    if (process.env.NODE_ENV !== &apos;production&apos;) &#123;</div><div class="line">      if (typeof reducers[key] === &apos;undefined&apos;) &#123;</div><div class="line">        warning(`No reducer provided for key &quot;$&#123;key&#125;&quot;`)</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (typeof reducers[key] === &apos;function&apos;) &#123;</div><div class="line">      finalReducers[key] = reducers[key]</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  const finalReducerKeys = Object.keys(finalReducers)</div><div class="line"></div><div class="line">  let unexpectedKeyCache</div><div class="line">  if (process.env.NODE_ENV !== &apos;production&apos;) &#123;</div><div class="line">    unexpectedKeyCache = &#123;&#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  let shapeAssertionError</div><div class="line">  try &#123;</div><div class="line">    assertReducerShape(finalReducers)</div><div class="line">  &#125; catch (e) &#123;</div><div class="line">    shapeAssertionError = e</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  return function combination(state = &#123;&#125;, action) &#123;</div><div class="line">    //...</div><div class="line">    return hasChanged ? nextState : state  </div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-<p>从源码看出combineReducers函数接收一个参数：reducers，返回一个函数。</p>
-<h4 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a>参数</h4><ul>
-<li>reducers (Object): 一个对象，它的值（value） 对应不同的 reducer 函数，这些 reducer 函数后面会被合并成一个。</li>
-</ul>
-<h4 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a>返回值</h4><p>(Function)：一个调用 reducers 对象里所有 reducer 的 reducer，并且构造一个与 reducers 对象结构相同的 state 对象。</p>
-<h2 id="7-bindActionCreators"><a href="#7-bindActionCreators" class="headerlink" title="7.bindActionCreators"></a>7.bindActionCreators</h2><blockquote>
-<p>把 action creators 转成拥有同名 keys 的对象，但使用 dispatch 把每个 action creator 包围起来，这样可以直接调用它们。</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">export default function bindActionCreators(actionCreators, dispatch) &#123;</div><div class="line">  if (typeof actionCreators === &apos;function&apos;) &#123;</div><div class="line">    return bindActionCreator(actionCreators, dispatch)</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  if (typeof actionCreators !== &apos;object&apos; || actionCreators === null) &#123;</div><div class="line">    throw new Error(</div><div class="line">      `bindActionCreators expected an object or a function, instead received $&#123;actionCreators === null ? &apos;null&apos; : typeof actionCreators&#125;. ` +</div><div class="line">      `Did you write &quot;import ActionCreators from&quot; instead of &quot;import * as ActionCreators from&quot;?`</div><div class="line">    )</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const keys = Object.keys(actionCreators)</div><div class="line">  const boundActionCreators = &#123;&#125;</div><div class="line">  for (let i = 0; i &lt; keys.length; i++) &#123;</div><div class="line">    const key = keys[i]</div><div class="line">    const actionCreator = actionCreators[key]</div><div class="line">    if (typeof actionCreator === &apos;function&apos;) &#123;</div><div class="line">      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  return boundActionCreators</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="参数-3"><a href="#参数-3" class="headerlink" title="参数"></a>参数</h4><ul>
-<li><p>actionCreators (Function or Object): 一个 action creator，或者键值是 action creators 的对象。</p>
-</li>
-<li><p>dispatch (Function): 一个 dispatch 函数，由 Store 实例提供。</p>
-</li>
-</ul>
-<h4 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a>返回值</h4><p>(Function or Object): 一个与原对象类似的对象，只不过这个对象中的的每个函数值都可以直接 dispatch action。如果传入的是一个函数，返回的也是一个函数。</p>
-<p><a href="https://github.com/RN-TV/Redux.git" target="_blank" rel="external">Demo</a></p>
-<p><a href="http://redux.js.org/" target="_blank" rel="external">官方文档</a></p>
-<p><a href="http://www.redux.org.cn/" target="_blank" rel="external">中文文档</a></p>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-      
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
     <article id="post-React组件生命周期" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -1017,6 +1223,109 @@
 </tr>
 </tbody>
 </table>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+      
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-Android嵌套RN页面" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/07/26/Android嵌套RN页面/" class="article-date">
+  	<time datetime="2017-07-26T12:37:44.000Z" itemprop="datePublished">2017-07-26</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/07/26/Android嵌套RN页面/">
+        Android嵌套RN页面
+        
+      </a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="引入ReactNative相关文件"><a href="#引入ReactNative相关文件" class="headerlink" title="引入ReactNative相关文件"></a>引入ReactNative相关文件</h1><h4 id="1-从一个现有的ReactNative项目拷贝如下文件到自己的工程目录"><a href="#1-从一个现有的ReactNative项目拷贝如下文件到自己的工程目录" class="headerlink" title="1.从一个现有的ReactNative项目拷贝如下文件到自己的工程目录:"></a>1.从一个现有的ReactNative项目拷贝如下文件到自己的工程目录:</h4><ul>
+<li>package.json </li>
+<li>index.js</li>
+<li>yarn.lock </li>
+<li>app.json </li>
+<li>——tests—— </li>
+<li>.babelrc </li>
+<li>.buckconfig </li>
+<li>.flowconfig </li>
+<li>.gitaattributes </li>
+<li>.watchmanconfig<blockquote>
+<p>其中package.json文件为安装项目node环境必须文件，其他文件也建议引入。当然也可以自己新建package.json app.json index.js文件</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="2-修改package-json-app-json-index-js-文件的相关配置为自己的工程信息"><a href="#2-修改package-json-app-json-index-js-文件的相关配置为自己的工程信息" class="headerlink" title="2.修改package.json app.json index.js 文件的相关配置为自己的工程信息"></a>2.修改package.json app.json index.js 文件的相关配置为自己的工程信息</h4><h4 id="3-安装工程node环境"><a href="#3-安装工程node环境" class="headerlink" title="3.安装工程node环境"></a>3.安装工程node环境</h4><p>在package.json文件所在目录执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ yarn install 或 npm install</div></pre></td></tr></table></figure>
+<blockquote>
+<p>执行完毕会在当前目录生成node_modules文件夹，前提是电脑已经安装了node和react-native环境</p>
+</blockquote>
+<h4 id="4-开始编写js代码"><a href="#4-开始编写js代码" class="headerlink" title="4.开始编写js代码"></a>4.开始编写js代码</h4><h1 id="编写Android端代码"><a href="#编写Android端代码" class="headerlink" title="编写Android端代码"></a>编写Android端代码</h1><h2 id="引入依赖："><a href="#引入依赖：" class="headerlink" title="引入依赖："></a>引入依赖：</h2><h4 id="1-工程根目录build-gradle"><a href="#1-工程根目录build-gradle" class="headerlink" title="1.工程根目录build.gradle:"></a>1.工程根目录build.gradle:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">allprojects &#123;</div><div class="line">    repositories &#123;</div><div class="line">        jcenter()</div><div class="line">        mavenLocal()</div><div class="line">        maven &#123;</div><div class="line">            // 这里是指定所依赖的 React Native 是来自从 npm 安装来的 /node_modules 目录，</div><div class="line">            // 因为 Maven 中央仓库里的 React Native 可能不是最新的。</div><div class="line">            url &quot;$rootDir/node_modules/react-native/android&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="2-主Moundle目录build-gradle"><a href="#2-主Moundle目录build-gradle" class="headerlink" title="2.主Moundle目录build.gradle:"></a>2.主Moundle目录build.gradle:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">//依赖</div><div class="line">compile &apos;com.facebook.react:react-native:+&apos;</div><div class="line"></div><div class="line">android&#123;</div><div class="line">    //...</div><div class="line">    defaultConfig&#123;</div><div class="line">        //ndk支持</div><div class="line">        ndk&#123;</div><div class="line">            abiFilters &apos;armeabi&apos;, &apos;x86&apos;, &apos;armeabi-v7a&apos;</div><div class="line">        &#125;</div><div class="line">        //...</div><div class="line">    &#125;</div><div class="line">    //</div><div class="line">    splits &#123;</div><div class="line">        abi &#123;</div><div class="line">            reset()</div><div class="line">            enable enableSeparateBuildPerCPUArchitecture</div><div class="line">            universalApk false  // If true, also generate a universal APK</div><div class="line">            include &quot;armeabi-v7a&quot;, &quot;x86&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    //...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="３-如果有依赖其他三方开源项目："><a href="#３-如果有依赖其他三方开源项目：" class="headerlink" title="３.如果有依赖其他三方开源项目："></a>３.如果有依赖其他三方开源项目：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">//例子：</div><div class="line">//settings.gradle中</div><div class="line"></div><div class="line">include &apos;:react-native-sqlite-storage&apos;</div><div class="line">project(&apos;:react-native-sqlite-storage&apos;).projectDir = new File(rootProject.projectDir, &apos;../node_modules/react-native-sqlite-storage/src/android&apos;)</div><div class="line"></div><div class="line">//主Moundle目录build.gradle中</div><div class="line">compile project(&apos;:react-native-sqlite-storage&apos;)</div></pre></td></tr></table></figure>
+<blockquote>
+<p>默认情况执行react-native link会自动添加以上代码</p>
+</blockquote>
+<h2 id="修改代码"><a href="#修改代码" class="headerlink" title="修改代码"></a>修改代码</h2><h4 id="1-AndroidManifest-xml中添加权限并注册DevSettingsActivity"><a href="#1-AndroidManifest-xml中添加权限并注册DevSettingsActivity" class="headerlink" title="1. AndroidManifest.xml中添加权限并注册DevSettingsActivity"></a>1. AndroidManifest.xml中添加权限并注册DevSettingsActivity</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.SYSTEM_ALERT_WINDOW&quot; /&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;</div><div class="line">&lt;application</div><div class="line">        android:name=&quot;.MyApplication&quot;</div><div class="line">        android:allowBackup=&quot;true&quot;</div><div class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;</div><div class="line">        android:label=&quot;@string/app_name&quot;</div><div class="line">        android:supportsRtl=&quot;true&quot;</div><div class="line">        android:theme=&quot;@style/AppTheme&quot;&gt;</div><div class="line">          &lt;activity android:name=&quot;com.facebook.react.devsupport.DevSettingsActivity&quot; /&gt;</div><div class="line"> &lt;/application&gt;</div></pre></td></tr></table></figure>
+<h4 id="2-创建容器Activity"><a href="#2-创建容器Activity" class="headerlink" title="2. 创建容器Activity"></a>2. 创建容器Activity</h4><p> 创建容器Activity有两种方案。一:继承ReactNative提供ReactActivity。二:继承Android原生Activity,然后自己实现ReactNative提供的DefaultHardwareBackBtnHandler, PermissionAwareActivity接口.</p>
+<blockquote>
+<p>建议使用第二种方式,这样可以实现预加载需求.</p>
+</blockquote>
+<h4 id="3-创建ReactRootView"><a href="#3-创建ReactRootView" class="headerlink" title="3. 创建ReactRootView"></a>3. 创建ReactRootView</h4><p>在容器Activity onCreate中创建ReactRootView，如果有做预加载，优先缓存中获取ReactRootView</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mReactRootView = new ReactRootView(this);</div><div class="line"></div><div class="line">setContentView(mReactRootView);</div></pre></td></tr></table></figure>
+<h4 id="4-获得ReactInstanceManager"><a href="#4-获得ReactInstanceManager" class="headerlink" title="4. 获得ReactInstanceManager"></a>4. 获得ReactInstanceManager</h4><p>ReactInstanceManager可以自己构建，也可以从ReactNativeHost获取，建议从ReactNativeHost中获取</p>
+<p>从ReactNativeHost中获取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();</div></pre></td></tr></table></figure></p>
+<p>自己构建：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"> ReactInstanceManagerBuilder builder = ReactInstanceManager.builder()</div><div class="line">                .setApplication(getApplication())</div><div class="line">                .setJSMainModuleName(&quot;index.android&quot;)</div><div class="line">                .addPackage(new MainReactPackage())</div><div class="line">                .setUseDeveloperSupport(true)</div><div class="line">                .setInitialLifecycleState(LifecycleState.RESUMED);</div><div class="line"></div><div class="line">//        for (ReactPackage reactPackage : getPackages()) &#123;</div><div class="line">//            builder.addPackage(reactPackage);</div><div class="line">//        &#125;</div><div class="line"></div><div class="line">        String jsBundleFile = FileUtils.getJsBundleFile(getApplicationContext());</div><div class="line">        if (jsBundleFile != null) &#123;</div><div class="line">            builder.setJSBundleFile(jsBundleFile);</div><div class="line">        &#125; else &#123;</div><div class="line">            builder.setBundleAssetName(Assertions.assertNotNull(&quot;index.android.bundle&quot;));</div><div class="line">        &#125;</div><div class="line">        mReactInstanceManager = builder.build();</div></pre></td></tr></table></figure></p>
+<h4 id="5-生命周期函数回调ReactInstanceManager对应的方法。"><a href="#5-生命周期函数回调ReactInstanceManager对应的方法。" class="headerlink" title="5. 生命周期函数回调ReactInstanceManager对应的方法。"></a>5. 生命周期函数回调ReactInstanceManager对应的方法。</h4><h4 id="6-关联react-native项目。"><a href="#6-关联react-native项目。" class="headerlink" title="6. 关联react native项目。"></a>6. 关联react native项目。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mReactRootView.startReactApplication(mReactInstanceManager, &quot;RN&quot;, null);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>注意第二个参数与AppRegistry.registerComponent第一个参数一样。</p>
+</blockquote>
+<h4 id="7-打包js"><a href="#7-打包js" class="headerlink" title="7. 打包js"></a>7. 打包js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output app/src/main/assets/index.android.bundle --assets-dest app/src/main/res/</div></pre></td></tr></table></figure>
+<ul>
+<li>（1）–entry   入口js文件，android系统就是index.android.js，ios系统就是index.ios.js</li>
+<li>（2）–bundle-output   生成的bundle文件路径</li>
+<li>（3）–platform   平台</li>
+<li>（4）–assets-dest  图片资源的输出目录</li>
+<li>（5）–dev   是否为开发版本，打正式版的安装包时我们将其赋值为false</li>
+</ul>
+<p><a href="https://github.com/RN-TV/Native" target="_blank" rel="external">Demo</a></p>
 
       
     </div>
@@ -1440,147 +1749,10 @@
 
 
   
-    <article id="post-Service" class="article article-type-post" itemscope itemprop="blogPost">
   
-    <div class="article-meta">
-      <a href="/2015/10/02/Service/" class="article-date">
-  	<time datetime="2015-10-02T12:30:24.000Z" itemprop="datePublished">2015-10-02</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/10/02/Service/">
-        Service
-        
-      </a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="一、Service："><a href="#一、Service：" class="headerlink" title="一、Service："></a>一、Service：</h1><h2 id="（一）、Service-简介："><a href="#（一）、Service-简介：" class="headerlink" title="（一）、Service 简介："></a>（一）、Service 简介：</h2><p>1、何谓“Service”？<br>“Service” 意思即“服务”的意思， 像 Windows 上面的服务一样，服务是在后台上运行，承担着静悄悄的不为人所注意的工作。Service运行在后台，它是不可见的、无界面的程序。<br>Service可以在很多场合的应用中使用，比如播放多媒体的时候用户启动了其他Activity，这个时候程序要在后台继续播放；比如检测SD卡上文件的变化；再或者在后台记录用户的地理信息位置的改变；或者启动一个服务来运行并一直监听某种动作等等。</p>
-<p>2、Service概念的总结：<br>Service在后台运行，不可以与用户直接交互；<br>一个服务不是一个单独的进程。服务对象本身并不意味着它是在自己的进程中运行，除非另有规定，否则它与运行程序是同在一个进程中；<br>一个服务不是一个单独的线程。Service和其他组件一样，默认情况下，Service中的所有代码都是运行在主线程中；<br>Service存在的价值虽然不如Activity那么清晰。但是一般都让Service执行耗时较长的操作。例如：播放音乐、下载文件、上传文件等等。但是因为Service默认运行在主线程中，因此不能直接用它来做耗时的请求或者动作，最好在Service中启动新线程来运行耗时的任务；<br>需要通过某一个Activity或其他Context对象来启动Service。context.startService() 或 context.bindService()；<br>Service很大程度上充当了应用程序后台线程管理器的角色。（如果Activity中新开启一个线程，当该Acitivity关闭后，该线程依然在工作，但是与开启它的Activity失去联系。也就是说此时的这个线程处于失去管理的状态。但是使用Service，则可以对后台运行的线程有效地管理。）</p>
-<p>3、为什么不使用后台线程而使用Service？<br>1、Service可以放在独立的进程中，所以更安全；<br>2、使用Service可以依赖现有的binder机制，不需要在应用层面上处理线程同步的繁杂工作；<br>3、系统可以重新启动异常死去的Service。<br>4、Service 与 Activity 的相同点与不同点：<br>不同点：Activity是与用户交互的组件，即可以看到UI界面，而Service是在后台运行、无需界面；<br>相同点：使用Activity 时我们需要在配置文件中声明<activity>标签，同样的使用Service 也需要在配置文件中声明<service>标签。都具有一定的生命周期。</service></activity></p>
-<h2 id="（二）、服务的分类："><a href="#（二）、服务的分类：" class="headerlink" title="（二）、服务的分类："></a>（二）、服务的分类：</h2><p>1、本地服务Local Service：<br>Local Service 用于应用程序内部。用于实现应用程序自己的一些耗时任务，比如查询升级信息，并不占用应用程序比如Activity所属线程，而是单开线程后台执行，这样用户体验比较好。</p>
-<p>启动service有两种方法：<br>1）、  Context.startService()<br>                    调用者与服务之间没有关联，即使调用者退出，服务仍可运行<br>2）、  Context.bindService()<br>                    调用者与服务绑定在一起，调用者一旦退出，服务也就终止</p>
-<p>A、根据启动方式将本地服务分为：启动服务Started Service和绑定服务Bound  Service。【重点】</p>
-<ul>
-<li><p>Started Service：被启动的服务</p>
-<pre><code>- 被启动的服务是由其它组件调用startService()方法而启动的，该方法会导致被启动服务的生命周期方法onStartCommand()被回调。当服务是被启动状态后，其生命周期与启动它的组件无关，即使启动服务的组件（Activity，BroadcastReceiver）已经被销毁，该服务还可以在后台无限期运行。除非调用stopSelf()或stopService()来停止该服务。
-</code></pre></li>
-<li><p>Bound  Service：被绑定的服务</p>
-<pre><code>- 绑定服务是允许其它应用程序绑定并且与之交互的Service的实现类。为了提供绑定，必须实现onBind()回调方法。该方法返回IBinder对象，它定义了服务类与Activity交互的程序接口。
-- Activity通过bindService()方法绑定到服务类，同时Activity必须提供ServiceConnection接口的实现类，它监视Activity与服务类之间的连接。在重写ServiceConnection接口的onServiceConnected()方法时，实现了将服务类顺利赋值到了Activity中，实现了在Activity中使用该服务类并执行其中的方法。
-</code></pre></li>
-</ul>
-<p>B、根据onStartCommand()回调方法的返回值，将Service分为粘性Service和非粘性Service：<br>onStartCommand()方法有三种返回值：</p>
-<ul>
-<li>START_STICKY（常量值：1）：sticky的意思是“粘性的”。使用这个返回值时，我们启动的服务跟应用程序”粘”在一起，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务。当再次启动服务时，传入的第一个参数将为null;</li>
-<li>START_NOT_STICKY（常量值：2）：“非粘性的”。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统不会自动重启该服务。</li>
-<li>START_REDELIVER_INTENT（常量值：3）：重传Intent。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。</li>
-</ul>
-<p>【备注：】<br>以上三种情况，可以理解为发生车祸后的人：<br>START_STICKY：（常量值：1）车祸后自己苏醒，但是失忆；<br>START_NOT_STICKY：（常量值：2）车祸后再也没有苏醒；<br>START_REDELIVER_INTENT：（常量值：3）车祸后自己苏醒，依然保持记忆。<br>2、远程服务Remote Service：<br>Remote Service 用于android系统内部的应用程序之间。可以定义接口并把接口暴露出来，以便其他应用进行操作。可被其他应用程序复用，比如天气预报服务，其他应用程序不需要再写这样的服务，调用已有的即可。</p>
-<h2 id="（三）、Service的生命周期："><a href="#（三）、Service的生命周期：" class="headerlink" title="（三）、Service的生命周期："></a>（三）、Service的生命周期：</h2><p>1、Started Service的生命周期：</p>
-<ul>
-<li>onCreate()：创建服务</li>
-<li>onStartCommand()：服务开始运行（在2.0以前版本中，使用onStart()回调方法）</li>
-<li>onDestroy() ：服务被停止</li>
-</ul>
-<p>【详细说明：】<br>在程序中调用：context.startService() 会触发执行Service生命周期中的onCreate()、onStartCommand()回调方法，此时服务就开始正式运行；<br>如果Service还没有运行，则android先调用onCreate()然后调用onStartCommand()；如果Service已经运行，则只调用onStartCommand()，所以一个Service的onStartCommand方法可能会重复调用多次；<br>如果在程序中调用：context.stopService()会触发执行Service生命周期中的onDestroy()回调方法，会让服务停止；<br>stopService()的时候直接onDestroy，如果是调用者自己直接退出而没有调用stopService()的话，Service会一直在后台运行。该Service的调用者再启动该Service后可以通过stopService关闭Service；stopSelf()<br>所以StartService的生命周期为：onCreate –&gt; onStartCommand(可多次调用) –&gt; onDestroy。</p>
-<p>2、Bound Service的生命周期：</p>
-<ul>
-<li>onCreate()：创建服务</li>
-<li>onBind()：绑定服务，服务开始运行</li>
-<li>onUnbind()：取消绑定</li>
-<li>onDestroy() ：服务被停止</li>
-</ul>
-<p>【详细说明：】<br>在程序中调用：context.bindService()会触发执行Service生命周期中的onCreate()、onBind()回调方法，此时服务开始运行；<br>onBind将返回给客户端一个IBind接口实例，IBind允许客户端回调服务的方法，比如得到Service运行的状态或其他操作。此后调用者（Context，例如Activity）会和Service绑定在一起；<br>如果调用Service的调用者Context退出了，那么会依次调用Service生命周期中的onUnbind()、onDestroy()回调方法，会让服务停止；<br>所以BindService的生命周期为：onCreate –&gt; onBind(只一次，不可多次绑定) –&gt; onUnbind –&gt; onDestory。</p>
-<p> 【备注：】<br>Service是不能自己启动的，只有通过 Context 对象调用startService() 和bindService() 方法来启动。<br>在Service每一次的开启关闭过程中，只有onStartCommand()可被多次调用(通过多次startService调用)，其他onCreate()、onBind()、onUnbind()、onDestory()在一个生命周期中只能被调用一次。</p>
-<p>Service可以在和多场合的应用中使用，比如播放多媒体的时候用户启动了其他Activity这个时候程序要在后台继续播放，比如检测SD卡上文件的变化，再或者在后台记录你地理信息位置的改变等等，总之服务总是藏在后头的。</p>
-<p>Service和Thread的区别:</p>
-<ul>
-<li>Thread：Thread 是程序执行的最小单元，可以用 Thread 来执行一些异步的操作。</li>
-<li>Service：Service 是android的一种机制，当它运行的时候如果是Local Service，那么对应的 Service 是运行在主进程的 main 线程上的。如果是Remote Service，那么对应的 Service 则是运行在独立进程的 main 线程上。<pre><code>Thread 的运行是独立的，也就是说当一个 Activity 被 finish 之后，如果没有主动停止 Thread 或者 Thread 里的 run 方法没有执行完毕的话，Thread 也会一直执行。因此这里会出现一个问题：当 Activity 被 finish 之后，不再持有该 Thread 的引用，也就是不能再控制该Thread。另一方面，没有办法在不同的 Activity 中对同一 Thread 进行控制。
-例如：如果 一个Thread 需要每隔一段时间连接服务器校验数据，该Thread需要在后台一直运行。这时候如果创建该Thread的Activity被结束了而该Thread没有 停止，那么将没有办法再控制该Thread，除非kill掉该程序的进程。这时候如果创建并启动一个 Service ，在 Service 里面创建、运行并控制该 Thread，这样便解决了该问题(因为任何 Activity 都可以控制同一个Service，而系统也只会创建一个对应 Service 的实例)。
-因此可以把 Service 想象成一种消息服务，可以在任何有 Context 的地方调用 Context.startService、Context.stopService、Context.bindService、 Context.unbindService来控制它，也可以在 Service 里注册 BroadcastReceiver，通过发送 broadcast 来达到控制的目的，这些都是 Thread 做不到的。
-</code></pre></li>
-</ul>
-<h1 id="二、本地Service："><a href="#二、本地Service：" class="headerlink" title="二、本地Service："></a>二、本地Service：</h1><h2 id="（一）、Started-Service启动MediaPlayer播放音乐："><a href="#（一）、Started-Service启动MediaPlayer播放音乐：" class="headerlink" title="（一）、Started Service启动MediaPlayer播放音乐："></a>（一）、Started Service启动MediaPlayer播放音乐：</h2><p>1、操作步骤：<br>1、写xml布局文件；<br>2、写MainActivity文件，通过按钮点击事件启动Service；<br>3、写继承于Service的StartService类文件：重写onCreate()/onStartCommand()/onDestroy()回调方法。</p>
-<p>2、XML布局文件核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">&lt;LinearLayoutxmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:layout_width=&quot;fill_parent&quot;</div><div class="line">    android:layout_height=&quot;fill_parent&quot;</div><div class="line">    android:orientation=&quot;vertical&quot;&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_play&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;播放音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_pause&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;暂停音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_stop&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;停止音乐&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_exit&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;关闭当前窗体&quot;/&gt;</div><div class="line"></div><div class="line">&lt;Button</div><div class="line">android:id=&quot;@+id/button_main_stopservice&quot;</div><div class="line">        android:layout_width=&quot;wrap_content&quot;</div><div class="line">        android:layout_height=&quot;wrap_content&quot;</div><div class="line">        android:onClick=&quot;clickButton&quot;</div><div class="line">        android:text=&quot;停止服务&quot;/&gt;</div><div class="line"></div><div class="line">&lt;/LinearLayout&gt;</div></pre></td></tr></table></figure>
-<p>3、MainActivty核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">publicclass MainActivity extends Activity &#123;</div><div class="line">privatestaticfinal String TAG = &quot;MainActivity&quot;;</div><div class="line">private Intent intent = null;</div><div class="line">   @Override</div><div class="line">protectedvoid onCreate(Bundle savedInstanceState) &#123;</div><div class="line">           Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate(savedInstanceState);</div><div class="line">           setContentView(R.layout.activity_main);</div><div class="line">intent = new Intent(this, StartServicePlayMusic.class);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">protectedvoid onDestroy() &#123;</div><div class="line">           Log.i (&quot;MainActivty&quot;, &quot;==onDestroy()&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (intent != null) &#123;</div><div class="line">                // 停止服务可以通过stopService(intent)来停止，也可以intent到Service程序中，通过stopSelf()来停止。</div><div class="line">                stopService(intent);</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid clickButton(View view) &#123;</div><div class="line">int type = 0;</div><div class="line">switch (view.getId()) &#123;</div><div class="line">case R.id.button_main_play:</div><div class="line">                   type = 1;</div><div class="line">break;</div><div class="line">case R.id.button_main_pause:</div><div class="line">                   type = 2;</div><div class="line">break;</div><div class="line">case R.id.button_main_stop:</div><div class="line">                   type = 3;</div><div class="line">break;</div><div class="line">case R.id.button_main_exit:</div><div class="line">                   finish();</div><div class="line">break;</div><div class="line">case R.id.button_main_stopservice:</div><div class="line">                    // 停止服务可以通过stopService(intent)来停止，也可以intent到Service程序中，通过stopSelf()来停止</div><div class="line">                    // stopService(intent);</div><div class="line">                    // finish();</div><div class="line">                   type = 4;</div><div class="line">break;</div><div class="line">           &#125;</div><div class="line">           Bundle bundle = new Bundle();</div><div class="line">           bundle.putInt(&quot;type&quot;, type);</div><div class="line">intent.putExtras(bundle);</div><div class="line">           startService(intent);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>4、StartServicePlayMusic核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">publicclass StartServicePlayMusic extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;StartServicePlayMusic&quot;;</div><div class="line">private MediaPlayer mediaPlayer;</div><div class="line"></div><div class="line">   @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">           Log.i (TAG, &quot;==onBind执行&quot;);</div><div class="line">returnnull;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">           Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate();</div><div class="line">if (mediaPlayer == null) &#123;</div><div class="line">mediaPlayer = MediaPlayer.create(this, R.raw.hitta);</div><div class="line">mediaPlayer.setLooping(false);</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicint onStartCommand(Intent intent, int flags, int startId) &#123;</div><div class="line">           Log.i (TAG, &quot;==onStartCommand执行&quot;);</div><div class="line">if (intent != null) &#123;</div><div class="line">                   Bundle bundle = intent.getExtras();</div><div class="line">int type = bundle.getInt(&quot;type&quot;);</div><div class="line">switch (type) &#123;</div><div class="line">case 1:</div><div class="line">                           play();</div><div class="line">break;</div><div class="line">case 2:</div><div class="line">                           pause();</div><div class="line">break;</div><div class="line">case 3:</div><div class="line">                           stop();</div><div class="line">break;</div><div class="line">case 4:</div><div class="line">                           stopSelf();</div><div class="line">break;</div><div class="line">                   &#125;</div><div class="line">           &#125;</div><div class="line">              returnSTART_STICKY;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">             Log.i (TAG, &quot;==onDestroy执行&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">mediaPlayer.release();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid play() &#123;</div><div class="line">if (!mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.start();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid pause() &#123;</div><div class="line">if (mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.pause();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">publicvoid stop() &#123;</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">           &#125;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>5、Manifest清单配置文件核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;service </div><div class="line"></div><div class="line">android:name=&quot;.StartServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=&quot;com.steven.startservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line">android:name=&quot;.StartServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=&quot;com.steven.startservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div></pre></td></tr></table></figure>
-<p>6、Started  Service总结：<br>Activity页面中需要startService(intent) 和 stopService(intent)两个方法来启动Service和停止Service;<br>继承于Service类的自定义子类——MyStartService类中，生命周期回调方法有：onCreate() 、onStartCommand() 、onDestroy()；<br>如果停止服务，可以在Activity中调用stopService(intent)，也可以intent到Service中执行stopSelf()方法；<br>执行停止服务方法，会回调Service生命周期中的onDestroy()方法；<br>如果希望关闭Activity窗体，服务也停止，那么在Activity的onDestroy()方法中执行stopService()方法。如果希望关闭窗体后，服务还继续，那么Activity的onDestroy()中不执行停止服务即可；<br>在StartService中不会回调onBind()方法；<br>在停止服务后，如果再次点击“播放”，可以重新启动StartService。</p>
-<p>7、IntentService与Service：</p>
-<p>不管是何种Service，它默认都是在应用程序的主线程（亦即UI线程）中运行的。所以，如果你的Service将要运行非常耗时或者可能被阻塞的操作时，你的应用程序将会被挂起，甚至会出现ANR错误。为了避免这一问题，你应该在Service中重新启动一个新的线程来进行这些操作。现有两种方法大家参考：</p>
-<ol>
-<li><p>直接在Service的onStartCommand()方法中新建一个线程来执行;</p>
-</li>
-<li><p>Android SDK 中为我们提供了一个现成的Service类来实现这个功能，它就是IntentService，它主要负责以下几个方面：<br>Creates a default worker thread that executes all intents delivered to onStartCommand() separate from your application’s main thread.<br> 生成一个默认的且与主线程互相独立的工作者线程来执行所有传送至 onStartCommand() 方法的Intetnt<br>Creates a work queue that passes one intent at a time to your onHandleIntent() implementation, so you never have to worry about multi-threading.<br> 生成一个工作队列来传送Intent对象给你的onHandleIntent()方法，同一时刻只传送一个Intent对象，这样一来，你就不必担心多线程的问题。<br>Stops the service after all start requests have been handled, so you never have to call stopSelf().<br> 在所有的请求(Intent)都被执行完以后会自动停止服务，所以，你不需要自己去调用stopSelf()方法来停止该服务<br>Provides default implementation of onBind() that returns null.<br> 提供了一个onBind()方法的默认实现，它返回null<br>Provides a default implementation of onStartCommand() that sends the intent to the work queue and then to your onHandleIntent() implementation<br> 提供了一个onStartCommand()方法的默认实现，它将Intent先传送至工作队列，然后从工作队列中每次取出一个传送至onHandleIntent()方法，在该方法中对Intent对相应的处理</p>
-</li>
-</ol>
-<p>IntentService使用队列的方式将请求的Intent加入队列，然后开启一个worker thread(线程)来处理队列中的Intent，对于异步的startService请求，IntentService会处理完成一个之后再处理第二个，每一个请求都会在一个单独的worker thread中处理，不会阻塞应用程序的主线程。<br>这里就给我们提供了一个思路，如果有耗时的操作可以在Service里面开启新线程，也可以使用IntentService来处理耗时操作。 但你若是想在Service中让多个线程并发的话，就得使用第一种方法，在Service内部起多个线程，但是这样的话，你可要处理好线程的同步。</p>
-<p>（1）、Service实现加载图片的核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">publicclass DownloadService extends IntentService &#123;</div><div class="line">privatestaticfinal String TAG = &quot;DownloadService&quot;;</div><div class="line">private String urlString = &quot;https://www.google.com.hk/images/srpr/logo11w.png&quot;;</div><div class="line">private NotificationCompat.Builder builder = null;</div><div class="line">private NotificationManager manager = null;</div><div class="line"></div><div class="line">public DownloadService() &#123;</div><div class="line">super(&quot;&quot;);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">protectedvoid onHandleIntent(Intent intent) &#123;</div><div class="line">manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">builder = new NotificationCompat.Builder(getApplicationContext());</div><div class="line">builder.setSmallIcon(R.drawable.ic_launcher);</div><div class="line">builder.setContentTitle(&quot;提示：&quot;);</div><div class="line">builder.setContentText(&quot;图片加载完成，请点击查看！&quot;);</div><div class="line">builder.setTicker(&quot;图片加载完成&quot;);</div><div class="line">builder.setAutoCancel(true);</div><div class="line">             Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);</div><div class="line">             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</div><div class="line">             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent2,</div><div class="line">                             PendingIntent.FLAG_ONE_SHOT);</div><div class="line">builder.setContentIntent(pIntent);</div><div class="line"></div><div class="line">byte[] data = HttpClientHelper.loadByteFromURL(urlString);</div><div class="line">boolean flag = SDCardHelper.saveFileToSDCard(data, &quot;Download&quot;, &quot;logo11w.png&quot;);</div><div class="line">            </div><div class="line">if (flag) &#123;</div><div class="line">manager.notify(1, builder.build());</div><div class="line">             &#125;</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>（2）、IntentService实现加载图片的核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">publicclass DownloadService extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;DownloadService&quot;;</div><div class="line">private String urlString = &quot;https://www.google.com.hk/images/srpr/logo11w.png&quot;;</div><div class="line">private NotificationCompat.Builder builder = null;</div><div class="line">private NotificationManager manager = null;</div><div class="line">     @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">returnnull;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">super.onCreate();</div><div class="line">manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">builder = new NotificationCompat.Builder(getApplicationContext());</div><div class="line">builder.setSmallIcon(R.drawable.ic_launcher);</div><div class="line">builder.setContentTitle(&quot;提示：&quot;);</div><div class="line">builder.setContentText(&quot;图片加载完成，请点击查看！&quot;);</div><div class="line">builder.setTicker(&quot;图片加载完成&quot;);</div><div class="line">builder.setAutoCancel(true);</div><div class="line">             Intent intent = new Intent(getApplicationContext(), MainActivity.class);</div><div class="line">             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</div><div class="line">             PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent,</div><div class="line">             PendingIntent.FLAG_ONE_SHOT);</div><div class="line">builder.setContentIntent(pIntent);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicint onStartCommand(Intent intent, int flags, int startId) &#123;</div><div class="line">new Thread(new Runnable() &#123;</div><div class="line">                    @Override</div><div class="line">publicvoid run() &#123;</div><div class="line">byte[] data = HttpClientHelper.loadByteFromURL(urlString);</div><div class="line">boolean flag = SDCardHelper.saveFileToSDCard(data, &quot;Download&quot;,&quot;logo11w.png&quot;);</div><div class="line">if (flag) &#123;</div><div class="line">manager.notify(1, builder.build());</div><div class="line">                                     stopSelf();</div><div class="line">                             &#125;</div><div class="line">                     &#125;</div><div class="line">             &#125;).start();</div><div class="line">returnSTART_STICKY;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">super.onDestroy();</div><div class="line">     &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="（二）、Bound-Service启动MediaPlayer播放音乐："><a href="#（二）、Bound-Service启动MediaPlayer播放音乐：" class="headerlink" title="（二）、Bound Service启动MediaPlayer播放音乐："></a>（二）、Bound Service启动MediaPlayer播放音乐：</h2><p>1、操作步骤：<br>1、写xml布局文件；<br>2、写MainActivity文件，构建ServiceConnection对象，重写其中的抽象方法onServiceDisconnected()和onServiceConnected()；<br>3、写继承于Service的BindService类文件，定义继承于Binder的内部类MyBinder，在其中定义方法getService()；<br>4、BindService类中重写onCreate()方法、重写onBind()回调方法，onBind()方法返回MyBinder对象，重写onDestroy()方法；</p>
-<p>2、XML布局文件：同上</p>
-<p>3、MainActivty核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line">publicclass MainActivity extends Activity &#123;</div><div class="line">privatestaticfinal String TAG = &quot;MainActivity&quot;;</div><div class="line">private Intent intent;</div><div class="line">private ServiceConnection conn = null;</div><div class="line">private BindServicePlayMusic musicService;</div><div class="line"></div><div class="line"> @Override</div><div class="line">protectedvoid onCreate(Bundle savedInstanceState) &#123;</div><div class="line">          Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate(savedInstanceState);</div><div class="line"></div><div class="line">          setContentView(R.layout.activity_main);</div><div class="line">          // 启动服务有多种写法：</div><div class="line">          // 可以通过new Intent(action字符串)来实现;</div><div class="line">          // intent = new Intent(&quot;com.steven.bindservice.playmusic&quot;);</div><div class="line">intent = new Intent(this, BindServicePlayMusic.class);</div><div class="line">conn = new ServiceConnection() &#123;</div><div class="line"> @Override</div><div class="line">publicvoid onServiceDisconnected(ComponentName name) &#123;</div><div class="line">                            musicService = null;</div><div class="line">                  &#125;</div><div class="line"></div><div class="line">                 @Override</div><div class="line">publicvoid onServiceConnected(ComponentName name, IBinder service) &#123;</div><div class="line">musicService = ((BindServicePlayMusic.MyBinder) service).getService();</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.play();</div><div class="line">                          &#125;</div><div class="line">                  &#125;</div><div class="line">          &#125;;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">publicvoid clickButton(View view) &#123;</div><div class="line">switch (view.getId()) &#123;</div><div class="line">case R.id.button_main_play:</div><div class="line">if (musicService == null) &#123;</div><div class="line">                           bindService(intent, conn, Context.BIND_AUTO_CREATE);</div><div class="line">                   &#125; else &#123;</div><div class="line">musicService.play();</div><div class="line">                   &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_pause:</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.pause();</div><div class="line">                  &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_stop:</div><div class="line">if (musicService != null) &#123;</div><div class="line">musicService.stop();</div><div class="line">                  &#125;</div><div class="line">break;</div><div class="line">case R.id.button_main_exit:</div><div class="line">                  finish();</div><div class="line">break;</div><div class="line">case R.id.button_main_stopservice:</div><div class="line">                  // BindService中stopService(intent)不起作用，要通过undbindService来停止服务</div><div class="line">                  // stopService(intent);</div><div class="line">                  // musicService = null的目的是如果停止服务后，再次”播放“，可以正常执行。</div><div class="line">                  // 如果不将musicService设置为null，再次播放时，将直接执行musicService.play()，</div><div class="line"> //而不执行bindService()，那么会导致异常</div><div class="line">                      musicService = null;</div><div class="line">                      unbindService(conn);</div><div class="line">break;</div><div class="line">          &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>4、BindServicePlayMusic核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">publicclass BindServicePlayMusic extends Service &#123;</div><div class="line">privatestaticfinal String TAG = &quot;BindServicePlayMusic&quot;;</div><div class="line">private MediaPlayer mediaPlayer;</div><div class="line">private IBinder binder = null;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onCreate() &#123;</div><div class="line">              Log.i (TAG, &quot;==onCreate执行&quot;);</div><div class="line">super.onCreate();</div><div class="line">if (mediaPlayer == null) &#123;</div><div class="line">mediaPlayer = MediaPlayer.create(this, R.raw.heavencity);</div><div class="line">mediaPlayer.setLooping(false);</div><div class="line">              &#125;</div><div class="line">binder = new MyBinder();</div><div class="line">      &#125;</div><div class="line"></div><div class="line">class MyBinder extends Binder &#123;</div><div class="line">public BindServicePlayMusic getService() &#123;</div><div class="line">return BindServicePlayMusic.this;</div><div class="line">              &#125;</div><div class="line">      &#125;;</div><div class="line"></div><div class="line">     @Override</div><div class="line">public IBinder onBind(Intent intent) &#123;</div><div class="line">              Log.i (TAG, &quot;==onBind执行&quot;);</div><div class="line">              play();</div><div class="line">returnbinder;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicboolean onUnbind(Intent intent) &#123;</div><div class="line">              Log.i (TAG, &quot;==onUnbind执行&quot;);</div><div class="line">returnsuper.onUnbind(intent);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">     @Override</div><div class="line">publicvoid onDestroy() &#123;</div><div class="line">              Log.i (TAG, &quot;==onDestroy执行&quot;);</div><div class="line">super.onDestroy();</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">mediaPlayer.release();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid play() &#123;</div><div class="line">if (!mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.start();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid pause() &#123;</div><div class="line">if (mediaPlayer.isPlaying()) &#123;</div><div class="line">mediaPlayer.pause();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">publicvoid stop() &#123;</div><div class="line">if (mediaPlayer != null) &#123;</div><div class="line">mediaPlayer.stop();</div><div class="line">              &#125;</div><div class="line">      &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>5、Manifest清单配置文件核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;service </div><div class="line"></div><div class="line">android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line"></div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line"></div><div class="line">           &lt;service android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div><div class="line">           &lt;service android:name=&quot;.BindServicePlayMusic&quot;&gt;</div><div class="line">&lt;intent-filter&gt;</div><div class="line">&lt;actionandroid:name=“com.steven.bindservice.playmusic&quot;/&gt;</div><div class="line">&lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div></pre></td></tr></table></figure>
-<p>6、Bound Service总结：</p>
-<h1 id="三、-拓展知识（进程和生命周期）："><a href="#三、-拓展知识（进程和生命周期）：" class="headerlink" title="三、 拓展知识（进程和生命周期）："></a>三、 拓展知识（进程和生命周期）：</h1><p>Android操作系统尝试尽可能长时间保持应用的进程，但当可用内存很低时要移走一部分进程。哪些程序可以运行，哪些要被销毁？答案是：重要级别低的进程可能被淘汰。<br>按照重要性排列，一共可以分成5级：</p>
-<p>1、前台运行进程：<br>用户此时需要处理和显示的进程。符合下列条件任何一个，这个进程就被认为是前台运行进程。<br>与用户正发生交互；<br>它控制一个与用户交互的必须的基本的服务；<br>一个正在调用生命周期回调方法的ervice（如onCreate()、onStar()、onDestroy()）；<br>一个正在运行onReceive()方法的广播接收对象。<br>销毁前台运行进程是系统万不得已的、最后的选择——当内存不够系统继续运行下去时，杀掉一些前台进程来保证能够响应用户的需求。</p>
-<p>2、可用进程：<br>一个可用进程没有任何前台组件，但它仍然可以影响到用户的界面。下面情况发生时，可以称该进程为可用进程。<br>        它是一个非前台的activity，但对用户仍然可用（onPause()方法已经被调用）。例如：前台的activity是一个允许上一个activity可见的对话框。也就是说当前activity中是一个对话框，对话框之外的地方能看到前一个activity的界面。</p>
-<p>3、服务进程：<br>服务进程是一个通过调用startService()方法启动的服务，并且不属于前两种情况。尽管服务进程没有直接被用户看到，但他们确实是用户所关心的，比如后台播放音乐或网络下载数据，所以系统保证他们的运行。</p>
-<p>4、后台进程：<br>一个后台进程就是非当前正在运行的activity（activity的onStop()方法已经被调用），他们不会对用户体验造成直接的影响，当没有足够内存来运行前台可见程序时，他们将会被终止。<br>通常，后台进程会有很多个在运行，LRU最近使用程序列表来保证经常运行的activity能最后一个被终止。</p>
-<p>5、空线程：<br>一个空线程没有运行任何可用应用程序，保留他们的唯一原因是为了设立一个缓存机制，来加快组件启动的时间。系统经常杀死这些内存来平衡系统的整个系统的资源，进程缓存和基本核心缓存之间的资源。</p>
-<h1 id="四、AIDL实现挂断电话："><a href="#四、AIDL实现挂断电话：" class="headerlink" title="四、AIDL实现挂断电话："></a>四、AIDL实现挂断电话：</h1><p>（一）、核心代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">publicclass InCallReceiver extends BroadcastReceiver &#123;</div><div class="line">private TelephonyManager manager = null;</div><div class="line"></div><div class="line">       @Override</div><div class="line">publicvoid onReceive(Context context, Intent intent) &#123;</div><div class="line">manager = (TelephonyManager) context .getSystemService(Service.TELEPHONY_SERVICE);</div><div class="line">              </div><div class="line">switch (manager.getCallState()) &#123;</div><div class="line">case TelephonyManager.CALL_STATE_RINGING:</div><div class="line">                       String incomingNumber = intent.getStringExtra(&quot;incoming_number&quot;);</div><div class="line">if (&quot;12345678&quot;.equals(incomingNumber)) &#123;</div><div class="line">try &#123;</div><div class="line">                                    // 获得TelephonyManager的class对象</div><div class="line">                                       Class&lt;TelephonyManager&gt; telephonyManagerClass = TelephonyManager.class;</div><div class="line">                                    // 获得TelephonyManager.getITelephony方法的Method对象</div><div class="line">                                       Method telephonyMethod = telephonyManagerClass</div><div class="line">                                                       .getDeclaredMethod(&quot;getITelephony&quot;, (Class[]) null);</div><div class="line">                                    // 允许访问私有的方法</div><div class="line">                                       telephonyMethod.setAccessible(true);</div><div class="line">                                    // 调用getITelephony()方法返回ITelephony对象</div><div class="line">                        ITelephony telephony = (com.android.internal.telephony.ITelephony) telephonyMethod</div><div class="line">                                                       .invoke(manager, (Object[]) null);</div><div class="line">                                    // 挂断电话</div><div class="line">                                       telephony.endCall();</div><div class="line">                               &#125; catch (Exception e) &#123;</div><div class="line">                                       Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();</div><div class="line">                               &#125;</div><div class="line">                       &#125;</div><div class="line">break;</div><div class="line">               &#125;</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-      
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 </div>
       <footer id="footer">

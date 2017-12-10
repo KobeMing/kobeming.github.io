@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android加载ReactNative页面流程 | Ming</title>
+
+  <!-- keywords -->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。 加载index.android.bundle的过程Android加载index.android.bundle途径有三种：  从node服务器远程调用（debug调试，也就是Debug JS Remotely">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android加载ReactNative页面流程">
+<meta property="og:url" content="http://yoursite.com/2017/12/04/Android加载ReactNative页面流程/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。 加载index.android.bundle的过程Android加载index.android.bundle途径有三种：  从node服务器远程调用（debug调试，也就是Debug JS Remotely">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-12-04T12:37:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android加载ReactNative页面流程">
+<meta name="twitter:description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。 加载index.android.bundle的过程Android加载index.android.bundle途径有三种：  从node服务器远程调用（debug调试，也就是Debug JS Remotely">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="../images/avatar.gif">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+
+  <script src="//cdn.bootcss.com/require.js/2.3.2/require.min.js"></script>
+  <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+  
+</head>
+<body>
+  <div id="container">
+    <div id="particles-js"></div>
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="../images/avatar.gif" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">ming</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="https://github.com/smackgg/hexo-theme-smackdown">smackdown</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">Pu Ming</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="../images/avatar.gif" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Pu Ming</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">ming</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-Android加载ReactNative页面流程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/12/04/Android加载ReactNative页面流程/" class="article-date">
+  	<time datetime="2017-12-04T12:37:44.000Z" itemprop="datePublished">2017-12-04</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android加载ReactNative页面流程
+      
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="ReactNative页面加载过程"><a href="#ReactNative页面加载过程" class="headerlink" title="ReactNative页面加载过程"></a>ReactNative页面加载过程</h1><p>Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。</p>
+<h2 id="加载index-android-bundle的过程"><a href="#加载index-android-bundle的过程" class="headerlink" title="加载index.android.bundle的过程"></a>加载index.android.bundle的过程</h2><p>Android加载index.android.bundle途径有三种：</p>
+<ol>
+<li>从node服务器远程调用（debug调试，也就是Debug JS Remotely开关打开）</li>
+<li>应用程序assets目录 </li>
+<li>本地文件（包括内部存储，外部存储）</li>
+</ol>
+<blockquote>
+<p>注意：开发阶段，reload时是先从node服务器把ReactNativeDevBundle.js文件缓存到内部存储（dada/data/包名/files/ReactNativeDevBundle.js），然后从内部存储加载。</p>
+</blockquote>
+<p>相关源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">//com.facebook.react.devsupport.DevSupportManagerImpl.java</div><div class="line"> //...</div><div class="line">   private static final String JS_BUNDLE_FILE_NAME = &quot;ReactNativeDevBundle.js&quot;;</div><div class="line"> //...</div><div class="line"> // TODO(6418010): Fix readers-writers problem in debug reload from HTTP server</div><div class="line">    mJSBundleTempFile = new File(applicationContext.getFilesDir(), JS_BUNDLE_FILE_NAME);</div></pre></td></tr></table></figure>
+<p>三种方式的加载其实只是bundle文件来源的path不同，最终都是由JSBundleLoader完成加载。下面把整个加载过程分为bundle文件path赋值过程和JSBundleLoader执行加载两部分进行分析。</p>
+<h4 id="JSBundleLoader执行加载过程："><a href="#JSBundleLoader执行加载过程：" class="headerlink" title="JSBundleLoader执行加载过程："></a>JSBundleLoader执行加载过程：</h4><p>整个JSBundleLoader源码非常简单，创建了4个加载器：</p>
+<ul>
+<li>createAssetLoader<blockquote>
+<p>加载assets目录下的bundle</p>
+</blockquote>
+</li>
+<li>createFileLoader<blockquote>
+<p>加载本地文件的bundle</p>
+</blockquote>
+</li>
+<li>createCachedBundleFromNetworkLoader<blockquote>
+<p>加载data/data/package-name/filses/ReactNativeDevBundle.js</p>
+</blockquote>
+</li>
+<li>createRemoteDebuggerBundleLoader<blockquote>
+<p>加载本地node服务器的bundle</p>
+</blockquote>
+</li>
+</ul>
+<p>真正完成加载功能是在CatalystInstanceImpl中，用JNI实现。源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">private native void jniSetSourceURL(String sourceURL);</div><div class="line"></div><div class="line">private native void jniLoadScriptFromAssets(AssetManager assetManager, String assetURL, boolean loadSynchronously);</div><div class="line"></div><div class="line">private native void jniLoadScriptFromFile(String fileName, String sourceURL, boolean loadSynchronously);</div></pre></td></tr></table></figure>
+<h4 id="bundle文件path赋值过程："><a href="#bundle文件path赋值过程：" class="headerlink" title="bundle文件path赋值过程："></a>bundle文件path赋值过程：</h4><p>我们在Application中实现或重写的ReactNativeHost相关方法就是初始化赋值，其中：</p>
+<ul>
+<li>getJSMainModuleName</li>
+<li>getJSBundleFile</li>
+<li>getBundleAssetName</li>
+</ul>
+<p>最终都会传递到ReactInstanceManagerBuilder中，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">protected ReactInstanceManager createReactInstanceManager() &#123;</div><div class="line">    ReactInstanceManagerBuilder builder = ReactInstanceManager.builder()</div><div class="line">      .setApplication(mApplication)</div><div class="line">      .setJSMainModuleName(getJSMainModuleName())</div><div class="line">      .setUseDeveloperSupport(getUseDeveloperSupport())</div><div class="line">      .setRedBoxHandler(getRedBoxHandler())</div><div class="line">      .setUIImplementationProvider(getUIImplementationProvider())</div><div class="line">      .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);</div><div class="line"></div><div class="line">    for (ReactPackage reactPackage : getPackages()) &#123;</div><div class="line">      builder.addPackage(reactPackage);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    String jsBundleFile = getJSBundleFile();</div><div class="line">    if (jsBundleFile != null) &#123;</div><div class="line">      builder.setJSBundleFile(jsBundleFile);</div><div class="line">    &#125; else &#123;</div><div class="line">      builder.setBundleAssetName(Assertions.assertNotNull(getBundleAssetName()));</div><div class="line">    &#125;</div><div class="line">    return builder.build();</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>从源码中可以看出，首先从本地文件加载bundle文件，如果本地文件不存在bundle文件从assets目录加载。</p>
+<p>然后ReactInstanceManagerBuilder构建ReactInstanceManager时把JSBundleLoader传递给ReactInstanceManager，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">new ReactInstanceManager(</div><div class="line">      mApplication,</div><div class="line">      mCurrentActivity,</div><div class="line">      mDefaultHardwareBackBtnHandler,</div><div class="line">      (mJSBundleLoader == null &amp;&amp; mJSBundleAssetUrl != null) ?</div><div class="line">        JSBundleLoader.createAssetLoader(mApplication, mJSBundleAssetUrl, false /*Asynchronous*/) :</div><div class="line">        mJSBundleLoader,</div><div class="line">      mJSMainModuleName,</div><div class="line">      mPackages,</div><div class="line">      mUseDeveloperSupport,</div><div class="line">      mBridgeIdleDebugListener,</div><div class="line">      Assertions.assertNotNull(mInitialLifecycleState, &quot;Initial lifecycle state was not set&quot;),</div><div class="line">      mUIImplementationProvider,</div><div class="line">      mNativeModuleCallExceptionHandler,</div><div class="line">      mJSCConfig,</div><div class="line">      mRedBoxHandler,</div><div class="line">      mLazyNativeModulesEnabled,</div><div class="line">      mLazyViewManagersEnabled,</div><div class="line">      mSetupReactContextInBackground,</div><div class="line">      mUseSeparateUIBackgroundThread,</div><div class="line">      mMinNumShakes);</div></pre></td></tr></table></figure>
+<p>在构建ReactInstanceManager过程中，首先判断JSBundleLoader是否为空，如果为空，调用JSBundleLoader内部方法创建对应的加载器（上文介绍的4个加载器）。如果不为空直接传递给ReactInstanceManager。</p>
+<p>以上JSBundleLoader只能加载本地文件或assets目录的bundle文件，那么远程bundle和缓存中的ReactNativeDevBundle.js的加载器是直接在ReactInstanceManager内部创建的，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">@ThreadConfined(UI)</div><div class="line">private void onReloadWithJSDebugger(JavaJSExecutor.Factory jsExecutorFactory) &#123;</div><div class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onReloadWithJSDebugger()&quot;);</div><div class="line">  recreateReactContextInBackground(</div><div class="line">      new ProxyJavaScriptExecutor.Factory(jsExecutorFactory),</div><div class="line">      //创建远程加载bundle文件的加载器（debug调试）</div><div class="line">      JSBundleLoader.createRemoteDebuggerBundleLoader(</div><div class="line">          mDevSupportManager.getJSBundleURLForRemoteDebugging(),</div><div class="line">          mDevSupportManager.getSourceUrl()));</div><div class="line">&#125;</div><div class="line"></div><div class="line">@ThreadConfined(UI)</div><div class="line">private void onJSBundleLoadedFromServer() &#123;</div><div class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onJSBundleLoadedFromServer()&quot;);</div><div class="line">  recreateReactContextInBackground(</div><div class="line">      mJavaScriptExecutorFactory,</div><div class="line">      //创建加载缓存目录ReactNativeDevBundle.js的加载器</div><div class="line">      JSBundleLoader.createCachedBundleFromNetworkLoader(</div><div class="line">          mDevSupportManager.getSourceUrl(), mDevSupportManager.getDownloadedJSBundleFile()));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="一张图总结："><a href="#一张图总结：" class="headerlink" title="一张图总结："></a>一张图总结：</h4><p><img src="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h2 id="图片加载过程"><a href="#图片加载过程" class="headerlink" title="图片加载过程"></a>图片加载过程</h2><h4 id="ReactNative加载图片的几种方式"><a href="#ReactNative加载图片的几种方式" class="headerlink" title="ReactNative加载图片的几种方式"></a>ReactNative加载图片的几种方式</h4><h6 id="1-通过uri加载图片"><a href="#1-通过uri加载图片" class="headerlink" title="1.通过uri加载图片"></a>1.通过uri加载图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> source=&#123;&#123;uri: &quot;file://&quot; + path&#125;&#125;/&gt;</div><div class="line"> //或</div><div class="line">source=&#123;&#123;uri: &quot;http://&quot; + location&#125;&#125;/&gt;</div></pre></td></tr></table></figure>
+<h6 id="2-加载本地图片"><a href="#2-加载本地图片" class="headerlink" title="2.加载本地图片"></a>2.加载本地图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;Image source=&#123;require(&quot;../../images/mode.png&quot;)&#125;/&gt;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>最终加载的是被打包到drawable-mdpi下的图片，形如：images_mode.png</p>
+</blockquote>
+<h6 id="3-加载Native端资源图片"><a href="#3-加载Native端资源图片" class="headerlink" title="3.加载Native端资源图片"></a>3.加载Native端资源图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">//导入 nativeImageSource函数</div><div class="line">let nativeImageSource = require(&apos;nativeImageSource&apos;);</div><div class="line"></div><div class="line"> let spec = &#123;</div><div class="line">        android: &apos;mipmap/ic_launcher&apos;,</div><div class="line">        width: 72,</div><div class="line">        height: 72</div><div class="line">      &#125;;</div><div class="line">      </div><div class="line">&lt;Image source=&#123;nativeImageSource(spec)&#125;/&gt;</div></pre></td></tr></table></figure>
+<p>以上几种加载图片的方式只是为Image组件的source属性赋值不同，最终都是resolveAssetSource.js中实现。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * `source` is either a number (opaque type returned by require(&apos;./foo.png&apos;))</div><div class="line"> * or an `ImageSource` like &#123; uri: &apos;&lt;http location || file path&gt;&apos; &#125;</div><div class="line"> */</div><div class="line">function resolveAssetSource(source: any): ?ResolvedAssetSource &#123;</div><div class="line">  if (typeof source === &apos;object&apos;) &#123;</div><div class="line">    return source;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  var asset = AssetRegistry.getAssetByID(source);</div><div class="line">  if (!asset) &#123;</div><div class="line">    return null;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  const resolver = new AssetSourceResolver(getDevServerURL(), getBundleSourcePath(), asset);</div><div class="line">  if (_customSourceTransformer) &#123;</div><div class="line">    return _customSourceTransformer(resolver);</div><div class="line">  &#125;</div><div class="line">  return resolver.defaultAsset();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上三种加载图片的方式中，<strong>通过uri加载图片</strong>和<strong>加载Native端资源图片</strong>赋值给source的值其实就是object。从源码可以看出，如果通过这两种方式加载图片直接就把这个对象返回了。</p>
+<p>后面的处理逻辑都是在处理通过<strong>加载本地图片</strong>的方式的流程，具体实现在AssetSourceResolver.js中。如果应用有热更新需求，那么热更新图片就只需要处理这种加载方式的问题。建议有热更新功能的应用尽量都把图片放在服务器，然后通过第一种方式加载。</p>
+<h4 id="本地图片加载过程"><a href="#本地图片加载过程" class="headerlink" title="本地图片加载过程"></a>本地图片加载过程</h4><p>本地图片加载其实就是加载的被打包到drawable-mdpi中的图片，实现源码如下：</p>
+<blockquote>
+<p>node_modules / react-native / Libraries / Image /AssetSourceResolver.js</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">defaultAsset(): ResolvedAssetSource &#123;  </div><div class="line">  if (this.isLoadedFromServer()) &#123;  </div><div class="line">    return this.assetServerURL();  </div><div class="line">  &#125;  </div><div class="line">  </div><div class="line">  if (Platform.OS === &apos;android&apos;) &#123;  </div><div class="line">    return this.isLoadedFromFileSystem() ?  </div><div class="line">      this.drawableFolderInBundle() :  </div><div class="line">      this.resourceIdentifierWithoutScale();  </div><div class="line">  &#125; else &#123;  </div><div class="line">    return this.scaledAssetPathInBundle();  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>drawableFolderInBundle方法为在存在离线bundle文件时，从bundle文件所在目录加载图片。</p>
+<p>resourceIdentifierWithoutScale方法从asset资源目录下加载。</p>
+</blockquote>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/11/12/Android-Multidex原理/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android Multidex原理</div>
+      <strong class="article-nav-caption">&gt;</strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="ds-share share" data-thread-key="Android加载ReactNative页面流程" data-title="Android加载ReactNative页面流程" data-url="http://yoursite.com/2017/12/04/Android加载ReactNative页面流程/"  data-images="../images/avatar.gif" data-content="Android加载ReactNative页面流程">
+    <div class="ds-share-inline">
+      <ul  class="ds-share-icons-16">
+      	<li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+        <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+        <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+        <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+        <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+      </ul>
+      <div class="ds-share-icons-more">
+      </div>
+    </div>
+ </div>
+ 
+
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+      <div class="footer-left">
+        &copy; 2017 Pu Ming
+      </div>
+        <div class="footer-right">
+          <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/smackgg/hexo-theme-smackdown" target="_blank">Smackdown</a>
+        </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="/js/main.js"></script>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js"></script>
+
+
+  </div>
+</body>
+</html>
