@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>ContentProvider | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一、ContentProvider简介：1.引入：数据库在Android当中是私有的，不能将数据库设为WORLD_READABLE,每个数据库都只能创建它的包访问。这意味着只有创建这个数据库的应用程序才可访问它。也就是说不能跨越进程和包的边界，直接访问别的应用程序的数据库。那么如何在应用程序间交换数据呢？ 如果需要在进程间传递数据，可以使用ContentProvider来实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ContentProvider">
+<meta property="og:url" content="http://yoursite.com/2015/12/12/ContentProvider/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="一、ContentProvider简介：1.引入：数据库在Android当中是私有的，不能将数据库设为WORLD_READABLE,每个数据库都只能创建它的包访问。这意味着只有创建这个数据库的应用程序才可访问它。也就是说不能跨越进程和包的边界，直接访问别的应用程序的数据库。那么如何在应用程序间交换数据呢？ 如果需要在进程间传递数据，可以使用ContentProvider来实现。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2015-12-13T12:10:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ContentProvider">
+<meta name="twitter:description" content="一、ContentProvider简介：1.引入：数据库在Android当中是私有的，不能将数据库设为WORLD_READABLE,每个数据库都只能创建它的包访问。这意味着只有创建这个数据库的应用程序才可访问它。也就是说不能跨越进程和包的边界，直接访问别的应用程序的数据库。那么如何在应用程序间交换数据呢？ 如果需要在进程间传递数据，可以使用ContentProvider来实现。">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-ContentProvider" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2015/12/12/ContentProvider/" class="article-date">
+      <time datetime="2015-12-12T12:10:00.000Z" itemprop="datePublished">2015-12-12</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ContentProvider
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="一、ContentProvider简介："><a href="#一、ContentProvider简介：" class="headerlink" title="一、ContentProvider简介："></a>一、ContentProvider简介：</h1><h2 id="1-引入："><a href="#1-引入：" class="headerlink" title="1.引入："></a>1.引入：</h2><p>数据库在Android当中是私有的，不能将数据库设为WORLD_READABLE,每个数据库都只能创建它的包访问。这意味着只有创建这个数据库的应用程序才可访问它。也就是说不能跨越进程和包的边界，直接访问别的应用程序的数据库。那么如何在应用程序间交换数据呢？ 如果需要在进程间传递数据，可以使用ContentProvider来实现。</p>
+<a id="more"></a>
+<h2 id="2-ContentProvider的功能和意义："><a href="#2-ContentProvider的功能和意义：" class="headerlink" title="2.ContentProvider的功能和意义："></a>2.ContentProvider的功能和意义：</h2><p>为了在应用程序之间交换数据，Android提供了ContentProvider，ContentProvider是不同应用程序之间进行数据交换的标准API。当一个应用程序需要把自己的数据暴露给其他应用程序使用时，该应用程序可以通过提供ContentProvider来实现；而其他应用程序需要使用这些数据时，可以通过ContentResolver来操作ContentProvider暴露的数据。</p>
+<p>一旦某个应用程序通过ContentProvider暴露了自己的数据操作接口，那么不管该应用程序是否启动，其他应用程序都可以通过该接口来操作被暴露的内部数据，包括增加数据、删除数据、修改数据、查询数据等。</p>
+<p>虽然大部分使用ContentProvider操作的数据都来自于数据库，但是也可以来自于文件、SharedPreferences、XML或网络等其他存储方式。</p>
+<h2 id="3-核心类："><a href="#3-核心类：" class="headerlink" title="3.核心类："></a>3.核心类：</h2><h4 id="ContentProvider：（A应用暴露数据）"><a href="#ContentProvider：（A应用暴露数据）" class="headerlink" title="ContentProvider：（A应用暴露数据）"></a>ContentProvider：（A应用暴露数据）</h4><p> 一个程序可以通过实现一个ContentProvider的抽象接口将自己的数据暴露出去；<br> 外界根本看不到，也不用看到这个应用暴露的数据在应用当中是如何存储的，是用数据库存储还是用文件存储，还是通过网上获得，这些一切都不重要，重要的是外界可以通过这一套标准及统一的接口和程序里的数据打交道，可以读取程序的数据，也可以修改程序的数据。</p>
+<h4 id="ContentResolver：（操作A应用所暴露的数据）"><a href="#ContentResolver：（操作A应用所暴露的数据）" class="headerlink" title="ContentResolver：（操作A应用所暴露的数据）"></a>ContentResolver：（操作A应用所暴露的数据）</h4><p>  外界的程序通过ContentResolver接口可以访问ContentProvider提供的数据；<br>  ContentResolver 可以理解成是HttpClient的作用。</p>
+<h4 id="Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。"><a href="#Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。" class="headerlink" title="Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。"></a>Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。</h4><p>  每个ContentProvider提供公共的URI来唯一标识其数据集。管理多个数据集的（多个表）的 ContentProvider 为每个数据集提供了单独的URI。<br>  Uri 的标准前缀：以“content://”作为前缀，这个是标准的前缀，表示该数据由 ContentProvider 管理。<br>  Uri 的authority部分：该部分是完整的类名。（使用小写形式）。<br>  Uri 的path部分（资源部分、数据部分）： 用于决定哪类数据被请求。<br>  被请求的特定记录的id值。如果请求不仅限于某个单条数据，该部分及其前面的斜线应该删除。<br>  为了将一个字符串转换成Uri，Android中提供了Uri的parse()静态方法来实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">content://com.example.test/tranis/122</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>【备注：】URI、URL、URN的区别：<br>首先，URI，是uniform resource identifier，统一资源标识符，用来唯一的标识一个资源。<br>URL是uniform resource locator，统一资源定位器，它是一种具体的URI，即URL可以用来标识一个资源，而且还指明了如何locate这个资源。<br>URN，uniform resource name，统一资源命名，是通过名字来标识资源，比如mailto:<a href="mailto:java-net@java.sun.com" target="_blank" rel="noopener">java-net@java.sun.com</a>。</p>
+</blockquote>
+<blockquote>
+<p>也就是说，URI是以一种抽象的，高层次概念定义统一资源标识，而URL和URN则是具体的资源标识的方式。URL和URN都是一种URI。</p>
+</blockquote>
+<blockquote>
+<p>总结：URL是一种具体的URI，它不仅唯一标识资源，而且还提供了定位该资源的信息。URI是一种语义上的抽象概念，可以是绝对的，也可以是相对的，而URL则必须提供足够的信息来定位，所以，是绝对的。</p>
+</blockquote>
+<h2 id="4-系统内置的预定义ContentProvider："><a href="#4-系统内置的预定义ContentProvider：" class="headerlink" title="4.系统内置的预定义ContentProvider："></a>4.系统内置的预定义ContentProvider：</h2><ul>
+<li>1、Contacts：获取、修改、保存联系人的信息；</li>
+<li>2、MediaStore：访问声音、视频、图片等多媒体文件；</li>
+<li>3、CallLog ：查看或更新通话记录；</li>
+<li>4、Browser：读取或修改浏览历史、网络搜索、书签；</li>
+<li>5、Setting：查看和获取蓝牙设置、铃声设置等设备首选项。</li>
+</ul>
+<h1 id="二、使用ContentResolver-管理联系人："><a href="#二、使用ContentResolver-管理联系人：" class="headerlink" title="二、使用ContentResolver 管理联系人："></a>二、使用ContentResolver 管理联系人：</h1><h2 id="1-使用ContentResolver-操作数据的步骤："><a href="#1-使用ContentResolver-操作数据的步骤：" class="headerlink" title="1.使用ContentResolver 操作数据的步骤："></a>1.使用ContentResolver 操作数据的步骤：</h2><ul>
+<li>step1、调用Context的getContentResolver()方法获得ContentResolver 对象；</li>
+<li>step2、调用使用ContentResolver 的insert()、delete()、update()、query()方法操作数据。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Uri insert(Uri uri, ContentValues values)</span><br><span class="line"></span><br><span class="line">int delete(Uri uri, String where, String[] whereArgs)</span><br><span class="line"></span><br><span class="line">Cursor query(Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder)</span><br><span class="line"></span><br><span class="line">int update(Uri uri, ContentValues values, String where, String[] whereArgs)</span><br></pre></td></tr></table></figure>
+<p>参数解释：</p>
+<ul>
+<li>String   where：表示带有占位符的where子句组成的字符串；</li>
+<li>String[]   whereArgs：表示替换where参数中占位符后的数据组成的字符串数组；</li>
+<li>String   sortOrder：表示select语句中的order by子句组成的字符串；</li>
+<li>String[]   projection：表示select语句中需要查询的所有的字段组成的字符串数组。</li>
+<li>ContentValues values：是由数据库中表字段和往该字段中放置的数据所组成的键值对对象。</li>
+</ul>
+<blockquote>
+<p>【备注：】以上四个方法的参数分别是2、3、4、5个。</p>
+</blockquote>
+<h2 id="2-联系人中管理ContentProvider的几个Uri："><a href="#2-联系人中管理ContentProvider的几个Uri：" class="headerlink" title="2.联系人中管理ContentProvider的几个Uri："></a>2.联系人中管理ContentProvider的几个Uri：</h2><ul>
+<li>1、联系人的Uri==&gt;      content://com.android.contacts/contacts 和 content://com.android.contacts/raw_contacts</li>
+<li>2、电话号码的Uri==&gt;  content://com.android.contacts/data/phones</li>
+<li>3、EMAIL的URI==&gt;     content://com.android.contacts/data/emails</li>
+</ul>
+<p>不过为了方便记忆，系统中提供了以下常量来替代以上的Uri字符串。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Uri CONTACTS_URI = ContactsContract.Contacts.CONTENT_URI;</span><br><span class="line">Uri PHONE_URI = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;</span><br><span class="line">Uri EMAIL_URI = ContactsContract.CommonDataKinds.Email.CONTENT_URI;</span><br></pre></td></tr></table></figure>
+<h2 id="3-示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息："><a href="#3-示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息：" class="headerlink" title="3.示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息："></a>3.示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">public static List&lt;Map&lt;String, Object&gt;&gt; selectContactsMsg(ContentResolver resolver, ContentValues values) &#123;</span><br><span class="line">    List&lt;Map&lt;String, Object&gt;&gt; list = new ArrayList&lt;Map&lt;String, Object&gt;&gt;();</span><br><span class="line">    String uri_contacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">    String uri_contacts_phones = &quot;content://com.android.contacts/data/phones&quot;;</span><br><span class="line">    String uri_contacts_emails = &quot;content://com.android.contacts/data/emails&quot;;</span><br><span class="line">    // 从raw_contacts表中获取联系人的id和联系人的姓名。</span><br><span class="line">    Cursor cursor_contacts = resolver.query(Uri.parse(uri_contacts),</span><br><span class="line">            new String[]&#123;&quot;_id&quot;, &quot;display_name&quot;&#125;,</span><br><span class="line">            null, null, null);</span><br><span class="line">    // 遍历所有的联系人的信息</span><br><span class="line">    while (cursor_contacts.moveToNext()) &#123;</span><br><span class="line">        int contacts_id = cursor_contacts.getInt(cursor_contacts.getColumnIndex(&quot;_id&quot;));</span><br><span class="line">        String display_name = cursor_contacts.getString(cursor_contacts.getColumnIndex(&quot;display_name&quot;));</span><br><span class="line">        Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();</span><br><span class="line">        map.put(&quot;id&quot;, contacts_id);</span><br><span class="line">        map.put(&quot;display_name&quot;, display_name);</span><br><span class="line">        // 以下开始获取电话号码</span><br><span class="line">        // 根据每个联系人的id再去data表中查找相应的电话号码。</span><br><span class="line">        Cursor cursor_phones = resolver.query(Uri.parse(uri_contacts_phones),</span><br><span class="line">                new String[]&#123;&quot;raw_contact_id&quot;, &quot;data1&quot;&#125;,</span><br><span class="line">                &quot;raw_contact_id=?&quot;,</span><br><span class="line">                new String[]&#123;contacts_id + &quot;&quot;&#125;,</span><br><span class="line">                null);</span><br><span class="line">        // 因为电话号码可能是多个，所以需要再遍历，组合在一起形成一个电话号码的字符串，放到StringBuilder中</span><br><span class="line">        StringBuilder sb = new StringBuilder();</span><br><span class="line">        while (cursor_phones.moveToNext()) &#123;</span><br><span class="line">            sb.append(cursor_phones.getString(1));</span><br><span class="line">            sb.append(&quot; | &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        // 将生成的电话号码放到map集合中</span><br><span class="line">        map.put(&quot;phones&quot;, sb.toString());</span><br><span class="line">        // 以下开始获取Email信息</span><br><span class="line">        Cursor cursor_emails = resolver.query(Uri.parse(uri_contacts_emails),</span><br><span class="line">                new String[]&#123;&quot;raw_contact_id&quot;, &quot;data1&quot;&#125;,</span><br><span class="line">                &quot;raw_contact_id=?&quot;,</span><br><span class="line">                new String[]&#123;contacts_id + &quot;&quot;&#125;,</span><br><span class="line">                null);</span><br><span class="line">        StringBuilder sb2 = new StringBuilder();</span><br><span class="line">        while (cursor_emails.moveToNext()) &#123;</span><br><span class="line">            sb2.append(cursor_emails.getString(1));</span><br><span class="line">            sb2.append(&quot; | &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        map.put(&quot;emails&quot;, sb2.toString());</span><br><span class="line">        // 将包含有id、联系人姓名、手机号码、emails的map放到list集合中</span><br><span class="line">        list.add(map);</span><br><span class="line">    &#125;</span><br><span class="line">    return list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-示例代码2——实现新添加通讯录信息："><a href="#4-示例代码2——实现新添加通讯录信息：" class="headerlink" title="4.示例代码2——实现新添加通讯录信息："></a>4.示例代码2——实现新添加通讯录信息：</h2><p>// 以下方法是利用常量值所写的插入联系人的方法。如果希望封装成方法，再增加一个Map集合的参数，用来传入信息即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public void insertContacts(ContentValues values, ContentResolver resolver) &#123;</span><br><span class="line">    // 首先向RawContacts.CONTENT_URI执行一个空值插入，目的是获取系统返回的rawContactId</span><br><span class="line">    Uri rawContactUri = resolver.insert(ContactsContract.RawContacts.CONTENT_URI, values);</span><br><span class="line">    long rawContactId = ContentUris.parseId(rawContactUri);</span><br><span class="line">    </span><br><span class="line">    // 往data表入姓名数据</span><br><span class="line">    values.clear();</span><br><span class="line">    values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);</span><br><span class="line">    values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,&quot;王向军&quot;);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,&quot;王向军&quot;);</span><br><span class="line">    resolver.insert(ContactsContract.Data.CONTENT_URI, values);</span><br><span class="line">    </span><br><span class="line">    // 往data表入电话数据</span><br><span class="line">    values.clear();</span><br><span class="line">    values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);</span><br><span class="line">    values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, &quot;13520551441&quot;);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);</span><br><span class="line">    resolver.insert(ContactsContract.Data.CONTENT_URI, values);</span><br><span class="line">    </span><br><span class="line">    // 往data表入Email数据</span><br><span class="line">    values.clear();</span><br><span class="line">    values.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);</span><br><span class="line">    values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.Email.DATA,&quot;237235475@qq.com&quot;);</span><br><span class="line">    values.put(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK);</span><br><span class="line">    resolver.insert(ContactsContract.Data.CONTENT_URI, values);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5-封装ContentResolver操作系统联系人的工具类ContactsResolverHelper"><a href="#5-封装ContentResolver操作系统联系人的工具类ContactsResolverHelper" class="headerlink" title="5.封装ContentResolver操作系统联系人的工具类ContactsResolverHelper"></a>5.封装ContentResolver操作系统联系人的工具类ContactsResolverHelper</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line">public class ContactsResolverHelper &#123;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     *  以下代码是插入新联系人的子过程。其中第三个参数：List集合表示要插入到通讯录中的新数据(该集合中有三个值，</span><br><span class="line">     *  分别是：姓名、电话、email)。</span><br><span class="line">     */</span><br><span class="line">    public void insertContacts(ContentResolver resolver, ContentValues values, List&lt;String&gt; list) &#123;</span><br><span class="line">        String uri_rawcontacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">        String uri_data = &quot;content://com.android.contacts/data&quot;;</span><br><span class="line"></span><br><span class="line">        Uri uri = Uri.parse(uri_contacts);</span><br><span class="line">        // 首先向RawContacts.CONTENT_URI执行一个空值插入，目的是获取系统返回的rawContactId</span><br><span class="line">        Uri rawContactUri = resolver.insert(Uri.parse(uri_rawcontacts), values);</span><br><span class="line">        long contact_id = ContentUris.parseId(rawContactUri);</span><br><span class="line"></span><br><span class="line">        // 往data表中插入一条用户的名称信息</span><br><span class="line">        values.put(&quot;raw_contact_id&quot;, contact_id);</span><br><span class="line">        values.put(&quot;mimetype&quot;, &quot;vnd.android.cursor.item/name&quot;);</span><br><span class="line">        values.put(&quot;data1&quot;, list.get(0));</span><br><span class="line">        values.put(&quot;data2&quot;, list.get(0));</span><br><span class="line">        resolver.insert(uri_data, values);</span><br><span class="line">        </span><br><span class="line">        // 往data表中插入电话信息</span><br><span class="line">        values.clear();</span><br><span class="line">        values.put(&quot;raw_contact_id&quot;, contact_id);</span><br><span class="line">        values.put(&quot;mimetype&quot;, &quot;vnd.android.cursor.item/phone_v2&quot;);</span><br><span class="line">        values.put(&quot;data1&quot;, list.get(1));</span><br><span class="line">        values.put(&quot;data2&quot;, 2);// 2，Phone.TYPE_MOBILE ，表示手机号码</span><br><span class="line">        resolver.insert(uri_data, values);</span><br><span class="line">        </span><br><span class="line">        // 往data表中插入Email信息</span><br><span class="line">        values.clear();</span><br><span class="line">        values.put(&quot;raw_contact_id&quot;, contact_id);</span><br><span class="line">        values.put(&quot;mimetype&quot;, &quot;vnd.android.cursor.item/email_v2&quot;);</span><br><span class="line">        values.put(&quot;data1&quot;, list.get(2));</span><br><span class="line">        values.put(&quot;data2&quot;, 2);// 2，Email.TYPE_WORK ， 表示工作用Email号码</span><br><span class="line">        resolver.insert(uri_data, values);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 以下代码是删除联系人信息的方法。</span><br><span class="line">    public static int deleteContacts(ContentResolver resolver, String where, String[] whereArgs) &#123;</span><br><span class="line">        String uri_contacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">        return resolver.delete(Uri.parse(uri_contacts), where, whereArgs);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 以下代码是查询联系人信息的方法。</span><br><span class="line">    public static Cursor selectContactsName(ContentResolver resolver, String[] projection,</span><br><span class="line">                                            String where, String[] whereArgs, String sortOrder) &#123;</span><br><span class="line">        String uri_contacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">        return resolver.query(Uri.parse(uri_contacts), projection, where, whereArgs, sortOrder);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public static List&lt;Map&lt;String, Object&gt;&gt; selectContactsMsg(ContentResolver resolver, ContentValues values) &#123;</span><br><span class="line">        List&lt;Map&lt;String, Object&gt;&gt; list = new ArrayList&lt;Map&lt;String, Object&gt;&gt;();</span><br><span class="line">        String uri_contacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">        String uri_contacts_phones = &quot;content://com.android.contacts/data/phones&quot;;</span><br><span class="line">        String uri_contacts_emails = &quot;content://com.android.contacts/data/emails&quot;;</span><br><span class="line"></span><br><span class="line">        // 从raw_contacts表中或许联系人的id和联系人的姓名。</span><br><span class="line">        Cursor cursor_contacts = resolver.query(Uri.parse(uri_contacts),</span><br><span class="line">                new String[]&#123;&quot;_id&quot;, &quot;display_name&quot;&#125;,</span><br><span class="line">                null,</span><br><span class="line">                null,</span><br><span class="line">                null);</span><br><span class="line"></span><br><span class="line">        // 遍历所有的联系人的信息</span><br><span class="line">        while (cursor_contacts.moveToNext()) &#123;</span><br><span class="line">            int contacts_id = cursor_contacts.getInt(cursor_contacts.getColumnIndex(&quot;_id&quot;));</span><br><span class="line">            String display_name = cursor_contacts.getString(cursor_contacts.getColumnIndex(&quot;display_name&quot;));</span><br><span class="line">            Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();</span><br><span class="line">            map.put(&quot;id&quot;, contacts_id);</span><br><span class="line">            map.put(&quot;display_name&quot;, display_name);</span><br><span class="line"></span><br><span class="line">            // 以下开始获取电话号码</span><br><span class="line">            // 根据每个联系人的id再去data表中查找相应的电话号码。</span><br><span class="line">            Cursor cursor_phones = resolver.query(Uri.parse(uri_contacts_phones), new String[]&#123;</span><br><span class="line">                            &quot;raw_contact_id&quot;, &quot;data1&quot;&#125;,</span><br><span class="line">                    &quot;raw_contact_id=?&quot;,</span><br><span class="line">                    new String[]&#123;contacts_id + &quot;&quot;&#125;,</span><br><span class="line">                    null);</span><br><span class="line">            // 因为电话号码可能是多个，所以需要再遍历，组合在一起形成一个电话号码的字符串，放到StringBuilder中</span><br><span class="line">            StringBuilder sb = new StringBuilder();</span><br><span class="line">            while (cursor_phones.moveToNext()) &#123;</span><br><span class="line">                sb.append(cursor_phones.getString(1));</span><br><span class="line">                sb.append(&quot; | &quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            // 将生成的电话号码放到map集合中</span><br><span class="line">            map.put(&quot;phones&quot;, sb.toString());</span><br><span class="line">            // 以下开始或许Email信息</span><br><span class="line">            Cursor cursor_emails = resolver.query(Uri.parse(uri_contacts_emails), new String[]&#123;</span><br><span class="line">                            &quot;raw_contact_id&quot;, &quot;data1&quot;&#125;,</span><br><span class="line">                    &quot;raw_contact_id=?&quot;,</span><br><span class="line">                    new String[]&#123;contacts_id + &quot;&quot;&#125;,</span><br><span class="line">                    null);</span><br><span class="line">            StringBuilder sb2 = new StringBuilder();</span><br><span class="line">            while (cursor_emails.moveToNext()) &#123;</span><br><span class="line">                sb2.append(cursor_emails.getString(1));</span><br><span class="line">                sb2.append(&quot; | &quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            map.put(&quot;emails&quot;, sb2.toString());</span><br><span class="line">            // 将包含有id、联系人姓名、手机号码、emails的map放到list集合中</span><br><span class="line">            list.add(map);</span><br><span class="line">        &#125;</span><br><span class="line">        return list;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 以下代码是更新联系人姓名的方法。</span><br><span class="line">    public static int updateContactsName(ContentValues values,</span><br><span class="line">                                         ContentResolver resolver, String oldName, String newName) &#123;</span><br><span class="line">        String uri_contacts = &quot;content://com.android.contacts/raw_contacts&quot;;</span><br><span class="line">        String uri_contacts_data = &quot;content://com.android.contacts/data&quot;;</span><br><span class="line">        // 先更新raw_contacts表中的联系人姓名，共有四列需要更新</span><br><span class="line">        values.put(&quot;display_name&quot;, newName);</span><br><span class="line">        values.put(&quot;display_name_alt&quot;, newName);</span><br><span class="line">        values.put(&quot;sort_key&quot;, newName);</span><br><span class="line">        values.put(&quot;sort_key_alt&quot;, newName);</span><br><span class="line">        int count1 = resolver.update(Uri.parse(uri_contacts),</span><br><span class="line">                values,</span><br><span class="line">                &quot;display_name=?&quot;,</span><br><span class="line">                new String[]&#123;oldName&#125;);</span><br><span class="line">        // 再更新data表中联系人的姓名，共有两列</span><br><span class="line">        values.clear();</span><br><span class="line">        values.put(&quot;data1&quot;, newName);</span><br><span class="line">        values.put(&quot;data2&quot;, newName);</span><br><span class="line">        int count2 = resolver.update(Uri.parse(uri_contacts_data),</span><br><span class="line">                values,</span><br><span class="line">                &quot;data1=? and mimetype_id=?&quot;,</span><br><span class="line">                new String[]&#123;oldName, &quot;7&quot;&#125;);</span><br><span class="line">        // 返回2，则说明六项都被更新。如果只返回1，则说明没有修改完全</span><br><span class="line">        return count1 + count2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="三、系统自带ContentProvider的常用Uri地址："><a href="#三、系统自带ContentProvider的常用Uri地址：" class="headerlink" title="三、系统自带ContentProvider的常用Uri地址："></a>三、系统自带ContentProvider的常用Uri地址：</h1><h2 id="1Android系统管理联系人的Uri如下："><a href="#1Android系统管理联系人的Uri如下：" class="headerlink" title="1Android系统管理联系人的Uri如下："></a>1Android系统管理联系人的Uri如下：</h2><ul>
+<li>ContactsContract.Contacts.CONTENT_URI 管理联系人的Uri</li>
+<li>ContactsContract.CommonDataKinds.Phone.CONTENT_URI 管理联系人的电话的Uri</li>
+<li>ContactsContract.CommonDataKinds.Email.CONTENT_URI 管理联系人的Email的Uri</li>
+</ul>
+<p>【数据库中主要字段：】</p>
+<ul>
+<li>联系人id字段名称为：ContactsContract.Contacts._ID</li>
+<li>联系人name 字段为：ContactContract.Contracts.DISPLAY_NAME</li>
+<li>电话信息表的外键id为：ContactsContract.CommonDataKinds.Phone.CONTACT_ID</li>
+<li>电话号码字段为：ContactsContract.CommonDataKinds.Phone.NUMBER.</li>
+<li>Email 字段为：ContactsContract.CommonDataKinds.Email.DATA</li>
+<li>其外键为：ContactsContract.CommonDataKinds.Email.CONTACT_ID</li>
+</ul>
+<h2 id="2-Android为多媒体提供的ContentProvider的Uri如下："><a href="#2-Android为多媒体提供的ContentProvider的Uri如下：" class="headerlink" title="2.Android为多媒体提供的ContentProvider的Uri如下："></a>2.Android为多媒体提供的ContentProvider的Uri如下：</h2><ul>
+<li>MediaStore.Audio.Media.EXTERNAL_CONTENT_URI        存储在SD卡上的音频文件</li>
+<li>MediaStore.Audio.Video.EXTERNAL_CONTENT_URI         存储在 SD卡上的视频</li>
+<li>MediaStore.Audio.Images.EXTERNAL_CONTENT_URI       存储在 SD卡上的图片文件内容</li>
+<li>MediaStore.Audio.Media.INTERNAL_CONTENT_URI         手机内部存储器上的音频文件 </li>
+<li>MediaStore.Audio.Video.INTERNAL_CONTENT_URI          手机内部存储器上的视频</li>
+<li>MediaStore.Audio.Images.INTERNAL_CONTENT_URI        手机内部存储器上的图片</li>
+</ul>
+<p>【数据库中主要字段：】</p>
+<ul>
+<li>图片名称字段：Media.DISPLAY_NAME</li>
+<li>图片的详细描述字段：Media.DESCRIPTION  </li>
+<li>图片的保存位置字段：Media.DATA<h2 id="3-短信Uri："><a href="#3-短信Uri：" class="headerlink" title="3.短信Uri："></a>3.短信Uri：</h2></li>
+<li>content://sms                所有短信</li>
+<li>content://sms/outbox      发送箱中的短信 </li>
+<li>content://sms/inbox       收件箱中短信</li>
+</ul>
+<p>【数据库中主要字段：】</p>
+<ul>
+<li>短信手机号码 ： address</li>
+<li>短信标题：  subject</li>
+<li>短信内容：body</li>
+<li>短信发送时间戳：date</li>
+</ul>
+<h2 id="4-通话记录Uri："><a href="#4-通话记录Uri：" class="headerlink" title="4.通话记录Uri："></a>4.通话记录Uri：</h2><ul>
+<li>content://call_log/calls               所有通话记录</li>
+</ul>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2015/12/12/ContentProvider/">ContentProvider</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2015年12月12日 - 20时10分</p>
+        <p><span>最后更新:</span>2015年12月13日 - 20时10分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2015/12/12/ContentProvider/" title="ContentProvider">http://yoursite.com/2015/12/12/ContentProvider/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2015/12/12/ContentProvider/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2015/12/13/自定义ContentProvider/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          自定义ContentProvider
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2015/12/05/Activity/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Activity</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一、ContentProvider简介："><span class="toc-number">1.</span> <span class="toc-text">一、ContentProvider简介：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-引入："><span class="toc-number">1.1.</span> <span class="toc-text">1.引入：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-ContentProvider的功能和意义："><span class="toc-number">1.2.</span> <span class="toc-text">2.ContentProvider的功能和意义：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-核心类："><span class="toc-number">1.3.</span> <span class="toc-text">3.核心类：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ContentProvider：（A应用暴露数据）"><span class="toc-number">1.3.0.1.</span> <span class="toc-text">ContentProvider：（A应用暴露数据）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ContentResolver：（操作A应用所暴露的数据）"><span class="toc-number">1.3.0.2.</span> <span class="toc-text">ContentResolver：（操作A应用所暴露的数据）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。"><span class="toc-number">1.3.0.3.</span> <span class="toc-text">Uri：Uri是ContentResolver和ContentProvider进行数据交换的标识。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-系统内置的预定义ContentProvider："><span class="toc-number">1.4.</span> <span class="toc-text">4.系统内置的预定义ContentProvider：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#二、使用ContentResolver-管理联系人："><span class="toc-number">2.</span> <span class="toc-text">二、使用ContentResolver 管理联系人：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-使用ContentResolver-操作数据的步骤："><span class="toc-number">2.1.</span> <span class="toc-text">1.使用ContentResolver 操作数据的步骤：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-联系人中管理ContentProvider的几个Uri："><span class="toc-number">2.2.</span> <span class="toc-text">2.联系人中管理ContentProvider的几个Uri：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息："><span class="toc-number">2.3.</span> <span class="toc-text">3.示例代码1——查看通讯录中的联系人姓名、id、电话、Email等信息：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-示例代码2——实现新添加通讯录信息："><span class="toc-number">2.4.</span> <span class="toc-text">4.示例代码2——实现新添加通讯录信息：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-封装ContentResolver操作系统联系人的工具类ContactsResolverHelper"><span class="toc-number">2.5.</span> <span class="toc-text">5.封装ContentResolver操作系统联系人的工具类ContactsResolverHelper</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#三、系统自带ContentProvider的常用Uri地址："><span class="toc-number">3.</span> <span class="toc-text">三、系统自带ContentProvider的常用Uri地址：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1Android系统管理联系人的Uri如下："><span class="toc-number">3.1.</span> <span class="toc-text">1Android系统管理联系人的Uri如下：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Android为多媒体提供的ContentProvider的Uri如下："><span class="toc-number">3.2.</span> <span class="toc-text">2.Android为多媒体提供的ContentProvider的Uri如下：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-短信Uri："><span class="toc-number">3.3.</span> <span class="toc-text">3.短信Uri：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-通话记录Uri："><span class="toc-number">3.4.</span> <span class="toc-text">4.通话记录Uri：</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2015/12/13/自定义ContentProvider/" title="上一篇: 自定义ContentProvider">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2015/12/05/Activity/" title="下一篇: Activity">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

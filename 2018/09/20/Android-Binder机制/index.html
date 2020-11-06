@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>Android-Binder机制 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一. Linux进程Linux中的进程是相互独立的，也就是所谓的进程隔离，而且进程中的用户空间和内核空间也是隔离的。 也就是说为了安全和独立，一个进程是不能直接操作或者访问另外一个进程的内存空间的。他们之间既然是隔离的，在需要通信、协作的时候就需要使用进程间通信技术（即IPC，也称跨进程通信），我们都知道Android框架是建立在Linux之上的，当然也会面对进程间通讯的问题。因此Android引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android-Binder机制">
+<meta property="og:url" content="http://yoursite.com/2018/09/20/Android-Binder机制/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="一. Linux进程Linux中的进程是相互独立的，也就是所谓的进程隔离，而且进程中的用户空间和内核空间也是隔离的。 也就是说为了安全和独立，一个进程是不能直接操作或者访问另外一个进程的内存空间的。他们之间既然是隔离的，在需要通信、协作的时候就需要使用进程间通信技术（即IPC，也称跨进程通信），我们都知道Android框架是建立在Linux之上的，当然也会面对进程间通讯的问题。因此Android引">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://s1.ax1x.com/2018/09/20/imfHDf.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/02/BBBQLd.jpg">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/19/U2WABt.md.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/18/U2cGWj.md.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/19/URi3rj.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/07/19/URiqFP.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/02/BBD9tP.jpg">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/02/BBDip8.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/02/BBDCff.jpg">
+<meta property="og:updated_time" content="2020-11-05T09:42:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android-Binder机制">
+<meta name="twitter:description" content="一. Linux进程Linux中的进程是相互独立的，也就是所谓的进程隔离，而且进程中的用户空间和内核空间也是隔离的。 也就是说为了安全和独立，一个进程是不能直接操作或者访问另外一个进程的内存空间的。他们之间既然是隔离的，在需要通信、协作的时候就需要使用进程间通信技术（即IPC，也称跨进程通信），我们都知道Android框架是建立在Linux之上的，当然也会面对进程间通讯的问题。因此Android引">
+<meta name="twitter:image" content="https://s1.ax1x.com/2018/09/20/imfHDf.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Android-Binder机制" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2018/09/20/Android-Binder机制/" class="article-date">
+      <time datetime="2018-09-20T09:42:12.000Z" itemprop="datePublished">2018-09-20</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android-Binder机制
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="一-Linux进程"><a href="#一-Linux进程" class="headerlink" title="一. Linux进程"></a>一. Linux进程</h1><p>Linux中的进程是相互独立的，也就是所谓的进程隔离，而且进程中的用户空间和内核空间也是隔离的。</p>
+<p>也就是说为了安全和独立，一个进程是不能直接操作或者访问另外一个进程的内存空间的。他们之间既然是隔离的，在需要通信、协作的时候就需要使用进程间通信技术（即IPC，也称跨进程通信），我们都知道Android框架是建立在Linux之上的，当然也会面对进程间通讯的问题。因此Android引入Binder机制进行进程间通信。<br><a id="more"></a></p>
+<p><strong>如下图：</strong></p>
+<p><img src="https://s1.ax1x.com/2018/09/20/imfHDf.png" alt="image"></p>
+<blockquote>
+<p>应用层使用多进程的场景：Webview,服务保活，推送等。</p>
+</blockquote>
+<blockquote>
+<p>使用多进程的目的：一个进程对应一个虚拟机，内存分配有限。使用多进程扩大内存，隔离风险。</p>
+</blockquote>
+<blockquote>
+<p>Binder机制的优势：拷贝一次，C/S架构，每个App分配UID，同时支持实名和匿名服务（实名对应系统服务，匿名对应自己的服务）。</p>
+</blockquote>
+<blockquote>
+<p>在计算机中，ioctl(input/output control)是一个专用于设备输入输出操作的系统调用。ioctl是设备驱动程序中对设备的I/O通道进行管理的函数</p>
+</blockquote>
+<h1 id="二-进程间通信方式"><a href="#二-进程间通信方式" class="headerlink" title="二. 进程间通信方式"></a>二. 进程间通信方式</h1><p>传统的进程间通信方式有：管道，信号量，共享内存，Socket。</p>
+<h2 id="Binder与传统IPC对比"><a href="#Binder与传统IPC对比" class="headerlink" title="Binder与传统IPC对比"></a>Binder与传统IPC对比</h2><p><a href="https://imgchr.com/i/BBBQLd" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/02/BBBQLd.jpg" alt="BBBQLd.jpg"></a></p>
+<ul>
+<li>Binder 只拷贝一次数据，C/S架构。Android系统会为每一个App分配一个UID(类似身份证，做任何事情都可以通过UID找到)。同时支持实名和匿名，实名比如系统服务进程是开放的，匿名就是我们App自己创建的服务，是不开放的。</li>
+<li>共享内存<br>两个进程共享一个内存空间，操作过程保护数据安全需要加锁，操作复杂。访问接入点是开放的。</li>
+<li>Socket<br>需要两次内存拷贝，通用网络通信协议，无法做到实时传输，效率低，开销大。访问接入点是开放的。</li>
+</ul>
+<h2 id="Android-IPC方式对比"><a href="#Android-IPC方式对比" class="headerlink" title="Android IPC方式对比"></a>Android IPC方式对比</h2><p><img src="https://s1.ax1x.com/2020/07/19/U2WABt.md.png" alt="image"></p>
+<h1 id="三-Binder数据传输"><a href="#三-Binder数据传输" class="headerlink" title="三. Binder数据传输"></a>三. Binder数据传输</h1><p><img src="https://s1.ax1x.com/2020/07/18/U2cGWj.md.png" alt="image"></p>
+<ol>
+<li><p>客户端(数据发送方)用户地址空间，服务端(数据接收方)用户地址空间，内核地址空间都是虚拟的内存空间。他们分别映射到自己对应的物理内存空间(磁盘)。</p>
+</li>
+<li><p>传统的IPC数据传输过程是:先从客户端用户地址空间同过copy_from_user拷贝数据到内核地址空间。然后从内核地址空间通过copy_to_user拷贝数据到服务端的用户地址空间。整个过程会有两次拷贝，效率低。</p>
+</li>
+<li><p>Binder相比与传统的IPC方式比如Socket只会做一次内存数据拷贝。如上图所示，Binder的数据传输过程是：从客户端用户地址空间通过copy_from_user函数拷贝数据到内核地址空间。然后内核地址空间与服务端用户地址空间通过MMAP机制把他们的虚机空间映射到同一个物理空间。也就是说内核地址空间与服务端用户地址空间共享一块物理内存。</p>
+</li>
+</ol>
+<h1 id="四-Framework层类图"><a href="#四-Framework层类图" class="headerlink" title="四.Framework层类图"></a>四.Framework层类图</h1><h2 id="1-系统服务类图："><a href="#1-系统服务类图：" class="headerlink" title="1.系统服务类图："></a>1.系统服务类图：</h2><p><a href="https://imgchr.com/i/URi3rj" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/07/19/URi3rj.png" alt="URi3rj.png"></a></p>
+<p>如上图，Android Framework层所有的Manager的类图关系都与ServiceManager雷同。并且调用机制都一样。其中包括ActivityManager,PackageManager,WindowManager等。每一个xxxxManger对应一个IxxxxManager接口并提供调用方法。这些接口的具体实现是一般都是xxxxManagerService中，这些服务运行在system_server进程中。但是xxxxManger通常仅暴露部分公开的API供应用层开发者使用，系统层的业务逻辑无法通过xxxxManger访问。</p>
+<blockquote>
+<p>例如：ActivityManager对应IActivityManager,如果应用层调用ActivityManager.getAppTasks则在ActivityManager#getAppTasks内部调用IActivityManager.getAppTasks,最终实现在ActivityManagerService中，ActivityManagerService运行在system_server进程中,由SystemServer创建。这样应用层进程就可以和系统层进程实现通信。</p>
+</blockquote>
+<p>其中上图标注为红色的类(IInterface,IBinder,Binder,BinderProxy)是Binder机制中Framework层的核心API,无论是系统各种Manager还是自己开发中用AIDL来实现跨进程通信都必须在这几个核心API基础上进行。</p>
+<h2 id="2-自定义服务类图："><a href="#2-自定义服务类图：" class="headerlink" title="2.自定义服务类图："></a>2.自定义服务类图：</h2><p><a href="https://imgchr.com/i/URiqFP" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/07/19/URiqFP.png" alt="URiqFP.png"></a></p>
+<h2 id="3-AIDL时序图"><a href="#3-AIDL时序图" class="headerlink" title="3.AIDL时序图"></a>3.AIDL时序图</h2><p><a href="https://imgchr.com/i/BBD9tP" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/02/BBD9tP.jpg" alt="BBD9tP.jpg"></a></p>
+<h2 id="4-bindService流程图"><a href="#4-bindService流程图" class="headerlink" title="4.bindService流程图"></a>4.bindService流程图</h2><p><a href="https://imgchr.com/i/BBDip8" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/02/BBDip8.png" alt="BBDip8.png"></a></p>
+<blockquote>
+<p>注意：</p>
+<ol>
+<li>asInterface判断是否是在同一个进程</li>
+<li>执行transact方法，当前线程会挂起。</li>
+<li>onTransact通过code来判断方法</li>
+<li>系统服务的Binder对象通过ServiceManager获取。自定义服务的Binder对象通过ServiceConnection获取。</li>
+</ol>
+</blockquote>
+<h1 id="五-Framework层API分析"><a href="#五-Framework层API分析" class="headerlink" title="五.Framework层API分析"></a>五.Framework层API分析</h1><h2 id="IInterface"><a href="#IInterface" class="headerlink" title="IInterface"></a>IInterface</h2><blockquote>
+<p>IIterface是Binder中通信接口的顶级抽象接口，比如根据AIDL文件生成的Java接口也必须实现IIterface，IIterface中就一个方法,asBinder返回一个IBinder对象</p>
+</blockquote>
+<ul>
+<li>asBinder</li>
+</ul>
+<blockquote>
+</blockquote>
+<h2 id="IBinder"><a href="#IBinder" class="headerlink" title="IBinder"></a>IBinder</h2><blockquote>
+<p>IBinder是Android框架的通用性接口，是Binder对象的抽象接口，其中抽取了queryLocalInterface，transact，linkToDeath，linkToDeath等方法</p>
+</blockquote>
+<ul>
+<li>queryLocalInterface</li>
+</ul>
+<blockquote>
+<p>queryLocalInterface根据传入的描述符返回一个IInterface,如果描述符是当前这个Binder的描述符，那么返回当前的Binder的IInterface，否则返回null。<br>其中当前描述符和当前Binder的IInterface对象是在attachInterface传入，而attachInterface一般是在Binder子类初始化的时候调用。例如ActivityManagerNative中如下：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public abstract class ActivityManagerNative extends Binder implements IActivityManager&#123;</span><br><span class="line">    //...</span><br><span class="line">   public ActivityManagerNative() &#123;</span><br><span class="line">        attachInterface(this, descriptor);</span><br><span class="line">    &#125; </span><br><span class="line">    //...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>transact</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//方法源码</span><br><span class="line">public boolean transact(int code, Parcel data, Parcel reply, int flags)</span><br><span class="line">        throws RemoteException;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>transact在Binder和BinderProxy实现不同，在Binder中的实现最终调用onTransact，在BinderProxy中的实现最终调用transactNative，onTransact和transactNative方法在下文分析，这里重点介绍transact的四个参数，onTransact和transactNative方法中也有这四个参数。</p>
+</blockquote>
+<blockquote>
+<ol>
+<li>int code:</li>
+<li>Parcel data:</li>
+<li>Parcel reply:</li>
+<li>int flags:</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>transact一般是在Proxy类中的具体方法里面由客户端调用，客户端调用该方法后就进入了bander驱动，进入驱动层后通过mmap机制把数据传递到服务端然后回调服务端的onTransact。服务端的实现一般在Stub类中。</p>
+</blockquote>
+<ul>
+<li>linkToDeath <blockquote>
+</blockquote>
+</li>
+<li>unlinkToDeath</li>
+</ul>
+<h2 id="Binder"><a href="#Binder" class="headerlink" title="Binder"></a>Binder</h2><blockquote>
+<p>Binder是IBinder的具体实现，实现了IBinderr的所有接口方法，并且提供了attachInterface，onTransact等重要方法。</p>
+</blockquote>
+<ul>
+<li>attachInterface</li>
+</ul>
+<blockquote>
+<p>attachInterface方法一般是在Binder子类构造方法中调用，attach一个IInterface接口，传入的第一个参数就是需要attach的当前IInterface对象，第二个参数就是Binder对象的一个描述符。</p>
+</blockquote>
+<ul>
+<li>onTransact</li>
+</ul>
+<blockquote>
+<p>onTransact一般在Stub类中实现，这是binder驱动给服务端的回调。服务端在这个回调中根据code调用具体的服务端实现方法。</p>
+</blockquote>
+<h2 id="BinderProxy"><a href="#BinderProxy" class="headerlink" title="BinderProxy"></a>BinderProxy</h2><ul>
+<li>transactNative<blockquote>
+<p>transactNative是一个native方法</p>
+</blockquote>
+</li>
+</ul>
+<h1 id="六-Native层分析"><a href="#六-Native层分析" class="headerlink" title="六.Native层分析"></a>六.Native层分析</h1><p>binder驱动文件存储在/dev/binder。是一个可读可写可执行的文件。</p>
+<p>binder驱动层源码frameworks/native/cmds/servicemanager/</p>
+<p>service_manager.c<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    struct binder_state *bs;</span><br><span class="line">    //打开binder设备</span><br><span class="line">    bs = binder_open(128*1024);</span><br><span class="line">    if (!bs) &#123;</span><br><span class="line">        ALOGE(&quot;failed to open binder driver\n&quot;);</span><br><span class="line">        return -1;</span><br><span class="line">    &#125;</span><br><span class="line">    //成为manager</span><br><span class="line">    if (binder_become_context_manager(bs)) &#123;</span><br><span class="line">        ALOGE(&quot;cannot become context manager (%s)\n&quot;, strerror(errno));</span><br><span class="line">        return -1;</span><br><span class="line">    &#125;</span><br><span class="line">    //...</span><br><span class="line">    </span><br><span class="line">    //循环处理客户端发送过来的请求</span><br><span class="line">    binder_loop(bs, svcmgr_handler);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="binder-open"><a href="#binder-open" class="headerlink" title="binder_open"></a>binder_open</h2><p>binder.c<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">struct binder_state *binder_open(size_t mapsize)</span><br><span class="line">&#123;</span><br><span class="line">    struct binder_state *bs;</span><br><span class="line">    struct binder_version vers;</span><br><span class="line">    bs = malloc(sizeof(*bs));</span><br><span class="line">    if (!bs) &#123;</span><br><span class="line">        errno = ENOMEM;</span><br><span class="line">        return NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    //1.打开binder驱动文件</span><br><span class="line">    bs-&gt;fd = open(&quot;/dev/binder&quot;, O_RDWR | O_CLOEXEC);</span><br><span class="line">    if (bs-&gt;fd &lt; 0) &#123;</span><br><span class="line">        fprintf(stderr,&quot;binder: cannot open device (%s)\n&quot;,</span><br><span class="line">                strerror(errno));</span><br><span class="line">        goto fail_open;</span><br><span class="line">    &#125;</span><br><span class="line">    //2.io输入输出控制函数</span><br><span class="line">    if ((ioctl(bs-&gt;fd, BINDER_VERSION, &amp;vers) == -1) ||</span><br><span class="line">        (vers.protocol_version != BINDER_CURRENT_PROTOCOL_VERSION)) &#123;</span><br><span class="line">        fprintf(stderr,</span><br><span class="line">                &quot;binder: kernel driver version (%d) differs from user space version (%d)\n&quot;,</span><br><span class="line">                vers.protocol_version, BINDER_CURRENT_PROTOCOL_VERSION);</span><br><span class="line">        goto fail_open;</span><br><span class="line">    &#125;</span><br><span class="line">    bs-&gt;mapsize = mapsize;</span><br><span class="line">    //3.内存映射</span><br><span class="line">    bs-&gt;mapped = mmap(NULL, mapsize, PROT_READ, MAP_PRIVATE, bs-&gt;fd, 0);</span><br><span class="line">    if (bs-&gt;mapped == MAP_FAILED) &#123;</span><br><span class="line">        fprintf(stderr,&quot;binder: cannot map device (%s)\n&quot;,</span><br><span class="line">                strerror(errno));</span><br><span class="line">        goto fail_map;</span><br><span class="line">    &#125;</span><br><span class="line">    return bs;</span><br><span class="line">fail_map:</span><br><span class="line">    close(bs-&gt;fd);</span><br><span class="line">fail_open:</span><br><span class="line">    free(bs);</span><br><span class="line">    return NULL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="binder-loop"><a href="#binder-loop" class="headerlink" title="binder_loop"></a>binder_loop</h2><p>binder.c</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">void binder_loop(struct binder_state *bs, binder_handler func)</span><br><span class="line">&#123;</span><br><span class="line">    //...</span><br><span class="line">    binder_write(bs, readbuf, sizeof(uint32_t));</span><br><span class="line"></span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        bwr.read_size = sizeof(readbuf);</span><br><span class="line">        bwr.read_consumed = 0;</span><br><span class="line">        bwr.read_buffer = (uintptr_t) readbuf;</span><br><span class="line"></span><br><span class="line">        res = ioctl(bs-&gt;fd, BINDER_WRITE_READ, &amp;bwr);</span><br><span class="line"></span><br><span class="line">        if (res &lt; 0) &#123;</span><br><span class="line">            ALOGE(&quot;binder_loop: ioctl failed (%s)\n&quot;, strerror(errno));</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        //接收到请求，交给binder_parse最终会调用func来处理这些请求。</span><br><span class="line">        res = binder_parse(bs, 0, (uintptr_t) readbuf, bwr.read_consumed, func);</span><br><span class="line">        if (res == 0) &#123;</span><br><span class="line">            ALOGE(&quot;binder_loop: unexpected reply?!\n&quot;);</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        if (res &lt; 0) &#123;</span><br><span class="line">            ALOGE(&quot;binder_loop: io error %d %s\n&quot;, res, strerror(errno));</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="https://imgchr.com/i/BBDCff" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/02/BBDCff.jpg" alt="BBDCff.jpg"></a></p>
+<h1 id="七-ServiceManager简析"><a href="#七-ServiceManager简析" class="headerlink" title="七.ServiceManager简析"></a>七.ServiceManager简析</h1><p>ServiceManager是系统所有服务的总管，比如ActivityManagerService,PackageManagerService,WindowManagerService等这些服务全部注册在ServiceManager中，ServiceManager内部通过HashMap缓存系统所有核心服务，并提供getService方法给Client调用。</p>
+<p>如上文所讲，ServiceManager本身也是Binder实现，ServiceManager仅给Client提供访问入口，功能实现同样在system_server进程中。</p>
+<p><strong>注册服务的源码</strong></p>
+<p>ServiceManager#addService<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">     * Place a new @a service called @a name into the service</span><br><span class="line">     * manager.</span><br><span class="line">     * </span><br><span class="line">     * @param name the name of the new service</span><br><span class="line">     * @param service the service object</span><br><span class="line">     */</span><br><span class="line">    public static void addService(String name, IBinder service) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            getIServiceManager().addService(name, service, false);</span><br><span class="line">        &#125; catch (RemoteException e) &#123;</span><br><span class="line">            Log.e(TAG, &quot;error in addService&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取服务的源码</strong></p>
+<p>ServiceManager#getService<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">     * Returns a reference to a service with the given name.</span><br><span class="line">     * </span><br><span class="line">     * @param name the name of the service to get</span><br><span class="line">     * @return a reference to the service, or &lt;code&gt;null&lt;/code&gt; if the service doesn&apos;t exist</span><br><span class="line">     */</span><br><span class="line">    public static IBinder getService(String name) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            IBinder service = sCache.get(name);</span><br><span class="line">            if (service != null) &#123;</span><br><span class="line">                return service;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                return getIServiceManager().getService(name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (RemoteException e) &#123;</span><br><span class="line">            Log.e(TAG, &quot;error in getService&quot;, e);</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Intent不能传递大数据，默认大小1M-8k ProcessState.c</p>
+</blockquote>
+<p>Binder默认最大线程数</p>
+<p><a href="https://gitee.com/pming/AndroidDemo_4/tree/master/BinderSimple" target="_blank" rel="noopener">BinderSample</a></p>
+<p><a href="https://blog.csdn.net/freekiteyu/article/details/70082302" target="_blank" rel="noopener">参考博客1</a></p>
+<p><a href="https://blog.csdn.net/xuxl2050/article/details/46448573" target="_blank" rel="noopener">参考博客2</a></p>
+<p><a href="https://www.jianshu.com/p/4c4dcf80d412" target="_blank" rel="noopener">参考博客3</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2018年09月20日 - 17时42分</p>
+        <p><span>最后更新:</span>2020年11月05日 - 17时42分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/09/20/Android-Binder机制/" title="Android-Binder机制">http://yoursite.com/2018/09/20/Android-Binder机制/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/09/20/Android-Binder机制/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2019/09/09/Activity启动过程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Activity启动过程
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2018/08/23/Android焦点分发策略/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android焦点分发策略</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一-Linux进程"><span class="toc-number">1.</span> <span class="toc-text">一. Linux进程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#二-进程间通信方式"><span class="toc-number">2.</span> <span class="toc-text">二. 进程间通信方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Binder与传统IPC对比"><span class="toc-number">2.1.</span> <span class="toc-text">Binder与传统IPC对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Android-IPC方式对比"><span class="toc-number">2.2.</span> <span class="toc-text">Android IPC方式对比</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#三-Binder数据传输"><span class="toc-number">3.</span> <span class="toc-text">三. Binder数据传输</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#四-Framework层类图"><span class="toc-number">4.</span> <span class="toc-text">四.Framework层类图</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-系统服务类图："><span class="toc-number">4.1.</span> <span class="toc-text">1.系统服务类图：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-自定义服务类图："><span class="toc-number">4.2.</span> <span class="toc-text">2.自定义服务类图：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-AIDL时序图"><span class="toc-number">4.3.</span> <span class="toc-text">3.AIDL时序图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-bindService流程图"><span class="toc-number">4.4.</span> <span class="toc-text">4.bindService流程图</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#五-Framework层API分析"><span class="toc-number">5.</span> <span class="toc-text">五.Framework层API分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#IInterface"><span class="toc-number">5.1.</span> <span class="toc-text">IInterface</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IBinder"><span class="toc-number">5.2.</span> <span class="toc-text">IBinder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Binder"><span class="toc-number">5.3.</span> <span class="toc-text">Binder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BinderProxy"><span class="toc-number">5.4.</span> <span class="toc-text">BinderProxy</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#六-Native层分析"><span class="toc-number">6.</span> <span class="toc-text">六.Native层分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#binder-open"><span class="toc-number">6.1.</span> <span class="toc-text">binder_open</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#binder-loop"><span class="toc-number">6.2.</span> <span class="toc-text">binder_loop</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#七-ServiceManager简析"><span class="toc-number">7.</span> <span class="toc-text">七.ServiceManager简析</span></a></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2019/09/09/Activity启动过程/" title="上一篇: Activity启动过程">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2018/08/23/Android焦点分发策略/" title="下一篇: Android焦点分发策略">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

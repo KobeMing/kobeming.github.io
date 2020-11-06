@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>Android焦点分发策略 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="焦点分发基础知识获取焦点的前提 View#isFocusable返回true, 如果在触摸模式, 则View#isFocusableInTouchMode也要返回true 控件必须可见 控件相关的父控件, 包括祖父控件等, ViewGroup#getDescendantFocusability()不能为ViewGroup#FOCUS_BLOCK_DESCENDANTS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android焦点分发策略">
+<meta property="og:url" content="http://yoursite.com/2018/08/23/Android焦点分发策略/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="焦点分发基础知识获取焦点的前提 View#isFocusable返回true, 如果在触摸模式, 则View#isFocusableInTouchMode也要返回true 控件必须可见 控件相关的父控件, 包括祖父控件等, ViewGroup#getDescendantFocusability()不能为ViewGroup#FOCUS_BLOCK_DESCENDANTS">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-23T01:49:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android焦点分发策略">
+<meta name="twitter:description" content="焦点分发基础知识获取焦点的前提 View#isFocusable返回true, 如果在触摸模式, 则View#isFocusableInTouchMode也要返回true 控件必须可见 控件相关的父控件, 包括祖父控件等, ViewGroup#getDescendantFocusability()不能为ViewGroup#FOCUS_BLOCK_DESCENDANTS">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Android焦点分发策略" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2018/08/23/Android焦点分发策略/" class="article-date">
+      <time datetime="2018-08-23T01:49:38.000Z" itemprop="datePublished">2018-08-23</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android焦点分发策略
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="焦点分发基础知识"><a href="#焦点分发基础知识" class="headerlink" title="焦点分发基础知识"></a>焦点分发基础知识</h1><h2 id="获取焦点的前提"><a href="#获取焦点的前提" class="headerlink" title="获取焦点的前提"></a>获取焦点的前提</h2><ul>
+<li>View#isFocusable返回true, 如果在触摸模式, 则View#isFocusableInTouchMode也要返回true</li>
+<li>控件必须可见</li>
+<li>控件相关的父控件, 包括祖父控件等, ViewGroup#getDescendantFocusability()不能为ViewGroup#FOCUS_BLOCK_DESCENDANTS</li>
+</ul>
+<a id="more"></a>
+<h2 id="焦点相关api"><a href="#焦点相关api" class="headerlink" title="焦点相关api"></a>焦点相关api</h2><ul>
+<li>requestFocus</li>
+</ul>
+<blockquote>
+<p>主动请求焦点</p>
+</blockquote>
+<ul>
+<li><p>clearFocus</p>
+<blockquote>
+<p>主动清除焦点</p>
+</blockquote>
+</li>
+<li><p>focusSearch</p>
+<blockquote>
+<p>递归搜索需要焦点的View</p>
+</blockquote>
+</li>
+<li><p>ViewGroup.setDescendantFocusability</p>
+<blockquote>
+<p>三个参数含义：<br>FOCUS_BEFORE_DESCENDANTS<br>ViewGroup本身相对焦点进行处理，如果沒有处理则分发给child View进行处理</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>FOCUS_AFTER_DESCENDANTS<br>先分发给Child View进行处理，如果所有的Child View都沒有处理，則自己再处理</p>
+</blockquote>
+<blockquote>
+<p>FOCUS_BLOCK_DESCENDANTS<br>ViewGroup本身进行处理，不管是否处理成功，都不会分发给ChildView进行处理</p>
+</blockquote>
+<ul>
+<li>onRequestFocusInDescendants<blockquote>
+<p>可以传入方向来改变遍历的顺序, 默认是从0递增,遍历子控件,调用子控件的View#requestFocus来尝试把焦点给可见的子控件, 某个子控件成功获取到焦点后, 停止遍历</p>
+</blockquote>
+</li>
+</ul>
+<p>注: 重写该方法可以改变ViewGroup分发焦点给子控件的行为, 例如遍历顺</p>
+<ul>
+<li>requestChildFocus<blockquote>
+<p>当子控件主动放弃焦点的时候,回调这个方法通知父控件.</p>
+</blockquote>
+</li>
+<li><p>clearChildFocus</p>
+<blockquote>
+<p>当子控件获取了焦点后, 回调这个方法通知父控件</p>
+</blockquote>
+</li>
+<li><p>focusableViewAvailable</p>
+</li>
+</ul>
+<blockquote>
+<p>通知父控件, 子控件的状态发生改变, 从不能获取焦点, 变成可能可以获取焦点.</p>
+</blockquote>
+<ul>
+<li><p>hasFocus</p>
+<blockquote>
+<p>当前视图是否是焦点视图或子视图里面有焦点视图</p>
+</blockquote>
+</li>
+<li><p>isFocused() </p>
+<blockquote>
+<p>当前视图是否是焦点视图</p>
+</blockquote>
+</li>
+<li><p>findFocus</p>
+<blockquote>
+<p>查找焦点控件</p>
+</blockquote>
+</li>
+<li><p>getFocusedChild</p>
+<blockquote>
+<p>获取子控件的焦点view</p>
+</blockquote>
+</li>
+</ul>
+<p><a href="https://www.jianshu.com/p/641f96c19203" target="_blank" rel="noopener">参考博客</a></p>
+<h1 id="焦点分发源码分析"><a href="#焦点分发源码分析" class="headerlink" title="焦点分发源码分析"></a>焦点分发源码分析</h1><p>在Android中任何事件都会经由ViewRootImpl$ViewPostImeInputStage的onProcess处理.在onProcess方法中会判断不同事件类型做不同的处理.这里我们只分析触发焦点转移的KeyEvent.<a href="http://note.youdao.com/noteshare?id=7a1334c5522ce212c2da799c0db825b1&amp;sub=WEB426c74bf163265c7e2d68b10e3f5d7da" target="_blank" rel="noopener">事件分发机制参考</a></p>
+<p>当我们触发按键,最终会由底层把事件传入onProcess,在onProcess中如果是KeyEvent类型就进入processKeyEvent方法中进行处理.</p>
+<h2 id="processKeyEvent方法源码如下"><a href="#processKeyEvent方法源码如下" class="headerlink" title="processKeyEvent方法源码如下:"></a>processKeyEvent方法源码如下:</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">private int processKeyEvent(QueuedInputEvent q) &#123;</span><br><span class="line">            final KeyEvent event = (KeyEvent)q.mEvent;</span><br><span class="line"></span><br><span class="line">            if (event.getAction() != KeyEvent.ACTION_UP) &#123;</span><br><span class="line">                // If delivering a new key event, make sure the window is</span><br><span class="line">                // now allowed to start updating.</span><br><span class="line">                handleDispatchDoneAnimating();</span><br><span class="line">            &#125;</span><br><span class="line">            //1.向View树分发KeyEvent事件</span><br><span class="line">            // Deliver the key to the view hierarchy.</span><br><span class="line">            if (mView.dispatchKeyEvent(event)) &#123;</span><br><span class="line">                return FINISH_HANDLED;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            //........................此处省略部分代码</span><br><span class="line">            </span><br><span class="line">            //2.处理焦点的转移</span><br><span class="line">            // Handle automatic focus changes.</span><br><span class="line">           //........................此处省略部分代码</span><br><span class="line">                if (direction != 0) &#123;</span><br><span class="line">                //step1 找到当前View树中的焦点View</span><br><span class="line">                    View focused = mView.findFocus();</span><br><span class="line">                    if (focused != null) &#123;</span><br><span class="line">                    //step2 当前焦点View根据方向搜索下一个需要焦点的View并主动请求焦点</span><br><span class="line">                        View v = focused.focusSearch(direction);</span><br><span class="line">                        if (v != null &amp;&amp; v != focused) &#123;</span><br><span class="line">                            // do the math the get the interesting rect</span><br><span class="line">                            // of previous focused into the coord system of</span><br><span class="line">                            // newly focused view</span><br><span class="line">                            focused.getFocusedRect(mTempRect);</span><br><span class="line">                            if (mView instanceof ViewGroup) &#123;</span><br><span class="line">                                ((ViewGroup) mView).offsetDescendantRectToMyCoords(</span><br><span class="line">                                        focused, mTempRect);</span><br><span class="line">                                ((ViewGroup) mView).offsetRectIntoDescendantCoords(</span><br><span class="line">                                        v, mTempRect);</span><br><span class="line">                            &#125;</span><br><span class="line">                            if (v.requestFocus(direction, mTempRect)) &#123;</span><br><span class="line">                                playSoundEffect(SoundEffectConstants</span><br><span class="line">                                        .getContantForFocusDirection(direction));</span><br><span class="line">                                return FINISH_HANDLED;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        // Give the focused view a last chance to handle the dpad key.</span><br><span class="line">                        if (mView.dispatchUnhandledMove(focused, direction)) &#123;</span><br><span class="line">                            return FINISH_HANDLED;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; else &#123;</span><br><span class="line">                        // find the best view to give focus to in this non-touch-mode with no-focus</span><br><span class="line">                        //step3 ViewRootImpl根据方向搜索下一个需要焦点的View并主动请求焦点</span><br><span class="line">                        View v = focusSearch(null, direction);</span><br><span class="line">                        if (v != null &amp;&amp; v.requestFocus(direction)) &#123;</span><br><span class="line">                            return FINISH_HANDLED;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法中主要做了两件事,1.向View树分发KeyEvent事件 2.处理焦点的转移,下面主要分析处理焦点的转移这条逻辑.</p>
+<h4 id="1-向View树分发KeyEvent事件"><a href="#1-向View树分发KeyEvent事件" class="headerlink" title="1.向View树分发KeyEvent事件"></a>1.向View树分发KeyEvent事件</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// Deliver the key to the view hierarchy.</span><br><span class="line">if (mView.dispatchKeyEvent(event)) &#123;</span><br><span class="line">    return FINISH_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这就是我们熟悉View层的事件分发,同理还有</p>
+<ul>
+<li><p>dispatchHoverEvent</p>
+</li>
+<li><p>dispatchTouchEvent</p>
+</li>
+</ul>
+<h4 id="2-处理焦点的转移"><a href="#2-处理焦点的转移" class="headerlink" title="2.处理焦点的转移"></a>2.处理焦点的转移</h4><p><strong>step1</strong> : 当我们的按键有一个确定的方向,首先找到当前View树中的焦点view.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> if (direction != 0) &#123;</span><br><span class="line">    View focused = mView.findFocus();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>step2</strong> : 如果找到了当前焦点View,则调用当前焦点View的焦点搜索方法,并返回下一个需要焦点的View,最后需要焦点的View主动请求焦点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">View v = focused.focusSearch(direction);</span><br><span class="line"></span><br><span class="line">if (v.requestFocus(direction, mTempRect)) &#123;</span><br><span class="line">  playSoundEffect(SoundEffectConstants</span><br><span class="line">          .getContantForFocusDirection(direction));</span><br><span class="line">  return FINISH_HANDLED;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>最终View#focusSearch直接调用的是ViewPaent#focusSearch<br>ViewParent是一个接口,最后在ViewGroup中实现,后文分析ViewGroup#focusSearch,View的focusSearch方法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public View focusSearch(@FocusRealDirection int direction) &#123;</span><br><span class="line">        if (mParent != null) &#123;</span><br><span class="line">            return mParent.focusSearch(this, direction);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>step3</strong> : 如果未找到当前焦点View,则调用ViewRootImpl的焦点搜索方法,并返回下一个需要焦点的View,最后需要焦点的View主动请求焦点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">View v = focusSearch(null, direction);</span><br><span class="line">if (v != null &amp;&amp; v.requestFocus(direction)) &#123;</span><br><span class="line">    return FINISH_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本质上ViewRootImpl#focusSearch方法重写的是ViewPaent#focusSearch,此方法内部直接调用焦点帮助类,返回一个需要焦点的View.方法如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public View focusSearch(View focused, int direction) &#123;</span><br><span class="line">    checkThread();</span><br><span class="line">    if (!(mView instanceof ViewGroup)) &#123;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br><span class="line">    return FocusFinder.getInstance().findNextFocus((ViewGroup) mView, focused, direction);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此,焦点分发的逻辑就进入了View层,下面分析View层的逻辑.</p>
+<h1 id="ViewGroup-focusSearch"><a href="#ViewGroup-focusSearch" class="headerlink" title="ViewGroup#focusSearch"></a>ViewGroup#focusSearch</h1><p>因为View的focusSearch直接调用的是ViewParent的focusSearch,所以我们只分析ViewGroup的focusSearch</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public View focusSearch(View focused, int direction) &#123;</span><br><span class="line">        if (isRootNamespace()) &#123;</span><br><span class="line">            // root namespace means we should consider ourselves the top of the</span><br><span class="line">            // tree for focus searching; otherwise we could be focus searching</span><br><span class="line">            // into other tabs.  see LocalActivityManager and TabHost for more info</span><br><span class="line">            return FocusFinder.getInstance().findNextFocus(this, focused, direction);</span><br><span class="line">        &#125; else if (mParent != null) &#123;</span><br><span class="line">            return mParent.focusSearch(focused, direction);</span><br><span class="line">        &#125;</span><br><span class="line">        return null;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>ViewGroup的focusSearch方法非常简单,如果是root View就调用焦点帮助类返回一个需要焦点的View,反之递归调用ViewGroup的focusSearch,直到找到一个需要焦点的View.</p>
+<h1 id="requestFocus"><a href="#requestFocus" class="headerlink" title="requestFocus"></a>requestFocus</h1><p>了解完focusSearch我们继续分析requestFocus,requestFocus在View和ViewGrope有各自不同的实现.</p>
+<h2 id="ViewGroup-requestFocus"><a href="#ViewGroup-requestFocus" class="headerlink" title="ViewGroup#requestFocus"></a>ViewGroup#requestFocus</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">    public boolean requestFocus(int direction, Rect previouslyFocusedRect) &#123;</span><br><span class="line">        int descendantFocusability = getDescendantFocusability();</span><br><span class="line"></span><br><span class="line">        switch (descendantFocusability) &#123;</span><br><span class="line">            case FOCUS_BLOCK_DESCENDANTS:</span><br><span class="line">                return super.requestFocus(direction, previouslyFocusedRect);</span><br><span class="line">            case FOCUS_BEFORE_DESCENDANTS: &#123;</span><br><span class="line">                final boolean took = super.requestFocus(direction, previouslyFocusedRect);</span><br><span class="line">                return took ? took : onRequestFocusInDescendants(direction, previouslyFocusedRect);</span><br><span class="line">            &#125;</span><br><span class="line">            case FOCUS_AFTER_DESCENDANTS: &#123;</span><br><span class="line">                final boolean took = onRequestFocusInDescendants(direction, previouslyFocusedRect);</span><br><span class="line">                return took ? took : super.requestFocus(direction, previouslyFocusedRect);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>ViewGroup的requestFocus会根据三种分发策略决定是自己先请求还是child先请求,最终都会调用View的requestFocus</p>
+<h2 id="View-requestFocus"><a href="#View-requestFocus" class="headerlink" title="View#requestFocus"></a>View#requestFocus</h2><p>View的requestFocus会调用到requestFocusNoSearch<br>在requestFocusNoSearch中做一些位运算后最终调用handleFocusGainInternal</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">void handleFocusGainInternal(@FocusRealDirection int direction, Rect previouslyFocusedRect) &#123;</span><br><span class="line"></span><br><span class="line">        if ((mPrivateFlags &amp; PFLAG_FOCUSED) == 0) &#123;</span><br><span class="line">            mPrivateFlags |= PFLAG_FOCUSED;</span><br><span class="line"></span><br><span class="line">            View oldFocus = (mAttachInfo != null) ? getRootView().findFocus() : null;</span><br><span class="line"></span><br><span class="line">            if (mParent != null) &#123;</span><br><span class="line">                mParent.requestChildFocus(this, this);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (mAttachInfo != null) &#123;</span><br><span class="line">                mAttachInfo.mTreeObserver.dispatchOnGlobalFocusChange(oldFocus, this);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            onFocusChanged(true, direction, previouslyFocusedRect);</span><br><span class="line">            refreshDrawableState();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>handleFocusGainInternal中通知父容器自己请求了焦点,回调onFocusChanged,并刷新View</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2018年08月23日 - 09时49分</p>
+        <p><span>最后更新:</span>2019年08月23日 - 09时49分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/23/Android焦点分发策略/" title="Android焦点分发策略">http://yoursite.com/2018/08/23/Android焦点分发策略/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2018/08/23/Android焦点分发策略/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2018/09/20/Android-Binder机制/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Android-Binder机制
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2017/12/04/Android加载ReactNative页面流程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android加载ReactNative页面流程</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#焦点分发基础知识"><span class="toc-number">1.</span> <span class="toc-text">焦点分发基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#获取焦点的前提"><span class="toc-number">1.1.</span> <span class="toc-text">获取焦点的前提</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#焦点相关api"><span class="toc-number">1.2.</span> <span class="toc-text">焦点相关api</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#焦点分发源码分析"><span class="toc-number">2.</span> <span class="toc-text">焦点分发源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#processKeyEvent方法源码如下"><span class="toc-number">2.1.</span> <span class="toc-text">processKeyEvent方法源码如下:</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-向View树分发KeyEvent事件"><span class="toc-number">2.1.0.1.</span> <span class="toc-text">1.向View树分发KeyEvent事件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-处理焦点的转移"><span class="toc-number">2.1.0.2.</span> <span class="toc-text">2.处理焦点的转移</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ViewGroup-focusSearch"><span class="toc-number">3.</span> <span class="toc-text">ViewGroup#focusSearch</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#requestFocus"><span class="toc-number">4.</span> <span class="toc-text">requestFocus</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ViewGroup-requestFocus"><span class="toc-number">4.1.</span> <span class="toc-text">ViewGroup#requestFocus</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#View-requestFocus"><span class="toc-number">4.2.</span> <span class="toc-text">View#requestFocus</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2018/09/20/Android-Binder机制/" title="上一篇: Android-Binder机制">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2017/12/04/Android加载ReactNative页面流程/" title="下一篇: Android加载ReactNative页面流程">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

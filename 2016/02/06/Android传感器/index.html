@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>Android传感器 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Android传感器（一）、传感器概述：1、简介：Android手机中常支持多种类型传感器，如：光照传感器、加速度传感器、地磁传感器、压力传感器、温度传感器等。赛车游戏、微信摇一摇、指南针都需要借助传感器来完成。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android传感器">
+<meta property="og:url" content="http://yoursite.com/2016/02/06/Android传感器/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="Android传感器（一）、传感器概述：1、简介：Android手机中常支持多种类型传感器，如：光照传感器、加速度传感器、地磁传感器、压力传感器、温度传感器等。赛车游戏、微信摇一摇、指南针都需要借助传感器来完成。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2016-02-06T07:27:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android传感器">
+<meta name="twitter:description" content="Android传感器（一）、传感器概述：1、简介：Android手机中常支持多种类型传感器，如：光照传感器、加速度传感器、地磁传感器、压力传感器、温度传感器等。赛车游戏、微信摇一摇、指南针都需要借助传感器来完成。">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Android传感器" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2016/02/06/Android传感器/" class="article-date">
+      <time datetime="2016-02-06T07:27:35.000Z" itemprop="datePublished">2016-02-06</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android传感器
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="Android传感器"><a href="#Android传感器" class="headerlink" title="Android传感器"></a>Android传感器</h1><h2 id="（一）、传感器概述："><a href="#（一）、传感器概述：" class="headerlink" title="（一）、传感器概述："></a>（一）、传感器概述：</h2><h4 id="1、简介："><a href="#1、简介：" class="headerlink" title="1、简介："></a>1、简介：</h4><p>Android手机中常支持多种类型传感器，如：光照传感器、加速度传感器、地磁传感器、压力传感器、温度传感器等。赛车游戏、微信摇一摇、指南针都需要借助传感器来完成。</p>
+<a id="more"></a>
+<h4 id="2、传感器分类"><a href="#2、传感器分类" class="headerlink" title="2、传感器分类"></a>2、传感器分类</h4><h6 id="动作传感器（Motion）"><a href="#动作传感器（Motion）" class="headerlink" title="动作传感器（Motion）"></a>动作传感器（Motion）</h6><pre><code>加速(基于硬件)，重力（grayty），陀螺仪(基于硬件)，旋转
+</code></pre><h6 id="环境传感器-Environmental"><a href="#环境传感器-Environmental" class="headerlink" title="环境传感器(Environmental)"></a>环境传感器(Environmental)</h6><pre><code>湿度，光线，温度
+</code></pre><h6 id="位置传感器-Position"><a href="#位置传感器-Position" class="headerlink" title="位置传感器(Position)"></a>位置传感器(Position)</h6><pre><code>方向，磁力    
+</code></pre><h4 id="3、传感器使用步骤："><a href="#3、传感器使用步骤：" class="headerlink" title="3、传感器使用步骤："></a>3、传感器使用步骤：</h4><ul>
+<li>获取SensorManager对象：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取传感器类型：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>SensorManager对象注册监听器，监听传感器输出的信号：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sensorManager.registerListener(listener, sensor,sensorManager.SENSOR_DELAY_GAME);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>资源释放：SensorManager对象解除注册监听器</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sensorManager.unregisterListener(listener);</span><br></pre></td></tr></table></figure>
+<h2 id="（二）、光照传感器"><a href="#（二）、光照传感器" class="headerlink" title="（二）、光照传感器"></a>（二）、光照传感器</h2><p>1、核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line"></span><br><span class="line">	private TextView textView_lightlevel;</span><br><span class="line"></span><br><span class="line">	private SensorManager sensorManager;</span><br><span class="line"></span><br><span class="line">	private SensorEventListener listener = new SensorEventListener() &#123;</span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onSensorChanged(SensorEvent event) &#123;</span><br><span class="line"></span><br><span class="line">			float value = event.values[0];</span><br><span class="line"></span><br><span class="line">			textView_lightlevel.setText(value + &quot;lx&quot;);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onAccuracyChanged(Sensor sensor, int accuracy) &#123;</span><br><span class="line"></span><br><span class="line">			// TODO Auto-generated method stub</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line"></span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">		setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		textView_lightlevel = (TextView) findViewById(R.id.textView_lightlevel);</span><br><span class="line"></span><br><span class="line">		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);</span><br><span class="line"></span><br><span class="line">		Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);</span><br><span class="line"></span><br><span class="line">		// 传感器输出信息的更新速率</span><br><span class="line"></span><br><span class="line">		sensorManager.registerListener(listener, sensor,</span><br><span class="line"></span><br><span class="line">				sensorManager.SENSOR_DELAY_GAME);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onDestroy() &#123;</span><br><span class="line"></span><br><span class="line">		super.onDestroy();</span><br><span class="line"></span><br><span class="line">		if (sensorManager != null) &#123;</span><br><span class="line"></span><br><span class="line">			sensorManager.unregisterListener(listener);</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="（三）、加速度传感器：（模拟摇一摇）"><a href="#（三）、加速度传感器：（模拟摇一摇）" class="headerlink" title="（三）、加速度传感器：（模拟摇一摇）"></a>（三）、加速度传感器：（模拟摇一摇）</h2><p>1、核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line"></span><br><span class="line">	private SensorManager sensorManager;</span><br><span class="line"></span><br><span class="line">	private SensorEventListener listener = new SensorEventListener() &#123;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onSensorChanged(SensorEvent event) &#123;</span><br><span class="line"></span><br><span class="line">			float valueX = Math.abs(event.values[0]);</span><br><span class="line"></span><br><span class="line">			float valueY = Math.abs(event.values[1]);</span><br><span class="line"></span><br><span class="line">			float valueZ = Math.abs(event.values[2]);</span><br><span class="line"></span><br><span class="line">			if (valueX &gt; 15 || valueY &gt; 15 || valueZ &gt; 15) &#123;</span><br><span class="line"></span><br><span class="line">				Toast.makeText(MainActivity.this, &quot;摇晃了！&quot;, 0).show();</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onAccuracyChanged(Sensor sensor, int accuracy) &#123;</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line"></span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">		setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);</span><br><span class="line"></span><br><span class="line">		Sensor sensor = sensorManager</span><br><span class="line"></span><br><span class="line">				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);</span><br><span class="line"></span><br><span class="line">		sensorManager.registerListener(listener, sensor,</span><br><span class="line"></span><br><span class="line">				sensorManager.SENSOR_DELAY_FASTEST);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onDestroy() &#123;</span><br><span class="line"></span><br><span class="line">		super.onDestroy();</span><br><span class="line"></span><br><span class="line">		if (sensorManager != null) &#123;</span><br><span class="line"></span><br><span class="line">			sensorManager.unregisterListener(listener);</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	public boolean onCreateOptionsMenu(Menu menu) &#123;</span><br><span class="line"></span><br><span class="line">		// Inflate the menu; this adds items to the action bar if it is present.</span><br><span class="line"></span><br><span class="line">		getMenuInflater().inflate(R.menu.main, menu);</span><br><span class="line"></span><br><span class="line">		return true;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="（四）、方向传感器：（指南针）"><a href="#（四）、方向传感器：（指南针）" class="headerlink" title="（四）、方向传感器：（指南针）"></a>（四）、方向传感器：（指南针）</h2><p>1、核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line"></span><br><span class="line">	private TextView textView_main_info;</span><br><span class="line"></span><br><span class="line">	private ImageView imageView_main_arrow;</span><br><span class="line"></span><br><span class="line">	private SensorManager sensorManager;</span><br><span class="line"></span><br><span class="line">	private SensorEventListener listener = new SensorEventListener() &#123;</span><br><span class="line"></span><br><span class="line">		float[] accelerometerValues = new float[3];</span><br><span class="line"></span><br><span class="line">		float[] magneticValues = new float[3];</span><br><span class="line"></span><br><span class="line">		float lastRotateDegree;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onSensorChanged(SensorEvent event) &#123;</span><br><span class="line"></span><br><span class="line">			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) &#123;</span><br><span class="line"></span><br><span class="line">				accelerometerValues = event.values.clone();</span><br><span class="line"></span><br><span class="line">			&#125; else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) &#123;</span><br><span class="line"></span><br><span class="line">				magneticValues = event.values.clone();</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			float[] R = new float[9];// 包含旋转矩阵的数据放在R数组中</span><br><span class="line"></span><br><span class="line">			float[] values = new float[3];// 手机在各个方向上旋转的数据放在这个数组中</span><br><span class="line"></span><br><span class="line">			sensorManager.getRotationMatrix(R, null, accelerometerValues,</span><br><span class="line"></span><br><span class="line">					magneticValues);</span><br><span class="line"></span><br><span class="line">			sensorManager.getOrientation(R, values);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">			float rotateDegree = -(float) Math.toDegrees(values[0]);</span><br><span class="line"></span><br><span class="line">			// textView_main_info.setText(Math.toDegrees(values[0]) + &quot;&quot;);</span><br><span class="line"></span><br><span class="line">			if (Math.abs(rotateDegree - lastRotateDegree) &gt; 1) &#123;</span><br><span class="line"></span><br><span class="line">				RotateAnimation animation = new RotateAnimation(</span><br><span class="line"></span><br><span class="line">						lastRotateDegree, rotateDegree,</span><br><span class="line"></span><br><span class="line">						Animation.RELATIVE_TO_SELF, 0.5f,</span><br><span class="line"></span><br><span class="line">						Animation.RELATIVE_TO_SELF, 0.5f);</span><br><span class="line"></span><br><span class="line">				animation.setFillAfter(true);</span><br><span class="line"></span><br><span class="line">				imageView_main_arrow.startAnimation(animation);</span><br><span class="line"></span><br><span class="line">				lastRotateDegree = rotateDegree;</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			setTitle(&quot;角度为：&quot; + Math.toDegrees(values[0]));</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onAccuracyChanged(Sensor sensor, int accuracy) &#123;</span><br><span class="line"></span><br><span class="line">			// TODO Auto-generated method stub</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line"></span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">		setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line">		imageView_main_arrow = (ImageView) findViewById(R.id.imageView_main_arrow);</span><br><span class="line"></span><br><span class="line">		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);</span><br><span class="line"></span><br><span class="line">		Sensor accelerometerSensor = sensorManager</span><br><span class="line"></span><br><span class="line">				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);</span><br><span class="line"></span><br><span class="line">		Sensor mageneticSensor = sensorManager</span><br><span class="line"></span><br><span class="line">				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);</span><br><span class="line"></span><br><span class="line">		sensorManager.registerListener(listener, accelerometerSensor,</span><br><span class="line"></span><br><span class="line">				sensorManager.SENSOR_DELAY_NORMAL);</span><br><span class="line"></span><br><span class="line">		sensorManager.registerListener(listener, mageneticSensor,</span><br><span class="line"></span><br><span class="line">				sensorManager.SENSOR_DELAY_NORMAL);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	public boolean onCreateOptionsMenu(Menu menu) &#123;</span><br><span class="line"></span><br><span class="line">		// Inflate the menu; this adds items to the action bar if it is present.</span><br><span class="line"></span><br><span class="line">		getMenuInflater().inflate(R.menu.main, menu);</span><br><span class="line"></span><br><span class="line">		return true;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="（五）、加速度传感器-补间动画实现改进版《摇一摇》："><a href="#（五）、加速度传感器-补间动画实现改进版《摇一摇》：" class="headerlink" title="（五）、加速度传感器+补间动画实现改进版《摇一摇》："></a>（五）、加速度传感器+补间动画实现改进版《摇一摇》：</h2><p>1、布局核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line"></span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line"></span><br><span class="line">    android:layout_height=&quot;match_parent&quot; </span><br><span class="line"></span><br><span class="line">    android:background=&quot;#000&quot;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &lt;ImageView</span><br><span class="line"></span><br><span class="line">        android:id=&quot;@+id/imageView_main_flower&quot;</span><br><span class="line"></span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line"></span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line"></span><br><span class="line">        android:layout_centerInParent=&quot;true&quot;</span><br><span class="line"></span><br><span class="line">        android:src=&quot;@drawable/shakehideimg_man2&quot; /&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &lt;LinearLayout</span><br><span class="line"></span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line"></span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line"></span><br><span class="line">        android:layout_centerInParent=&quot;true&quot;</span><br><span class="line"></span><br><span class="line">        android:orientation=&quot;vertical&quot; </span><br><span class="line"></span><br><span class="line">        android:gravity=&quot;center&quot;</span><br><span class="line"></span><br><span class="line">        &gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        &lt;ImageView</span><br><span class="line"></span><br><span class="line">            android:id=&quot;@+id/imageView_main_logoup&quot;</span><br><span class="line"></span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line"></span><br><span class="line">            android:layout_height=&quot;wrap_content&quot;</span><br><span class="line"></span><br><span class="line">            android:background=&quot;#000&quot;</span><br><span class="line"></span><br><span class="line">            android:src=&quot;@drawable/shake_logo_up&quot; /&gt;</span><br><span class="line"></span><br><span class="line">        &lt;ImageView</span><br><span class="line"></span><br><span class="line">            android:id=&quot;@+id/imageView_main_logodown&quot;</span><br><span class="line"></span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line"></span><br><span class="line">            android:layout_height=&quot;wrap_content&quot;</span><br><span class="line"></span><br><span class="line">            android:background=&quot;#000&quot;</span><br><span class="line"></span><br><span class="line">            android:src=&quot;@drawable/shake_logo_down&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/LinearLayout&gt;</span><br><span class="line"></span><br><span class="line">&lt;/RelativeLayout&gt;</span><br></pre></td></tr></table></figure>
+<p>2、Java核心代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line"></span><br><span class="line">	// 两次检测的时间间隔</span><br><span class="line"></span><br><span class="line">	private static final int UPTATE_INTERVAL_TIME = 70;</span><br><span class="line"></span><br><span class="line">	private int track1, track2 = 0;</span><br><span class="line"></span><br><span class="line">	private SoundPool soundPool = null;</span><br><span class="line"></span><br><span class="line">	// 上次检测时间</span><br><span class="line"></span><br><span class="line">	private long lastUpdateTime;</span><br><span class="line"></span><br><span class="line">	private ImageView imageView_main_logoup;</span><br><span class="line"></span><br><span class="line">	private ImageView imageView_main_logodown;</span><br><span class="line"></span><br><span class="line">	private Vibrator mVibrator;</span><br><span class="line"></span><br><span class="line">	private SensorManager sensorManager;</span><br><span class="line"></span><br><span class="line">	private SensorEventListener listener = new SensorEventListener() &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onSensorChanged(SensorEvent event) &#123;</span><br><span class="line"></span><br><span class="line">			// 现在检测时间</span><br><span class="line"></span><br><span class="line">			long currentUpdateTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">			// 两次检测的时间间隔</span><br><span class="line"></span><br><span class="line">			long timeInterval = currentUpdateTime - lastUpdateTime;</span><br><span class="line"></span><br><span class="line">			// 判断是否达到了检测时间间隔</span><br><span class="line"></span><br><span class="line">			if (timeInterval &lt; UPTATE_INTERVAL_TIME)</span><br><span class="line"></span><br><span class="line">				return;</span><br><span class="line"></span><br><span class="line">			// 现在的时间变成last时间</span><br><span class="line"></span><br><span class="line">			lastUpdateTime = currentUpdateTime;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">			float valueX = Math.abs(event.values[0]);</span><br><span class="line"></span><br><span class="line">			float valueY = Math.abs(event.values[1]);</span><br><span class="line"></span><br><span class="line">			float valueZ = Math.abs(event.values[2]);</span><br><span class="line"></span><br><span class="line">			if (valueX &gt; 15 || valueY &gt; 15 || valueZ &gt; 15) &#123;</span><br><span class="line"></span><br><span class="line">				startAnimation();</span><br><span class="line"></span><br><span class="line">				startVibrato();</span><br><span class="line"></span><br><span class="line">				// stopSensor();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">				new Handler().postDelayed(new Runnable() &#123;</span><br><span class="line"></span><br><span class="line">					@Override</span><br><span class="line"></span><br><span class="line">					public void run() &#123;</span><br><span class="line"></span><br><span class="line">						Toast.makeText(getApplicationContext(),</span><br><span class="line"></span><br><span class="line">								&quot;抱歉，暂时没有找到\n在同一时刻摇一摇的人。\n再试一次吧！&quot;, 0).show();</span><br><span class="line"></span><br><span class="line">						// mVibrator.cancel();</span><br><span class="line"></span><br><span class="line">						// initSensor();</span><br><span class="line"></span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">				&#125;, 2000);</span><br><span class="line"></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line"></span><br><span class="line">		public void onAccuracyChanged(Sensor sensor, int accuracy) &#123;</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line"></span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line"></span><br><span class="line">		setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		imageView_main_logoup = (ImageView) findViewById(R.id.imageView_main_logoup);</span><br><span class="line"></span><br><span class="line">		imageView_main_logodown = (ImageView) findViewById(R.id.imageView_main_logodown);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		initSensor();</span><br><span class="line"></span><br><span class="line">		initSoundPool();</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	// 初始化Sensor</span><br><span class="line"></span><br><span class="line">	private void initSensor() &#123;</span><br><span class="line"></span><br><span class="line">		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);</span><br><span class="line"></span><br><span class="line">		Sensor sensor = sensorManager</span><br><span class="line"></span><br><span class="line">				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);</span><br><span class="line"></span><br><span class="line">		sensorManager.registerListener(listener, sensor,</span><br><span class="line"></span><br><span class="line">				sensorManager.SENSOR_DELAY_GAME);</span><br><span class="line"></span><br><span class="line">		mVibrator = (Vibrator) getApplication().getSystemService(</span><br><span class="line"></span><br><span class="line">				VIBRATOR_SERVICE);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	// 停止检测</span><br><span class="line"></span><br><span class="line">	private void stopSensor() &#123;</span><br><span class="line"></span><br><span class="line">		if (sensorManager != null) &#123;</span><br><span class="line"></span><br><span class="line">			sensorManager.unregisterListener(listener);</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	// 定义摇一摇之后的动画效果</span><br><span class="line"></span><br><span class="line">	private void startAnimation() &#123;</span><br><span class="line"></span><br><span class="line">		AnimationSet animationSetUp = new AnimationSet(true);</span><br><span class="line"></span><br><span class="line">		TranslateAnimation animationUp0 = new TranslateAnimation(</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0,</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF,</span><br><span class="line"></span><br><span class="line">				-1.0f);</span><br><span class="line"></span><br><span class="line">		animationUp0.setDuration(1000);</span><br><span class="line"></span><br><span class="line">		TranslateAnimation animationUp1 = new TranslateAnimation(</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0,</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF,</span><br><span class="line"></span><br><span class="line">				+1.0f);</span><br><span class="line"></span><br><span class="line">		animationUp1.setDuration(1000);</span><br><span class="line"></span><br><span class="line">		// 设置动画集中下一个动画的延迟执行时间</span><br><span class="line"></span><br><span class="line">		animationUp1.setStartOffset(1000);</span><br><span class="line"></span><br><span class="line">		// 给动画集中设置动画</span><br><span class="line"></span><br><span class="line">		animationSetUp.addAnimation(animationUp0);</span><br><span class="line"></span><br><span class="line">		animationSetUp.addAnimation(animationUp1);</span><br><span class="line"></span><br><span class="line">		// 控件启动动画集</span><br><span class="line"></span><br><span class="line">		imageView_main_logoup.startAnimation(animationSetUp);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		AnimationSet animationSetDown = new AnimationSet(true);</span><br><span class="line"></span><br><span class="line">		TranslateAnimation animationDown0 = new TranslateAnimation(</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF,</span><br><span class="line"></span><br><span class="line">				+1.0f);</span><br><span class="line"></span><br><span class="line">		animationDown0.setDuration(1000);</span><br><span class="line"></span><br><span class="line">		TranslateAnimation animationDown1 = new TranslateAnimation(</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,</span><br><span class="line"></span><br><span class="line">				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF,</span><br><span class="line"></span><br><span class="line">				-1.0f);</span><br><span class="line"></span><br><span class="line">		animationDown1.setDuration(1000);</span><br><span class="line"></span><br><span class="line">		animationDown1.setStartOffset(1000);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		animationSetDown.addAnimation(animationDown0);</span><br><span class="line"></span><br><span class="line">		animationSetDown.addAnimation(animationDown1);</span><br><span class="line"></span><br><span class="line">		imageView_main_logodown.startAnimation(animationSetDown);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	public void startVibrato() &#123;</span><br><span class="line"></span><br><span class="line">		// 第一种加载声音的方式：利用MediaPlayer播放器</span><br><span class="line"></span><br><span class="line">		// MediaPlayer player;</span><br><span class="line"></span><br><span class="line">		// player = MediaPlayer.create(this, R.raw.awe);</span><br><span class="line"></span><br><span class="line">		// player.setLooping(false);</span><br><span class="line"></span><br><span class="line">		// player.start();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		// 第二种加载声音的方式：利用声音池</span><br><span class="line"></span><br><span class="line">		soundPool.play(track2, 1, 1, 1, 0, 1);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">		// 定义震动</span><br><span class="line"></span><br><span class="line">		// 只有1个参数的时候，第一个参数用来指定振动的毫秒数。</span><br><span class="line"></span><br><span class="line">		// 要传递2个参数的时候，第1个参数用来指定振动时间的样本，第2个参数用来指定是否需要循环，-1为不重复，非-1则从pattern的指定下标开始重复</span><br><span class="line"></span><br><span class="line">		// 振动时间的样本是指振动时间和等待时间的交互指定的数组，即节奏数组。</span><br><span class="line"></span><br><span class="line">		// ※下面的例子，在程序起动后等待3秒后，振动1秒，再等待2秒后，振动5秒，再等待3秒后，振动1秒</span><br><span class="line"></span><br><span class="line">		// long[] pattern = &#123;3000, 1000, 2000, 5000, 3000, 1000&#125;;</span><br><span class="line"></span><br><span class="line">		// 震动节奏分别为：OFF/ON/OFF/ON…</span><br><span class="line"></span><br><span class="line">		mVibrator.vibrate(new long[] &#123; 500, 200, 500, 200 &#125;, -1);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	private void initSoundPool() &#123;</span><br><span class="line"></span><br><span class="line">		// 三个参数：播放最大并发流数量；目标流类型（总是STREAM_MUSIC）；0为默认值。</span><br><span class="line"></span><br><span class="line">		soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);</span><br><span class="line"></span><br><span class="line">		track1 = soundPool.load(this, R.raw.awe, 1);</span><br><span class="line"></span><br><span class="line">		track2 = soundPool.load(this, R.raw.aw, 1);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line"></span><br><span class="line">	protected void onDestroy() &#123;</span><br><span class="line"></span><br><span class="line">		super.onDestroy();</span><br><span class="line"></span><br><span class="line">		stopSensor();</span><br><span class="line"></span><br><span class="line">		if (soundPool != null) &#123;</span><br><span class="line"></span><br><span class="line">			soundPool.release();</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2016/02/06/Android传感器/">Android传感器</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2016年02月06日 - 15时27分</p>
+        <p><span>最后更新:</span>2016年02月06日 - 15时27分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/02/06/Android传感器/" title="Android传感器">http://yoursite.com/2016/02/06/Android传感器/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2016/02/06/Android传感器/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2016/11/24/AndroidStudio阅读Android系统源码/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          AndroidStudio阅读Android系统源码
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2015/12/13/自定义ContentProvider/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">自定义ContentProvider</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Android传感器"><span class="toc-number">1.</span> <span class="toc-text">Android传感器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#（一）、传感器概述："><span class="toc-number">1.1.</span> <span class="toc-text">（一）、传感器概述：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、简介："><span class="toc-number">1.1.0.1.</span> <span class="toc-text">1、简介：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、传感器分类"><span class="toc-number">1.1.0.2.</span> <span class="toc-text">2、传感器分类</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#动作传感器（Motion）"><span class="toc-number">1.1.0.2.0.1.</span> <span class="toc-text">动作传感器（Motion）</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#环境传感器-Environmental"><span class="toc-number">1.1.0.2.0.2.</span> <span class="toc-text">环境传感器(Environmental)</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#位置传感器-Position"><span class="toc-number">1.1.0.2.0.3.</span> <span class="toc-text">位置传感器(Position)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、传感器使用步骤："><span class="toc-number">1.1.0.3.</span> <span class="toc-text">3、传感器使用步骤：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（二）、光照传感器"><span class="toc-number">1.2.</span> <span class="toc-text">（二）、光照传感器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（三）、加速度传感器：（模拟摇一摇）"><span class="toc-number">1.3.</span> <span class="toc-text">（三）、加速度传感器：（模拟摇一摇）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（四）、方向传感器：（指南针）"><span class="toc-number">1.4.</span> <span class="toc-text">（四）、方向传感器：（指南针）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（五）、加速度传感器-补间动画实现改进版《摇一摇》："><span class="toc-number">1.5.</span> <span class="toc-text">（五）、加速度传感器+补间动画实现改进版《摇一摇》：</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2016/11/24/AndroidStudio阅读Android系统源码/" title="上一篇: AndroidStudio阅读Android系统源码">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2015/12/13/自定义ContentProvider/" title="下一篇: 自定义ContentProvider">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>Android加载ReactNative页面流程 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android加载ReactNative页面流程">
+<meta property="og:url" content="http://yoursite.com/2017/12/04/Android加载ReactNative页面流程/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-12-04T12:37:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android加载ReactNative页面流程">
+<meta name="twitter:description" content="ReactNative页面加载过程Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Android加载ReactNative页面流程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2017/12/04/Android加载ReactNative页面流程/" class="article-date">
+      <time datetime="2017-12-04T12:37:44.000Z" itemprop="datePublished">2017-12-04</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android加载ReactNative页面流程
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="ReactNative页面加载过程"><a href="#ReactNative页面加载过程" class="headerlink" title="ReactNative页面加载过程"></a>ReactNative页面加载过程</h1><p>Android加载ReactNative页面分为两条逻辑，第一：加载index.android.bundle 第二：加载drwable-mdpi目录下的图片。</p>
+<a id="more"></a>
+<h2 id="加载index-android-bundle的过程"><a href="#加载index-android-bundle的过程" class="headerlink" title="加载index.android.bundle的过程"></a>加载index.android.bundle的过程</h2><p>Android加载index.android.bundle途径有三种：</p>
+<ol>
+<li>从node服务器远程调用（debug调试，也就是Debug JS Remotely开关打开）</li>
+<li>应用程序assets目录 </li>
+<li>本地文件（包括内部存储，外部存储）</li>
+</ol>
+<blockquote>
+<p>注意：开发阶段，reload时是先从node服务器把ReactNativeDevBundle.js文件缓存到内部存储（dada/data/包名/files/ReactNativeDevBundle.js），然后从内部存储加载。</p>
+</blockquote>
+<p>相关源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//com.facebook.react.devsupport.DevSupportManagerImpl.java</span><br><span class="line"> //...</span><br><span class="line">   private static final String JS_BUNDLE_FILE_NAME = &quot;ReactNativeDevBundle.js&quot;;</span><br><span class="line"> //...</span><br><span class="line"> // TODO(6418010): Fix readers-writers problem in debug reload from HTTP server</span><br><span class="line">    mJSBundleTempFile = new File(applicationContext.getFilesDir(), JS_BUNDLE_FILE_NAME);</span><br></pre></td></tr></table></figure>
+<p>三种方式的加载其实只是bundle文件来源的path不同，最终都是由JSBundleLoader完成加载。下面把整个加载过程分为bundle文件path赋值过程和JSBundleLoader执行加载两部分进行分析。</p>
+<h4 id="JSBundleLoader执行加载过程："><a href="#JSBundleLoader执行加载过程：" class="headerlink" title="JSBundleLoader执行加载过程："></a>JSBundleLoader执行加载过程：</h4><p>整个JSBundleLoader源码非常简单，创建了4个加载器：</p>
+<ul>
+<li>createAssetLoader<blockquote>
+<p>加载assets目录下的bundle</p>
+</blockquote>
+</li>
+<li>createFileLoader<blockquote>
+<p>加载本地文件的bundle</p>
+</blockquote>
+</li>
+<li>createCachedBundleFromNetworkLoader<blockquote>
+<p>加载data/data/package-name/filses/ReactNativeDevBundle.js</p>
+</blockquote>
+</li>
+<li>createRemoteDebuggerBundleLoader<blockquote>
+<p>加载本地node服务器的bundle</p>
+</blockquote>
+</li>
+</ul>
+<p>真正完成加载功能是在CatalystInstanceImpl中，用JNI实现。源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">private native void jniSetSourceURL(String sourceURL);</span><br><span class="line"></span><br><span class="line">private native void jniLoadScriptFromAssets(AssetManager assetManager, String assetURL, boolean loadSynchronously);</span><br><span class="line"></span><br><span class="line">private native void jniLoadScriptFromFile(String fileName, String sourceURL, boolean loadSynchronously);</span><br></pre></td></tr></table></figure>
+<h4 id="bundle文件path赋值过程："><a href="#bundle文件path赋值过程：" class="headerlink" title="bundle文件path赋值过程："></a>bundle文件path赋值过程：</h4><p>我们在Application中实现或重写的ReactNativeHost相关方法就是初始化赋值，其中：</p>
+<ul>
+<li>getJSMainModuleName</li>
+<li>getJSBundleFile</li>
+<li>getBundleAssetName</li>
+</ul>
+<p>最终都会传递到ReactInstanceManagerBuilder中，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">protected ReactInstanceManager createReactInstanceManager() &#123;</span><br><span class="line">    ReactInstanceManagerBuilder builder = ReactInstanceManager.builder()</span><br><span class="line">      .setApplication(mApplication)</span><br><span class="line">      .setJSMainModuleName(getJSMainModuleName())</span><br><span class="line">      .setUseDeveloperSupport(getUseDeveloperSupport())</span><br><span class="line">      .setRedBoxHandler(getRedBoxHandler())</span><br><span class="line">      .setUIImplementationProvider(getUIImplementationProvider())</span><br><span class="line">      .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);</span><br><span class="line"></span><br><span class="line">    for (ReactPackage reactPackage : getPackages()) &#123;</span><br><span class="line">      builder.addPackage(reactPackage);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String jsBundleFile = getJSBundleFile();</span><br><span class="line">    if (jsBundleFile != null) &#123;</span><br><span class="line">      builder.setJSBundleFile(jsBundleFile);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      builder.setBundleAssetName(Assertions.assertNotNull(getBundleAssetName()));</span><br><span class="line">    &#125;</span><br><span class="line">    return builder.build();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>从源码中可以看出，首先从本地文件加载bundle文件，如果本地文件不存在bundle文件从assets目录加载。</p>
+<p>然后ReactInstanceManagerBuilder构建ReactInstanceManager时把JSBundleLoader传递给ReactInstanceManager，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">new ReactInstanceManager(</span><br><span class="line">      mApplication,</span><br><span class="line">      mCurrentActivity,</span><br><span class="line">      mDefaultHardwareBackBtnHandler,</span><br><span class="line">      (mJSBundleLoader == null &amp;&amp; mJSBundleAssetUrl != null) ?</span><br><span class="line">        JSBundleLoader.createAssetLoader(mApplication, mJSBundleAssetUrl, false /*Asynchronous*/) :</span><br><span class="line">        mJSBundleLoader,</span><br><span class="line">      mJSMainModuleName,</span><br><span class="line">      mPackages,</span><br><span class="line">      mUseDeveloperSupport,</span><br><span class="line">      mBridgeIdleDebugListener,</span><br><span class="line">      Assertions.assertNotNull(mInitialLifecycleState, &quot;Initial lifecycle state was not set&quot;),</span><br><span class="line">      mUIImplementationProvider,</span><br><span class="line">      mNativeModuleCallExceptionHandler,</span><br><span class="line">      mJSCConfig,</span><br><span class="line">      mRedBoxHandler,</span><br><span class="line">      mLazyNativeModulesEnabled,</span><br><span class="line">      mLazyViewManagersEnabled,</span><br><span class="line">      mSetupReactContextInBackground,</span><br><span class="line">      mUseSeparateUIBackgroundThread,</span><br><span class="line">      mMinNumShakes);</span><br></pre></td></tr></table></figure>
+<p>在构建ReactInstanceManager过程中，首先判断JSBundleLoader是否为空，如果为空，调用JSBundleLoader内部方法创建对应的加载器（上文介绍的4个加载器）。如果不为空直接传递给ReactInstanceManager。</p>
+<p>以上JSBundleLoader只能加载本地文件或assets目录的bundle文件，那么远程bundle和缓存中的ReactNativeDevBundle.js的加载器是直接在ReactInstanceManager内部创建的，源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@ThreadConfined(UI)</span><br><span class="line">private void onReloadWithJSDebugger(JavaJSExecutor.Factory jsExecutorFactory) &#123;</span><br><span class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onReloadWithJSDebugger()&quot;);</span><br><span class="line">  recreateReactContextInBackground(</span><br><span class="line">      new ProxyJavaScriptExecutor.Factory(jsExecutorFactory),</span><br><span class="line">      //创建远程加载bundle文件的加载器（debug调试）</span><br><span class="line">      JSBundleLoader.createRemoteDebuggerBundleLoader(</span><br><span class="line">          mDevSupportManager.getJSBundleURLForRemoteDebugging(),</span><br><span class="line">          mDevSupportManager.getSourceUrl()));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ThreadConfined(UI)</span><br><span class="line">private void onJSBundleLoadedFromServer() &#123;</span><br><span class="line">  Log.d(ReactConstants.TAG, &quot;ReactInstanceManager.onJSBundleLoadedFromServer()&quot;);</span><br><span class="line">  recreateReactContextInBackground(</span><br><span class="line">      mJavaScriptExecutorFactory,</span><br><span class="line">      //创建加载缓存目录ReactNativeDevBundle.js的加载器</span><br><span class="line">      JSBundleLoader.createCachedBundleFromNetworkLoader(</span><br><span class="line">          mDevSupportManager.getSourceUrl(), mDevSupportManager.getDownloadedJSBundleFile()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="一张图总结："><a href="#一张图总结：" class="headerlink" title="一张图总结："></a>一张图总结：</h4><p><img src="http://upload-images.jianshu.io/upload_images/5684685-885050fe85cbb356.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<h2 id="图片加载过程"><a href="#图片加载过程" class="headerlink" title="图片加载过程"></a>图片加载过程</h2><h4 id="ReactNative加载图片的几种方式"><a href="#ReactNative加载图片的几种方式" class="headerlink" title="ReactNative加载图片的几种方式"></a>ReactNative加载图片的几种方式</h4><h6 id="1-通过uri加载图片"><a href="#1-通过uri加载图片" class="headerlink" title="1.通过uri加载图片"></a>1.通过uri加载图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> source=&#123;&#123;uri: &quot;file://&quot; + path&#125;&#125;/&gt;</span><br><span class="line"> //或</span><br><span class="line">source=&#123;&#123;uri: &quot;http://&quot; + location&#125;&#125;/&gt;</span><br></pre></td></tr></table></figure>
+<h6 id="2-加载本地图片"><a href="#2-加载本地图片" class="headerlink" title="2.加载本地图片"></a>2.加载本地图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Image source=&#123;require(&quot;../../images/mode.png&quot;)&#125;/&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>最终加载的是被打包到drawable-mdpi下的图片，形如：images_mode.png</p>
+</blockquote>
+<h6 id="3-加载Native端资源图片"><a href="#3-加载Native端资源图片" class="headerlink" title="3.加载Native端资源图片"></a>3.加载Native端资源图片</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//导入 nativeImageSource函数</span><br><span class="line">let nativeImageSource = require(&apos;nativeImageSource&apos;);</span><br><span class="line"></span><br><span class="line"> let spec = &#123;</span><br><span class="line">        android: &apos;mipmap/ic_launcher&apos;,</span><br><span class="line">        width: 72,</span><br><span class="line">        height: 72</span><br><span class="line">      &#125;;</span><br><span class="line">      </span><br><span class="line">&lt;Image source=&#123;nativeImageSource(spec)&#125;/&gt;</span><br></pre></td></tr></table></figure>
+<p>以上几种加载图片的方式只是为Image组件的source属性赋值不同，最终都是resolveAssetSource.js中实现。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * `source` is either a number (opaque type returned by require(&apos;./foo.png&apos;))</span><br><span class="line"> * or an `ImageSource` like &#123; uri: &apos;&lt;http location || file path&gt;&apos; &#125;</span><br><span class="line"> */</span><br><span class="line">function resolveAssetSource(source: any): ?ResolvedAssetSource &#123;</span><br><span class="line">  if (typeof source === &apos;object&apos;) &#123;</span><br><span class="line">    return source;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  var asset = AssetRegistry.getAssetByID(source);</span><br><span class="line">  if (!asset) &#123;</span><br><span class="line">    return null;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  const resolver = new AssetSourceResolver(getDevServerURL(), getBundleSourcePath(), asset);</span><br><span class="line">  if (_customSourceTransformer) &#123;</span><br><span class="line">    return _customSourceTransformer(resolver);</span><br><span class="line">  &#125;</span><br><span class="line">  return resolver.defaultAsset();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上三种加载图片的方式中，<strong>通过uri加载图片</strong>和<strong>加载Native端资源图片</strong>赋值给source的值其实就是object。从源码可以看出，如果通过这两种方式加载图片直接就把这个对象返回了。</p>
+<p>后面的处理逻辑都是在处理通过<strong>加载本地图片</strong>的方式的流程，具体实现在AssetSourceResolver.js中。如果应用有热更新需求，那么热更新图片就只需要处理这种加载方式的问题。建议有热更新功能的应用尽量都把图片放在服务器，然后通过第一种方式加载。</p>
+<h4 id="本地图片加载过程"><a href="#本地图片加载过程" class="headerlink" title="本地图片加载过程"></a>本地图片加载过程</h4><p>本地图片加载其实就是加载的被打包到drawable-mdpi中的图片，实现源码如下：</p>
+<blockquote>
+<p>node_modules / react-native / Libraries / Image /AssetSourceResolver.js</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">defaultAsset(): ResolvedAssetSource &#123;  </span><br><span class="line">  if (this.isLoadedFromServer()) &#123;  </span><br><span class="line">    return this.assetServerURL();  </span><br><span class="line">  &#125;  </span><br><span class="line">  </span><br><span class="line">  if (Platform.OS === &apos;android&apos;) &#123;  </span><br><span class="line">    return this.isLoadedFromFileSystem() ?  </span><br><span class="line">      this.drawableFolderInBundle() :  </span><br><span class="line">      this.resourceIdentifierWithoutScale();  </span><br><span class="line">  &#125; else &#123;  </span><br><span class="line">    return this.scaledAssetPathInBundle();  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>drawableFolderInBundle方法为在存在离线bundle文件时，从bundle文件所在目录加载图片。</p>
+</blockquote>
+<blockquote>
+<p>resourceIdentifierWithoutScale方法从asset资源目录下加载。</p>
+</blockquote>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2017年12月04日 - 20时37分</p>
+        <p><span>最后更新:</span>2017年12月04日 - 20时37分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/12/04/Android加载ReactNative页面流程/" title="Android加载ReactNative页面流程">http://yoursite.com/2017/12/04/Android加载ReactNative页面流程/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/12/04/Android加载ReactNative页面流程/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2018/08/23/Android焦点分发策略/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          Android焦点分发策略
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2017/11/12/Android-Multidex原理/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android Multidex原理</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ReactNative页面加载过程"><span class="toc-number">1.</span> <span class="toc-text">ReactNative页面加载过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#加载index-android-bundle的过程"><span class="toc-number">1.1.</span> <span class="toc-text">加载index.android.bundle的过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JSBundleLoader执行加载过程："><span class="toc-number">1.1.0.1.</span> <span class="toc-text">JSBundleLoader执行加载过程：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bundle文件path赋值过程："><span class="toc-number">1.1.0.2.</span> <span class="toc-text">bundle文件path赋值过程：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#一张图总结："><span class="toc-number">1.1.0.3.</span> <span class="toc-text">一张图总结：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#图片加载过程"><span class="toc-number">1.2.</span> <span class="toc-text">图片加载过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ReactNative加载图片的几种方式"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">ReactNative加载图片的几种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-通过uri加载图片"><span class="toc-number">1.2.0.1.0.1.</span> <span class="toc-text">1.通过uri加载图片</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-加载本地图片"><span class="toc-number">1.2.0.1.0.2.</span> <span class="toc-text">2.加载本地图片</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-加载Native端资源图片"><span class="toc-number">1.2.0.1.0.3.</span> <span class="toc-text">3.加载Native端资源图片</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#本地图片加载过程"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">本地图片加载过程</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2018/08/23/Android焦点分发策略/" title="上一篇: Android焦点分发策略">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2017/11/12/Android-Multidex原理/" title="下一篇: Android Multidex原理">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

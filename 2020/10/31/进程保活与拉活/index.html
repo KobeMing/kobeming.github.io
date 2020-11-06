@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>进程保活与拉活 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Low Memory Killer机制 系统出于体验和性能的考虑，app在退到后台时系统并不会真正立马kill掉当前进程。而是先将其缓存起来。 手机打开的应用越多，系统缓存的进程也就越多。 系统缓存进程也是有个度的，总不能无限量的去缓存。例如，系统内存不足时，就需要腾出空间来给新的开的应用进程。于是就产生了一套根据不同的进程优先级去回收进程的机制。而这套机制就是大名鼎鼎的Low Memory Ki">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程保活与拉活">
+<meta property="og:url" content="http://yoursite.com/2020/10/31/进程保活与拉活/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="Low Memory Killer机制 系统出于体验和性能的考虑，app在退到后台时系统并不会真正立马kill掉当前进程。而是先将其缓存起来。 手机打开的应用越多，系统缓存的进程也就越多。 系统缓存进程也是有个度的，总不能无限量的去缓存。例如，系统内存不足时，就需要腾出空间来给新的开的应用进程。于是就产生了一套根据不同的进程优先级去回收进程的机制。而这套机制就是大名鼎鼎的Low Memory Ki">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/10/31/进程保活与拉活/WEBRESOURCE6e013b462f0ec2969f4ef6a16e43751f">
+<meta property="og:image" content="http://yoursite.com/2020/10/31/进程保活与拉活/03D0DC093ADD408EB26CE0517C70B512">
+<meta property="og:updated_time" content="2020-10-31T01:45:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程保活与拉活">
+<meta name="twitter:description" content="Low Memory Killer机制 系统出于体验和性能的考虑，app在退到后台时系统并不会真正立马kill掉当前进程。而是先将其缓存起来。 手机打开的应用越多，系统缓存的进程也就越多。 系统缓存进程也是有个度的，总不能无限量的去缓存。例如，系统内存不足时，就需要腾出空间来给新的开的应用进程。于是就产生了一套根据不同的进程优先级去回收进程的机制。而这套机制就是大名鼎鼎的Low Memory Ki">
+<meta name="twitter:image" content="http://yoursite.com/2020/10/31/进程保活与拉活/WEBRESOURCE6e013b462f0ec2969f4ef6a16e43751f">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-进程保活与拉活" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2020/10/31/进程保活与拉活/" class="article-date">
+      <time datetime="2020-10-31T01:45:29.000Z" itemprop="datePublished">2020-10-31</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      进程保活与拉活
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="Low-Memory-Killer机制"><a href="#Low-Memory-Killer机制" class="headerlink" title="Low Memory Killer机制"></a>Low Memory Killer机制</h1><ul>
+<li>系统出于体验和性能的考虑，app在退到后台时系统并不会真正立马kill掉当前进程。而是先将其缓存起来。</li>
+<li>手机打开的应用越多，系统缓存的进程也就越多。</li>
+<li>系统缓存进程也是有个度的，总不能无限量的去缓存。例如，系统内存不足时，就需要腾出空间来给新的开的应用进程。于是就产生了一套根据不同的进程优先级去回收进程的机制。而这套机制就是大名鼎鼎的Low Memory Killer机制。</li>
+</ul>
+<a id="more"></a>
+<p>Android手机是如何判断内存不足的呢？看下面的内存阈值。</p>
+<h2 id="进程内存阈值与进程优先级"><a href="#进程内存阈值与进程优先级" class="headerlink" title="进程内存阈值与进程优先级"></a>进程内存阈值与进程优先级</h2><p>不同手机内存阈值不同，一旦低于该值，Android便会杀死对应有限级的进程，例如：当系统可用内存小于315MB(80640)，就杀死空进程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">cat /sys/module/lowmemorykiller/parameters/minfree</span><br><span class="line"></span><br><span class="line">18432，23040，27648，55296，80640</span><br></pre></td></tr></table></figure>
+<p>以上获取的数值单位既不是KB也不是MB是4KB,Linux中一页等于4KB。比如第一个数值就是18432页。也就是18432*4/1024MB。</p>
+<p>这六个值从小到大除了倒数第二个值对应ContentProvider进程外其他几个分别对应前台进程，可见进程，服务进程，后台进程，空进程。</p>
+<p>进程优先级如下：</p>
+<p><img src="WEBRESOURCE6e013b462f0ec2969f4ef6a16e43751f" alt="进程优先级.png"></p>
+<p><a href="https://developer.android.google.cn/guide/components/activities/process-lifecycle?hl=zh-cn" target="_blank" rel="noopener">进程优先级官方定义</a></p>
+<p>Android系统是如何判断进程的优先级的呢，根据oom_adj值去判断的，oom_adj值请看如下：</p>
+<h1 id="进程oom-adj值"><a href="#进程oom-adj值" class="headerlink" title="进程oom_adj值"></a>进程oom_adj值</h1><p>获取进程oom_daj值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">cat /proc/pid/oom_adj</span><br></pre></td></tr></table></figure>
+<p>oom_adj值定义如下：<br><img src="03D0DC093ADD408EB26CE0517C70B512" alt="oom_adj定义"></p>
+<p>这里的adj数值越大优先级就越低。低于0值的进程都是系统进程（蓝色区间）。通常情况下3~0（绿色区间）这个区间的adj值进程我们就可以认为该进程是处于安全状态的进程（即：不会被系统强杀的进程），而红色区间的进程就属于不安全的进程，有很大的可能性会被系统强杀。</p>
+<p>讲了这么多的adj值表述，那么系统到底如何来计算一个进程的adj值的呢？我们前面也说了，应用进程的adj值是会跟着当前应用的生命周期状态不断发生着变化的。这就需要系统有一套计算每个应用的adj值的算法。这个算法的核心其实就在我们的AMS源码中。</p>
+<p>AMS源码中我们会找到如下三个方法，而着三个方法就是我们的adj算法核心。</p>
+<p>（1）updateOomAdjLocked:更新adj，当目标进程为空或者别杀则返回false，否则返回true。</p>
+<p>（2）computeOomAdjLocked:计算adj值，返回计算后的RawAdj值。</p>
+<p>（3）applyOomAdjLocked:使用adj，当需要杀掉目标进程则返回false,否则返回true。</p>
+<p>根据以上系统机制，我们衍生出如下保活解决方案。</p>
+<h1 id="保活解决方案"><a href="#保活解决方案" class="headerlink" title="保活解决方案"></a>保活解决方案</h1><h2 id="一像素Activity提权"><a href="#一像素Activity提权" class="headerlink" title="一像素Activity提权"></a>一像素Activity提权</h2><p>当锁屏的时候启动一个一像素大小的Activity,当解屏的时候关掉这个Acitivty。</p>
+<p>缺点：存在一个Activity不够干净，需要用户锁屏才能提权。</p>
+<h2 id="前台服务"><a href="#前台服务" class="headerlink" title="前台服务"></a>前台服务</h2><p>App中创建一个前台服务，但是会发送一个通知<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">startForeground(SERVICE_ID, new Notification());</span><br></pre></td></tr></table></figure></p>
+<p>需要适配：</p>
+<ul>
+<li>API&lt;18通知图标不会显示</li>
+<li>API&gt;=18&amp;&amp;API&lt;26（8.0以前）可以启动双服务，绑定同一个ID然后stop一个服务，通知图标将不会显示。因为系统会在服务停止的时候根据服务ID清除通知。</li>
+<li>API&gt;=26（8.0之后）没有方式能隐藏通知，因为系统不允许同样ID的服务创建两次。</li>
+</ul>
+<h2 id="后台无音播放服务"><a href="#后台无音播放服务" class="headerlink" title="后台无音播放服务"></a>后台无音播放服务</h2><p>严重损耗性能，而且会导致系统按键音消失等一系列问题。</p>
+<h1 id="拉活解决方案"><a href="#拉活解决方案" class="headerlink" title="拉活解决方案"></a>拉活解决方案</h1><h2 id="广播拉活"><a href="#广播拉活" class="headerlink" title="广播拉活"></a>广播拉活</h2><ol>
+<li>系统广播拉活<br>静态注册监听系统关键广播拉活，这种方式在Android7.0之前是可行的。系统广播在android7.0之后就限制很严格。android8.0之后更加严格。<br><a href="https://developer.android.google.cn/guide/components/broadcast-exceptions.html" target="_blank" rel="noopener">管方对广播的限制</a></li>
+<li>全家桶拉活<br>有多个app在用户设备上安装，只要开启其中一个就可以将其他的app也拉活。比如手机里装了手Q、QQ空间、兴趣部落等等，那么打开任意一个app后，其他的app也都会被唤醒。</li>
+</ol>
+<p>我们也可以尝试监听大厂APP广播以此来拉活我们的app。</p>
+<h2 id="利用Service系统机制拉活"><a href="#利用Service系统机制拉活" class="headerlink" title="利用Service系统机制拉活"></a>利用Service系统机制拉活</h2><p>onStartCommand这个方法不知道大家了解不，他是Service里面的方法，但是很多人并不知道它是用来干嘛的。其实它就是Service系统提供给我们的一个拉活方案。（但是说实话，在高版本系统真心没啥用）。这个方法有如下四种返回值，而每一种返回值都是一种策略。默认返回START_STICKY。</p>
+<p>START_STICKY：<br>“粘性”。如果service进程被kill掉，保留service的状态为开始状态，但不保留递送的intent对象。随后系统会尝试重新创建service，由于服务状态为开始状态，所以创建服务后一定会调用onStartCommand(Intent,int,int)方法。如果在此期间没有任何启动命令被传递到service，那么参数Intent将为null。</p>
+<p>START_NOT_STICKY：<br>“非粘性的”。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统不会自动重启该服务。</p>
+<p>START_REDELIVER_INTENT：<br>重传Intent。使用这个返回值时，如果在执行完onStartCommand后，服务被异常kill掉，系统会自动重启该服务，并将Intent的值传入。</p>
+<p>START_STICKY_COMPATIBILITY：<br>START_STICKY的兼容版本，但不保证服务被kill后一定能重启。</p>
+<p>系统具体是如何通过这些值来实现拉活的呢？通过源码跟踪我们最终能够在ActiveServices中看到如下一段逻辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">void serviceDoneExecutingLocked(ServiceRecord r, int type, int startId, int res) &#123;</span><br><span class="line">            if (type == ActivityThread.SERVICE_DONE_EXECUTING_START) &#123;</span><br><span class="line">                // This is a call from a service start...  take care of</span><br><span class="line">                // book-keeping.</span><br><span class="line">                r.callStart = true;</span><br><span class="line">                switch (res) &#123;</span><br><span class="line">                    case Service.START_STICKY_COMPATIBILITY:</span><br><span class="line">                    case Service.START_STICKY: &#123;</span><br><span class="line">                        // We are done with the associated start arguments.</span><br><span class="line">                        r.findDeliveredStart(startId, true);</span><br><span class="line">                        // Don&apos;t stop if killed.</span><br><span class="line">                        r.stopIfKilled = false;</span><br><span class="line">                        break;</span><br><span class="line">                    &#125;</span><br><span class="line">                    case Service.START_NOT_STICKY: &#123;</span><br><span class="line">                        // We are done with the associated start arguments.</span><br><span class="line">                        r.findDeliveredStart(startId, true);</span><br><span class="line">                        if (r.getLastStartId() == startId) &#123;</span><br><span class="line">                            // There is no more work, and this service</span><br><span class="line">                            // doesn&apos;t want to hang around if killed.</span><br><span class="line">                            r.stopIfKilled = true;</span><br><span class="line">                        &#125;</span><br><span class="line">                        break;</span><br><span class="line">                    &#125;</span><br><span class="line">                    case Service.START_REDELIVER_INTENT: &#123;</span><br><span class="line">                        // We&apos;ll keep this item until they explicitly</span><br><span class="line">                        // call stop for it, but keep track of the fact</span><br><span class="line">                        // that it was delivered.</span><br><span class="line">                        ServiceRecord.StartItem si = r.findDeliveredStart(startId, false);</span><br><span class="line">                        if (si != null) &#123;</span><br><span class="line">                            si.deliveryCount = 0;</span><br><span class="line">                            si.doneExecutingCount++;</span><br><span class="line">                            // Don&apos;t stop if killed.</span><br><span class="line">                            r.stopIfKilled = true;</span><br><span class="line">                        &#125;</span><br><span class="line">                        break;</span><br><span class="line">                    &#125;</span><br><span class="line">                    case Service.START_TASK_REMOVED_COMPLETE: &#123;</span><br><span class="line">                        // Special processing for onTaskRemoved().  Don&apos;t</span><br><span class="line">                        // impact normal onStartCommand() processing.</span><br><span class="line">                        r.findDeliveredStart(startId, true);</span><br><span class="line">                        break;</span><br><span class="line">                    &#125;</span><br><span class="line">                    default:</span><br><span class="line">                        throw new IllegalArgumentException(</span><br><span class="line">                                &quot;Unknown service start result: &quot; + res);</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure>
+<p>通过 这段逻辑我们能够清楚的看到，除了START_STICKY这种返回值，其他几种都是直接杀死服务。但是某些ROM 系统不会拉活。并且经过测试，Service 第一次被异常杀死后很快被重启，第二次会比第一次慢，第三次又会比前一次慢，一旦在短时间内 Service 被杀死4-5次，则系统不再拉起。</p>
+<h2 id="账户同步拉活"><a href="#账户同步拉活" class="headerlink" title="账户同步拉活"></a>账户同步拉活</h2><p>Android 手机的设置里面都有一个Account栏。很多人不清楚这个是用来干嘛的。实际上我们的Android手机会每过一段时间就会去同步我们手机里面被加入到Account中的应用的账户。而我们的账户同步拉活就是利用这个系统的定时刷新账户的原理来实现的。这种拉活方式的优点是系统拉活，比较稳定，但是缺点是这个同步账户的时间我们无法掌控，有的手机是15分钟，有的30分钟。</p>
+<h2 id="JobScheduler"><a href="#JobScheduler" class="headerlink" title="JobScheduler"></a>JobScheduler</h2><p>允许在特定状态与特定时间间隔周期执行任务。可以利用它的这个特点完成保活的功能,效果即开启一个定时器，与普通定时器不同的是其调度由系统完成。</p>
+<p>JobScheduler在Android6.0之后最小周期设置成了5秒。</p>
+<p>JobScheduler7.0之前是周期性执行，7.0以后循环调用自己实现周期性执行。</p>
+<p>也可以通过引导用户把自己的APP加入系统白名单。</p>
+<p>同样在某些ROM可能并不能达到需要的效果</p>
+<h2 id="双进程守护"><a href="#双进程守护" class="headerlink" title="双进程守护"></a>双进程守护</h2><p>启动两个运行在不同进程的Service。并相互绑定。一方被杀另一方进行拉活。但是这样方案在Android7.0以后好像就已经失效了。因为高版本的Android每次杀死进程都是杀死一个进程组。而一个应用内的进程都属于同一个进程组。</p>
+<p><a href="https://gitee.com/pming/AndroidDemo_4/tree/master/ProcessKeepAlive" target="_blank" rel="noopener">Sample</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2020年10月31日 - 09时45分</p>
+        <p><span>最后更新:</span>2020年10月31日 - 09时45分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2020/10/31/进程保活与拉活/" title="进程保活与拉活">http://yoursite.com/2020/10/31/进程保活与拉活/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/10/31/进程保活与拉活/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+  
+    <a  href="/2019/09/09/Activity启动过程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Activity启动过程</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Low-Memory-Killer机制"><span class="toc-number">1.</span> <span class="toc-text">Low Memory Killer机制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#进程内存阈值与进程优先级"><span class="toc-number">1.1.</span> <span class="toc-text">进程内存阈值与进程优先级</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进程oom-adj值"><span class="toc-number">2.</span> <span class="toc-text">进程oom_adj值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#保活解决方案"><span class="toc-number">3.</span> <span class="toc-text">保活解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一像素Activity提权"><span class="toc-number">3.1.</span> <span class="toc-text">一像素Activity提权</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前台服务"><span class="toc-number">3.2.</span> <span class="toc-text">前台服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#后台无音播放服务"><span class="toc-number">3.3.</span> <span class="toc-text">后台无音播放服务</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#拉活解决方案"><span class="toc-number">4.</span> <span class="toc-text">拉活解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#广播拉活"><span class="toc-number">4.1.</span> <span class="toc-text">广播拉活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#利用Service系统机制拉活"><span class="toc-number">4.2.</span> <span class="toc-text">利用Service系统机制拉活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#账户同步拉活"><span class="toc-number">4.3.</span> <span class="toc-text">账户同步拉活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JobScheduler"><span class="toc-number">4.4.</span> <span class="toc-text">JobScheduler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#双进程守护"><span class="toc-number">4.5.</span> <span class="toc-text">双进程守护</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2019/09/09/Activity启动过程/" title="下一篇: Activity启动过程">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

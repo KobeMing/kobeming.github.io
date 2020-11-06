@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>Activity启动过程 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Activity启动过程启动一个Activit有多种途径。系统启动Launcher包含Activity启动过程，启动一个应用程序也包含Activity启动过程，应用内开启一个新界面也包含Activity启动过程。这里只考虑应用内Activity启动过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Activity启动过程">
+<meta property="og:url" content="http://yoursite.com/2019/09/09/Activity启动过程/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="Activity启动过程启动一个Activit有多种途径。系统启动Launcher包含Activity启动过程，启动一个应用程序也包含Activity启动过程，应用内开启一个新界面也包含Activity启动过程。这里只考虑应用内Activity启动过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://img-blog.csdn.net/20180319142510456?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzAzNzk2ODk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2083810-ca51f7c43a1cc209.png">
+<meta property="og:image" content="https://box.kancloud.cn/51d2ff0baa74f1871a56ff5355931a9c_1501x2356.jpg">
+<meta property="og:updated_time" content="2019-09-09T01:12:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Activity启动过程">
+<meta name="twitter:description" content="Activity启动过程启动一个Activit有多种途径。系统启动Launcher包含Activity启动过程，启动一个应用程序也包含Activity启动过程，应用内开启一个新界面也包含Activity启动过程。这里只考虑应用内Activity启动过程。">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20180319142510456?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzAzNzk2ODk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Activity启动过程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2019/09/09/Activity启动过程/" class="article-date">
+      <time datetime="2019-09-09T01:12:42.000Z" itemprop="datePublished">2019-09-09</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Activity启动过程
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="Activity启动过程"><a href="#Activity启动过程" class="headerlink" title="Activity启动过程"></a>Activity启动过程</h1><p>启动一个Activit有多种途径。系统启动Launcher包含Activity启动过程，启动一个应用程序也包含Activity启动过程，应用内开启一个新界面也包含Activity启动过程。这里只考虑应用内Activity启动过程。</p>
+<a id="more"></a>
+<h2 id="应用内Activity启动过程"><a href="#应用内Activity启动过程" class="headerlink" title="应用内Activity启动过程"></a>应用内Activity启动过程</h2><p><a href="https://www.jianshu.com/p/13b07beacb1f" target="_blank" rel="noopener">参考</a></p>
+<p><a href="https://blog.csdn.net/qq_30379689/article/details/79611217" target="_blank" rel="noopener">参考1</a></p>
+<p><a href="https://blog.csdn.net/qian520ao/article/details/78156214#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B" target="_blank" rel="noopener">参考2</a></p>
+<p><a href="https://www.jianshu.com/p/6037f6fda285" target="_blank" rel="noopener">参考3</a></p>
+<h3 id="Activity启动涉及到的类"><a href="#Activity启动涉及到的类" class="headerlink" title="Activity启动涉及到的类"></a>Activity启动涉及到的类</h3><p>基于Android7.0源码分析</p>
+<ul>
+<li><p>ActivityThread：App启动的入口</p>
+</li>
+<li><p>Instrumentation：负责发起Activity的启动、并具体负责Activity的创建以及Activity生命周期的回调。一个应用进程只会有一个Instrumentation对象，App内的所有Activity都持有该对象的引用。</p>
+</li>
+</ul>
+<p><strong>IPC相关</strong></p>
+<ul>
+<li>IActivityManager: IPC通信的抽象接口</li>
+<li>ActivityManagerNative: AMS的Binder本地对象</li>
+<li>ActivityManagerProxy：是AMS的本地代理</li>
+<li>ActivityManagerService：简称AMS，是service端对象，负责管理系统中所有的Activity</li>
+<li></li>
+<li>ApplicationThread：ActivityThread的内部类，继承Binder，是AMS调用应用进程的通信接口。</li>
+<li>ApplicationThreadProxy：ApplicationThread的一个本地代理，AMS通过这个对象调用应用进程的ApplicationThread中方法。</li>
+</ul>
+<p><strong>AMS进程实现细节</strong></p>
+<ul>
+<li>ActivityStartController: Activity启动对象的控制者。</li>
+<li>ActivityStarter: Activity启动者，专职启动Activity。</li>
+<li>ActivityStack：Activity在AMS的栈管理，用来记录已经启动的Activity的先后关系，状态信息等。通过ActivityStack决定是否需要启动新的进程。</li>
+<li><p>ActivityStackSupervisor: 负责管理多个ActivityStack</p>
+</li>
+<li><p>ActivityRecord(AR)：ActivityStack的管理对象，每个Activity在AMS对应一个ActivityRecord，来记录Activity的状态以及其他的管理信息。其实就是服务器端的Activity对象的映像。</p>
+</li>
+<li>TaskRecord(TR)：AMS抽象出来的一个“任务”的概念，是记录ActivityRecord的栈，一个“Task”包含若干个ActivityRecord。AMS用TaskRecord确保Activity启动和退出的顺序。</li>
+<li>ProcessRecord(PR)：记录着属于一个进程的所有ActivityRecord，ActivityRecord可能跟运行在TaskRecord中的ActivityRecord属于同一个。</li>
+</ul>
+<p><strong>启动流程图</strong></p>
+<p><img src="https://img-blog.csdn.net/20180319142510456?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzAzNzk2ODk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="image"></p>
+<p><strong>启动时序图</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/2083810-ca51f7c43a1cc209.png" alt="image"></p>
+<h2 id="应用外的Activity启动过程"><a href="#应用外的Activity启动过程" class="headerlink" title="应用外的Activity启动过程"></a>应用外的Activity启动过程</h2><p>应用外的Activity启动可能是从Launcher中启动或者从三方应用中启动，又或者用adb am 命令启动。这种启动方式的特点是会启动一个新的进程来加载相应的Activity。</p>
+<p>应用外的Activity启动过程是一个应用程序启动过程的一部分，如果讨论一个应用程序启动过程应该包含进程的创建过程，Activity启动过程，Activity呈现视图的过程。</p>
+<p><strong>应用程序启动总流程：</strong></p>
+<p><img src="https://box.kancloud.cn/51d2ff0baa74f1871a56ff5355931a9c_1501x2356.jpg" alt="image"></p>
+<h3 id="一。应用进程发起启动activity"><a href="#一。应用进程发起启动activity" class="headerlink" title="一。应用进程发起启动activity"></a>一。应用进程发起启动activity</h3><p>启动activity的请求可以有两种方式：</p>
+<ol>
+<li>Activity#startActivity发起</li>
+<li>adb shell am 发起<blockquote>
+<p>am和pm一样，是一个脚本，它用来和AMS交互，如启动Activity、启动Service、发送广播等。其核心文件在Am.java中。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="二。Activity-Launch-Model的管理和Task的管理"><a href="#二。Activity-Launch-Model的管理和Task的管理" class="headerlink" title="二。Activity Launch Model的管理和Task的管理"></a>二。Activity Launch Model的管理和Task的管理</h3><p>应用进程发起启动Activity的请求后，接下来就是系统进程中AMS负责调度启动。</p>
+<p>Activity 与Task的关系管理。</p>
+<p>介绍完上面的知识后，下面来分析ActivityStack的startActivityMayWait函数。</p>
+<h6 id="ActivityStarter的-startActivityMayWait-函数分析"><a href="#ActivityStarter的-startActivityMayWait-函数分析" class="headerlink" title="ActivityStarter的 startActivityMayWait 函数分析:"></a>ActivityStarter的 startActivityMayWait 函数分析:</h6><p>startActivityMayWait函数的目标是启动com.dfp.test.TestActivity，假设系统之前没有启动过该 Activity，本例最终的结果将是∶</p>
+<ul>
+<li>由于在am中设置了FLAG_ACTIVITY_NEW_TASK标志，因此除了会创建一个新的ActivityRecord外，还会新创建一个 TaskRecord。</li>
+<li>还需要启动一个新的应用进程以加载并运行 com.dfp.test.TestActivity的一个实例。</li>
+<li>如果TestActivity 不是Home，还需要停止当前正在显示的Activity。</li>
+</ul>
+<h6 id="startActivityLocked-函数分析："><a href="#startActivityLocked-函数分析：" class="headerlink" title="startActivityLocked 函数分析："></a>startActivityLocked 函数分析：</h6><ul>
+<li>首先需要通过PKMS查找匹配该 Intent的ActivityInfo。</li>
+<li>处理 FLAGCANT_SAVE_STATE的情况，但系统目前不支持此情况。</li>
+<li><p>另外，获取调用者的pid和uid。由于本例的caller为null，故所得到的pid和uid均<br>为 am 所在进程的uid和pid。</p>
+</li>
+<li><p>根据返回值做一些处理，那么res返回成功（即res==IActivityManager.START_SUCCESS的时候）后为何还需要等待呢?这是因为目标Activity要运行在一个新的应用进程中，就必须等待那个应用进程正常启动并处理相关请求。注意，只有am设置了-W选项，才会进入 wait状态。</p>
+</li>
+</ul>
+<h6 id="startActivityUncheckedLocked-函数分析："><a href="#startActivityUncheckedLocked-函数分析：" class="headerlink" title="startActivityUncheckedLocked 函数分析："></a>startActivityUncheckedLocked 函数分析：</h6><p>startActivityUncheckedLocked函数目的比较简单，为新创建的ActivityRecord找到一个合适的Task。最终的结果是创建一个新的Task。即创建ActivityRecord和TaskRecord，并将ActivityRecord添加到mlHistory末尾，然后调用resumeTopActivityLocked启动它。<br>下面用一节来分析 resumeTopActivityLocked函数。</p>
+<h6 id="resumeTopActivityLocked函数分析："><a href="#resumeTopActivityLocked函数分析：" class="headerlink" title="resumeTopActivityLocked函数分析："></a>resumeTopActivityLocked函数分析：</h6><p>resumeTopActivityLocked函数中有两个非常重要的关键点∶</p>
+<ul>
+<li>如果mResumedActivity不为空，则需要先暂停（pause）这个Activity。由代码中的注释可知，mResumedActivity代表上一次启动的（即当前正显示的）Activity。现在要启动一个新的Activity，须先停止当前Activity，这部分工作由startPausingLocked 函数完成。</li>
+<li>mResumedActivity什么时候为空呢?当然是在启动全系统第一个Activity时，即启动Home 界面的时候。除此之外，该值都不会为空。</li>
+</ul>
+<p>resumeTopActivityLocked最后将调用另外一个startSpecificActivityLocked，<strong>该函数将真正创建一个应用进程</strong>。</p>
+<h3 id="三。应用进程的创建及初始化"><a href="#三。应用进程的创建及初始化" class="headerlink" title="三。应用进程的创建及初始化"></a>三。应用进程的创建及初始化</h3><h6 id="startSpecificActivityLocked函数分析∶"><a href="#startSpecificActivityLocked函数分析∶" class="headerlink" title="startSpecificActivityLocked函数分析∶"></a>startSpecificActivityLocked函数分析∶</h6><ul>
+<li>从AMS中查询是否已经存在满足要求的进程（根据processName和uid来查找）</li>
+<li>如果该进程存在并已经向AMS注册（例如之前在该进程中启动了其他Activity）则调用realStartActivityLocked通知该进程启动目标 Activity。</li>
+<li>如果该进程不存在，则需要调用AMS的startProcessLocked创建一个应用进程</li>
+</ul>
+<h6 id="startProcessLocked函数分析："><a href="#startProcessLocked函数分析：" class="headerlink" title="startProcessLocked函数分析："></a>startProcessLocked函数分析：</h6><p>startProcessLocked中有两个关键点，其中第一个和FLAG_FROMBACKGROUND有关，相关知识点如下∶</p>
+<ul>
+<li>FLAGFROMBACKGROUND标志发起这次启动的Task属于后台任务。很显然，手机中没有界面供用户操作位于后台Task中的Activity。如果没有设置该标志，那么这次启动请求就是由前台Task 因某种原因而触发的（例如，用户单击某个按钮）。</li>
+<li>如果一个应用进程在1分钟内连续崩溃超过2次，则AMS会将其ProcessRecord加入所谓的mBadProcesses中。一个应用崩溃后，系统会弹出一个警告框以提醒用户。但是，如果一个后台Task启动了一个”Bad Process”，然后该Process崩溃，结果弹出一个警告框，那么用户就会觉得很奇怪∶”为什么突然弹出一个框?”因此，此处将禁止后台Task启动”Bad Process”。如果用户主动选择启动（例如，单击一个按钮），则不能禁止该操作，并且要把应用进程从mBadProcesses中移除，以给它们”重新做人”的机会。当然，若作为测试工作者，要是该应用每次启动后都会崩溃，就需要其不停地去启动该应用以达到测试的目的。</li>
+</ul>
+<blockquote>
+<p>startProcessLocked通过发送消息给Zygote以fork一个应用进程。</p>
+</blockquote>
+<p>我们知道，AMS创建一个应用进程后，会设置一个超时时间（一般是10秒）。如果超过这个时间，应用进程还没有和AMS交互，则断定该进程创建失败。所以，应用进程启动后，需要尽快和AMS交互，即调用AMS的attachApplication函数。在该函数内部将调用atachApplicationLocked，所以此处直接分析 attachApplicationLocked。</p>
+<p>总结：</p>
+<blockquote>
+<p>在应用进程启动后，需要尽快调用 AMS的attachApplication 函数，该函数是这个刚创建的应用进程第一次和 AMS 交互。此时的它还默默”无名”，连一个确定的进程名都没有。不过没关系，attachApplication函数将根据创建该应用进程之前所保存的ProcessRecord为其准备一切”手续”。</p>
+</blockquote>
+<blockquote>
+<p>attachApplication准备好一切后，将调用应用进程的 bindApplication函数，在该函数内部将发消息给主线程，最终该消息由handleBindApplication处理。handle-BindApplication将为该进程设置进程名，初始化一些策略和参数信息等。另外，它还创建一个Application对象。同时，如果该Application声明了ContentProvider，还需要为该进程安装ContentProvider。</p>
+</blockquote>
+<h3 id="四。Activity实例创建过程及生命周期的回调"><a href="#四。Activity实例创建过程及生命周期的回调" class="headerlink" title="四。Activity实例创建过程及生命周期的回调"></a>四。Activity实例创建过程及生命周期的回调</h3><p>ActivityTherad#handleLaunchActivity中调用ActivityTherad#performLaunchActivity</p>
+<p>在performLaunchActivity中会调用Instrumentation.newActivity通过反射创建Activity对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">activity = mInstrumentation.newActivity(</span><br><span class="line">                    cl, component.getClassName(), r.intent);</span><br><span class="line"></span><br><span class="line">//创建Activity对象</span><br><span class="line">    public Activity newActivity(ClassLoader cl, String className,</span><br><span class="line">            Intent intent)</span><br><span class="line">            throws InstantiationException, IllegalAccessException,</span><br><span class="line">            ClassNotFoundException &#123;</span><br><span class="line">        return (Activity)cl.loadClass(className).newInstance();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>有了Activity对象之后接下来就是执行Activity内部的一些方法，包括生命周期的回调。</p>
+<ol>
+<li>调用Activity#attach完成Activity内部初始化的一些工作,主要初始化Window对象。</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">activity.attach(appContext, this, getInstrumentation(), r.token,</span><br><span class="line">                        r.ident, app, r.intent, r.activityInfo, title, r.parent,</span><br><span class="line">                        r.embeddedID, r.lastNonConfigurationInstances, config,</span><br><span class="line">                        r.referrer, r.voiceInteractor, window, r.configCallback);</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>设置Activity主题</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int theme = r.activityInfo.getThemeResource();</span><br><span class="line">               if (theme != 0) &#123;</span><br><span class="line">                   activity.setTheme(theme);</span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>回调onCreate</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (r.isPersistable()) &#123;</span><br><span class="line">                   mInstrumentation.callActivityOnCreate(activity, r.state, r.persistentState);</span><br><span class="line">               &#125; else &#123;</span><br><span class="line">                   mInstrumentation.callActivityOnCreate(activity, r.state);</span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>执行performStart,回调onStart</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (!r.activity.mFinished) &#123;</span><br><span class="line">                   activity.performStart();</span><br><span class="line">                   r.stopped = false;</span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>回调onRestoreInstanceState</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if (r.isPersistable()) &#123;</span><br><span class="line">                       if (r.state != null || r.persistentState != null) &#123;</span><br><span class="line">                           mInstrumentation.callActivityOnRestoreInstanceState(activity, r.state,</span><br><span class="line">                                   r.persistentState);</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125; else if (r.state != null) &#123;</span><br><span class="line">                       mInstrumentation.callActivityOnRestoreInstanceState(activity, r.state);</span><br><span class="line">                   &#125;</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>回调onPostCreate</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if (r.isPersistable()) &#123;</span><br><span class="line">                       mInstrumentation.callActivityOnPostCreate(activity, r.state,</span><br><span class="line">                               r.persistentState);</span><br><span class="line">                   &#125; else &#123;</span><br><span class="line">                       mInstrumentation.callActivityOnPostCreate(activity, r.state);</span><br><span class="line">                   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="五-Activity呈现视图的过程"><a href="#五-Activity呈现视图的过程" class="headerlink" title="五. Activity呈现视图的过程"></a>五. Activity呈现视图的过程</h3><p>每一个Activity组件都有一个关联的Window对象(PhoneWindow)，用来描述一个应用程序窗口。每一个应用程序窗口内部又包含有一个View对象(DecorView)，用来描述应用程序窗口的视图。应用程序窗口视图是真正用来实现UI内容和布局的，也就是说，每一个Activity组件的UI内容和布局都是通过与其所关联的一个Window对象的内部的一个View对象来实现的。</p>
+<h4 id="1-呈现视图前的准备"><a href="#1-呈现视图前的准备" class="headerlink" title="1.呈现视图前的准备"></a>1.呈现视图前的准备</h4><p>前文已经介绍过，Activity实例创建完毕后，会在Activity#attach方法中初始化Window,设置Winddow回调监听，获取WindowManager</p>
+<p>Activity#attach中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mWindow = new PhoneWindow(this, window);</span><br><span class="line">mWindow.setWindowControllerCallback(this);</span><br><span class="line">mWindow.setCallback(this);</span><br><span class="line">mWindow.setOnWindowDismissedCallback(this);</span><br><span class="line">mWindow.getLayoutInflater().setPrivateFactory(this);</span><br><span class="line">if (info.softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED) &#123;</span><br><span class="line">    mWindow.setSoftInputMode(info.softInputMode);</span><br><span class="line">&#125;</span><br><span class="line">if (info.uiOptions != 0) &#123;</span><br><span class="line">    mWindow.setUiOptions(info.uiOptions);</span><br><span class="line">&#125;</span><br><span class="line">//...</span><br><span class="line">mWindow.setWindowManager(</span><br><span class="line">    (WindowManager)context.getSystemService(Context.WINDOW_SERVICE),</span><br><span class="line">        mToken, mComponent.flattenToString(),</span><br><span class="line">        (info.flags &amp; ActivityInfo.FLAG_HARDWARE_ACCELERATED) != 0);</span><br><span class="line">if (mParent != null) &#123;</span><br><span class="line">    mWindow.setContainer(mParent.getWindow());</span><br><span class="line">&#125;</span><br><span class="line">mWindowManager = mWindow.getWindowManager();</span><br></pre></td></tr></table></figure></p>
+<p>然后在PhoneWindow中创建顶层视图对象DecorView,创建ContenView的容器。</p>
+<p><strong>整个方法调用链如下：</strong></p>
+<p>Activity#setContentView</p>
+<p>-&gt; PhoneWindow#setContentView</p>
+<p>-&gt; PhoneWindow#installDecor</p>
+<p>-&gt; PhoneWindow#generateDecor</p>
+<p>-&gt; PhoneWindow#generateLayout</p>
+<p>-&gt; DecorView#onResourcesLoaded</p>
+<hr>
+<p>PhoneWindow#installDecor中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">if (mDecor == null) &#123;</span><br><span class="line">//</span><br><span class="line">    mDecor = generateDecor(-1);</span><br><span class="line">    mDecor.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);</span><br><span class="line">    mDecor.setIsRootNamespace(true);</span><br><span class="line">    if (!mInvalidatePanelMenuPosted &amp;&amp; mInvalidatePanelMenuFeatures != 0) &#123;</span><br><span class="line">        mDecor.postOnAnimation(mInvalidatePanelMenuRunnable);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    mDecor.setWindow(this);</span><br><span class="line">&#125;</span><br><span class="line">if (mContentParent == null) &#123;</span><br><span class="line">//</span><br><span class="line">    mContentParent = generateLayout(mDecor);</span><br><span class="line">    //...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>PhoneWindow#generateDecor中创建DecorView对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">protected DecorView generateDecor(int featureId) &#123;</span><br><span class="line">        Context context;</span><br><span class="line">        if (mUseDecorContext) &#123;</span><br><span class="line">            Context applicationContext = getContext().getApplicationContext();</span><br><span class="line">            if (applicationContext == null) &#123;</span><br><span class="line">                context = getContext();</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                context = new DecorContext(applicationContext, getContext().getResources());</span><br><span class="line">                if (mTheme != -1) &#123;</span><br><span class="line">                    context.setTheme(mTheme);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            context = getContext();</span><br><span class="line">        &#125;</span><br><span class="line">        //创建DecorView对象</span><br><span class="line">        return new DecorView(context, featureId, this, getAttributes());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>PhoneWindow#generateLayout中创建ContentView的容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">protected ViewGroup generateLayout(DecorView decor) &#123;</span><br><span class="line">    mDecor.onResourcesLoaded(mLayoutInflater, layoutResource);</span><br><span class="line">        //com.android.internal.R.id.content</span><br><span class="line">        ViewGroup contentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT);</span><br><span class="line">        if (contentParent == null) &#123;</span><br><span class="line">            throw new RuntimeException(&quot;Window couldn&apos;t find content container view&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    return contentParent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>DecorView#onResourcesLoaded中加载布局并添加到DecorView</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void onResourcesLoaded(LayoutInflater inflater, int layoutResource) &#123;</span><br><span class="line">    mDecorCaptionView = createDecorCaptionView(inflater);</span><br><span class="line">    final View root = inflater.inflate(layoutResource, null);</span><br><span class="line">    if (mDecorCaptionView != null) &#123;</span><br><span class="line">        if (mDecorCaptionView.getParent() == null) &#123;</span><br><span class="line">            addView(mDecorCaptionView,</span><br><span class="line">                    new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));</span><br><span class="line">        &#125;</span><br><span class="line">        mDecorCaptionView.addView(root,</span><br><span class="line">                new ViewGroup.MarginLayoutParams(MATCH_PARENT, MATCH_PARENT));</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        addView(root, 0, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));</span><br><span class="line">    &#125;</span><br><span class="line">    mContentRoot = (ViewGroup) root;</span><br><span class="line">    initializeElevation();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时候视图仅仅是已经准备好了，并没有呈现在屏幕上，最终需要WindowManager把视图add进Surce系统，在Activity#onResume之后才会走到View的measure/layout/draw三大阶段。</p>
+<h4 id="2-将生成的视图添加到屏幕"><a href="#2-将生成的视图添加到屏幕" class="headerlink" title="2.将生成的视图添加到屏幕"></a>2.将生成的视图添加到屏幕</h4><p>前面的第一阶段已经准备好了视图，被包装在DecorView中。<br>当Activity启动代码执行到ActivityThread#handleResumeActivity中，先执行ActivityThread#performResumeActivity最终回调Activity#onResume,然后执行WindowManager#addView(DecorView)。这个过程其实是把View对象添加到Surface系统中去处理，因为View仅仅是一个视图元素，需要一块画布来承载,那么Surface就充当画布的角色。最后执行Activity#makeVisible，这时候视图就呈现在了屏幕上。</p>
+<p>ActivityThread#handleResumeActivity中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">final void handleResumeActivity(IBinder token,</span><br><span class="line">            boolean clearHide, boolean isForward, boolean reallyResume, int seq, String reason) &#123;</span><br><span class="line">       //...</span><br><span class="line">        r = performResumeActivity(token, clearHide, reason);</span><br><span class="line">        </span><br><span class="line">        //...</span><br><span class="line">        if (a.mVisibleFromClient &amp;&amp; !a.mWindowAdded) &#123;</span><br><span class="line">                    a.mWindowAdded = true;</span><br><span class="line">                    wm.addView(decor, l);</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">        //...</span><br><span class="line">         if (r.activity.mVisibleFromClient) &#123;</span><br><span class="line">                    r.activity.makeVisible();</span><br><span class="line">        &#125;</span><br><span class="line">        //...</span><br></pre></td></tr></table></figure>
+<p><strong>addView：</strong><br>WindowManager#addView</p>
+<p>-&gt; WindowManagerGlobal#addView</p>
+<p>-&gt; ViewRootImpl#setView</p>
+<p>-&gt; ViewRootImpl#requestLayout</p>
+<p>-&gt; ViewRootImpl#scheduleTraversals</p>
+<p>-&gt; ViewRootImpl#TraversalRunnable</p>
+<p>-&gt; ViewRootImpl#doTraversal</p>
+<p>-&gt; ViewRootImpl#performTraversals</p>
+<p>-&gt; ViewRootImpl#performMeasure/performLayout/performDraw</p>
+<p>-&gt;ViewRootImpl#drawSoftware</p>
+<p>-&gt; DecorView#measure/layout/draw</p>
+<hr>
+<p>WindowManagerGlobal#addView中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public void addView(View view, ViewGroup.LayoutParams params,</span><br><span class="line">            Display display, Window parentWindow) &#123;</span><br><span class="line">            //...</span><br><span class="line">            //创建ViewRootImpl对象</span><br><span class="line">            root = new ViewRootImpl(view.getContext(), display);</span><br><span class="line"></span><br><span class="line">            view.setLayoutParams(wparams);</span><br><span class="line"></span><br><span class="line">            mViews.add(view);</span><br><span class="line">            mRoots.add(root);</span><br><span class="line">            mParams.add(wparams);</span><br><span class="line">            //...</span><br><span class="line">            </span><br><span class="line">            // do this last because it fires off messages to start doing things</span><br><span class="line">        try &#123;</span><br><span class="line">            root.setView(view, wparams, panelParentView);</span><br><span class="line">        &#125; catch (RuntimeException e) &#123;</span><br><span class="line">            // BadTokenException or InvalidDisplayException, clean up.</span><br><span class="line">            synchronized (mLock) &#123;</span><br><span class="line">                final int index = findViewLocked(view, false);</span><br><span class="line">                if (index &gt;= 0) &#123;</span><br><span class="line">                    removeViewLocked(index, true);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            throw e;</span><br><span class="line">        &#125;</span><br><span class="line">                </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：ViewRootImpl中会把DectorView，Surface,WindowManagerService桥接起来。</p>
+</blockquote>
+<p>这个调用过程非常复杂，我们看一下ViewRootImpl#drawSoftware中对绘制的处理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">    private boolean drawSoftware(Surface surface, AttachInfo attachInfo, int xoff, int yoff,</span><br><span class="line">            boolean scalingRequired, Rect dirty) &#123;</span><br><span class="line"></span><br><span class="line">        // Draw with software renderer.</span><br><span class="line">        final Canvas canvas;</span><br><span class="line">        try &#123;</span><br><span class="line">            final int left = dirty.left;</span><br><span class="line">            final int top = dirty.top;</span><br><span class="line">            final int right = dirty.right;</span><br><span class="line">            final int bottom = dirty.bottom;</span><br><span class="line"></span><br><span class="line">            canvas = mSurface.lockCanvas(dirty);</span><br><span class="line">            //...</span><br><span class="line">            mView.draw(canvas);</span><br><span class="line">            //...</span><br><span class="line">            surface.unlockCanvasAndPost(canvas);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>开始绘制时，会调用Surface.lockCanvas，由SurfaceFlinger锁定一块共享内存传递给Canvas，内存共享的是设备显存，在上面绘制相当于在屏幕上绘画。绘制结束调用Surface.unlockCanvasAndPost，从Suface上detach掉canvas，释放Surface。</p>
+<p>Activity#makeVisible中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void makeVisible() &#123;</span><br><span class="line">    if (!mWindowAdded) &#123;</span><br><span class="line">        ViewManager wm = getWindowManager();</span><br><span class="line">        wm.addView(mDecor, getWindow().getAttributes());</span><br><span class="line">        mWindowAdded = true;</span><br><span class="line">    &#125;</span><br><span class="line">    mDecor.setVisibility(View.VISIBLE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2019/09/09/Activity启动过程/">Activity启动过程</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2019年09月09日 - 09时12分</p>
+        <p><span>最后更新:</span>2019年09月09日 - 09时12分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/09/09/Activity启动过程/" title="Activity启动过程">http://yoursite.com/2019/09/09/Activity启动过程/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/09/09/Activity启动过程/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2020/10/31/进程保活与拉活/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          进程保活与拉活
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2018/09/20/Android-Binder机制/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android-Binder机制</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Activity启动过程"><span class="toc-number">1.</span> <span class="toc-text">Activity启动过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#应用内Activity启动过程"><span class="toc-number">1.1.</span> <span class="toc-text">应用内Activity启动过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Activity启动涉及到的类"><span class="toc-number">1.1.1.</span> <span class="toc-text">Activity启动涉及到的类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#应用外的Activity启动过程"><span class="toc-number">1.2.</span> <span class="toc-text">应用外的Activity启动过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一。应用进程发起启动activity"><span class="toc-number">1.2.1.</span> <span class="toc-text">一。应用进程发起启动activity</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二。Activity-Launch-Model的管理和Task的管理"><span class="toc-number">1.2.2.</span> <span class="toc-text">二。Activity Launch Model的管理和Task的管理</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#ActivityStarter的-startActivityMayWait-函数分析"><span class="toc-number">1.2.2.0.0.1.</span> <span class="toc-text">ActivityStarter的 startActivityMayWait 函数分析:</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#startActivityLocked-函数分析："><span class="toc-number">1.2.2.0.0.2.</span> <span class="toc-text">startActivityLocked 函数分析：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#startActivityUncheckedLocked-函数分析："><span class="toc-number">1.2.2.0.0.3.</span> <span class="toc-text">startActivityUncheckedLocked 函数分析：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#resumeTopActivityLocked函数分析："><span class="toc-number">1.2.2.0.0.4.</span> <span class="toc-text">resumeTopActivityLocked函数分析：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三。应用进程的创建及初始化"><span class="toc-number">1.2.3.</span> <span class="toc-text">三。应用进程的创建及初始化</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#startSpecificActivityLocked函数分析∶"><span class="toc-number">1.2.3.0.0.1.</span> <span class="toc-text">startSpecificActivityLocked函数分析∶</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#startProcessLocked函数分析："><span class="toc-number">1.2.3.0.0.2.</span> <span class="toc-text">startProcessLocked函数分析：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四。Activity实例创建过程及生命周期的回调"><span class="toc-number">1.2.4.</span> <span class="toc-text">四。Activity实例创建过程及生命周期的回调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五-Activity呈现视图的过程"><span class="toc-number">1.2.5.</span> <span class="toc-text">五. Activity呈现视图的过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-呈现视图前的准备"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">1.呈现视图前的准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-将生成的视图添加到屏幕"><span class="toc-number">1.2.5.2.</span> <span class="toc-text">2.将生成的视图添加到屏幕</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2020/10/31/进程保活与拉活/" title="上一篇: 进程保活与拉活">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2018/09/20/Android-Binder机制/" title="下一篇: Android-Binder机制">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2020 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
