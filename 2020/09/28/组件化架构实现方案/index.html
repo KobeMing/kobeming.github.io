@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl">
+  
+  
+  
+  
+  <title>组件化架构实现方案 | Ming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1、为什么要项目组件化随着 APP 版本不断的迭代，新功能的不断增加，业务也会变的越来越复杂，APP 业务模块 的数量有可能还会继续增加，而且每个模块的代码也变的越来越多，这样发展下去单一工程 下的 APP 架构势必会影响开发效率，增加项目的维护成本，每个工程师都要熟悉如此之多 的代码，将很难进行多人协作开发，而且 Android 项目在编译代码的时候电脑会非常卡，又 因为单一工程下代码耦合严重，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="组件化架构实现方案">
+<meta property="og:url" content="http://yoursite.com/2020/09/28/组件化架构实现方案/index.html">
+<meta property="og:site_name" content="Ming">
+<meta property="og:description" content="1、为什么要项目组件化随着 APP 版本不断的迭代，新功能的不断增加，业务也会变的越来越复杂，APP 业务模块 的数量有可能还会继续增加，而且每个模块的代码也变的越来越多，这样发展下去单一工程 下的 APP 架构势必会影响开发效率，增加项目的维护成本，每个工程师都要熟悉如此之多 的代码，将很难进行多人协作开发，而且 Android 项目在编译代码的时候电脑会非常卡，又 因为单一工程下代码耦合严重，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/11/BjhGnK.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/11/11/BjhDjP.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/18/DmRRpj.png">
+<meta property="og:image" content="https://s3.ax1x.com/2020/11/18/DmR0Xt.png">
+<meta property="og:updated_time" content="2020-09-28T12:10:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="组件化架构实现方案">
+<meta name="twitter:description" content="1、为什么要项目组件化随着 APP 版本不断的迭代，新功能的不断增加，业务也会变的越来越复杂，APP 业务模块 的数量有可能还会继续增加，而且每个模块的代码也变的越来越多，这样发展下去单一工程 下的 APP 架构势必会影响开发效率，增加项目的维护成本，每个工程师都要熟悉如此之多 的代码，将很难进行多人协作开发，而且 Android 项目在编译代码的时候电脑会非常卡，又 因为单一工程下代码耦合严重，">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/11/11/BjhGnK.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Ming" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/avatar.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Pu Ming</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/puming" title="github">github</a>
+                            
+                                <a class="fl jianshu"  target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        
+                    </div>
+                </section>
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://www.jianshu.com/u/343e9f257182">简书</a>
+                    
+                      <a target="_blank"  class="main-nav-link switch-friends-link" href="https://blog.csdn.net/mingkobe">csdn</a>
+                    
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">折腾技术，爱好篮球。</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Pu Ming</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/avatar.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Pu Ming</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">学而时习之，不亦乐乎。</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/puming" title="github">github</a>
+                    
+                        <a class="jianshu" target="_blank" href="https://www.jianshu.com/u/343e9f257182" title="jianshu">jianshu</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/5055949697/profile?topnav=1&wvr=6&is_all=1" title="weibo">weibo</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-组件化架构实现方案" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2020/09/28/组件化架构实现方案/" class="article-date">
+      <time datetime="2020-09-28T12:10:00.000Z" itemprop="datePublished">2020-09-28</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      组件化架构实现方案
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="1、为什么要项目组件化"><a href="#1、为什么要项目组件化" class="headerlink" title="1、为什么要项目组件化"></a>1、为什么要项目组件化</h1><p>随着 APP 版本不断的迭代，新功能的不断增加，业务也会变的越来越复杂，APP 业务模块 的数量有可能还会继续增加，而且每个模块的代码也变的越来越多，这样发展下去单一工程 下的 APP 架构势必会影响开发效率，增加项目的维护成本，每个工程师都要熟悉如此之多 的代码，将很难进行多人协作开发，而且 Android 项目在编译代码的时候电脑会非常卡，又 因为单一工程下代码耦合严重，每修改一处代码后都要重新编译打包测试，导致非常耗时， 最重要的是这样的代码想要做单元测试根本无从下手，所以必须要有更灵活的架构代替过去 单一的工程架构。</p>
+<a id="more"></a>
+<p><a href="https://imgchr.com/i/BjhGnK" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/11/BjhGnK.png" alt="BjhGnK.png"></a></p>
+<p>上图是目前比较普遍使用的 Android APP 技术架构，往往是在一个界面中存在大量的业务 逻辑，而业务逻辑中充斥着各种网络请求、数据操作等行为，整个项目中也没有模块的概念， 只有简单的以业务逻辑划分的文件夹，并且业务之间也是直接相互调用、高度耦合在一起的。</p>
+<p><a href="https://imgchr.com/i/BjhDjP" target="_blank" rel="noopener"><img src="https://s1.ax1x.com/2020/11/11/BjhDjP.png" alt="BjhDjP.png"></a></p>
+<p>上图单一工程模型下的业务关系，总的来说就是：你中有我，我中有你，相互依赖，无法分 离。然而随着产品的迭代，业务越来越复杂，随之带来的是项目结构复杂度的极度增加，此时我 们会面临如下几个问题： </p>
+<ul>
+<li>1、实际业务变化非常快，但是单一工程的业务模块耦合度太高，牵一发而动全身；</li>
+<li>2、对工程所做的任何修改都必须要编译整个工程；</li>
+<li>3、功能测试和系统测试每次都要进行；</li>
+<li>4、团队协同开发存在较多的冲突.不得不花费更多的时间去沟通和协调，并且在开发过程中， 任何一位成员没办法专注于自己的功能点，影响开发效率；</li>
+<li>5、不能灵活的对业务模块进行配置和组装； 为了满足各个业务模块的迭代而彼此不受影响，更好的解决上面这种让人头疼的依赖关系， 就需要整改 App 的架构。</li>
+</ul>
+<h1 id="2、如何组件化"><a href="#2、如何组件化" class="headerlink" title="2、如何组件化"></a>2、如何组件化</h1><p><a href="https://imgchr.com/i/DmRRpj" target="_blank" rel="noopener"><img src="https://s3.ax1x.com/2020/11/18/DmRRpj.png" alt="DmRRpj.png"></a></p>
+<p>Android APP 组件化架构的目标是告别结构臃肿，让各个业务变得相对独立，业务组件在组件模式下可以独立开发，而在集成模式下又可以变为 arr 包集成到“app 壳工程”中，组成一 个完整功能的 APP；</p>
+<p>从组件化工程模型中可以看到，业务组件之间是独立的，没有关联的，这些业务组件在集 成模式下是一个个 library，被 app 壳工程所依赖，组成一个具有完整业务功能的 APP 应用， 但是在组件开发模式下，业务组件又变成了一个个 application，它们可以独立开发和调试， 由于在组件开发模式下，业务组件们的代码量相比于完整的项目差了很远，因此在运行时可 以显著减少编译时间。</p>
+<p><a href="https://imgchr.com/i/DmR0Xt" target="_blank" rel="noopener"><img src="https://s3.ax1x.com/2020/11/18/DmR0Xt.png" alt="DmR0Xt.png"></a></p>
+<p>这是组件化工程模型下的业务关系，业务之间将不再直接引用和依赖，而是通过“路由”这样 一个中转站间接产生联系，而 Android 中的路由实际就是对 URL Scheme 的封装； 如此规模大的架构整改需要付出更高的成本，还会涉及一些潜在的风险，但是整改后的架构 能够带来很多好处：</p>
+<ul>
+<li>1、加快业务迭代速度，各个业务模块组件更加独立，不再出现业务耦合情况；</li>
+<li>2、稳定的公共模块采用依赖库方式，提供给各个业务线使用，减少重复开发和维护工作量； </li>
+<li>3、迭代频繁的业务模块采用组件方式，各业务研发可以互不干扰、提升协作效率，并控制 产品质量； </li>
+<li>4、为新业务随时集成提供了基础，所有业务可上可下，灵活多变；</li>
+<li>5、降低团队成员熟悉项目的成本，降低项目的维护难度；</li>
+<li>6、加快编译速度，提高开发效率；</li>
+<li>7、控制代码权限，将代码的权限细分到更小的粒度；</li>
+</ul>
+<h1 id="3、组件化实施流程"><a href="#3、组件化实施流程" class="headerlink" title="3、组件化实施流程"></a>3、组件化实施流程</h1><h2 id="1-组件之间资源名冲突"><a href="#1-组件之间资源名冲突" class="headerlink" title="1. 组件之间资源名冲突"></a>1. 组件之间资源名冲突</h2><p>因为我们拆分出了很多业务组件和功能组件，在把这些组件合并到“app 壳工程”时候就有可能会出现资源名冲突问题，例如 A 组件和 B 组件都有一张叫做“ic_home”的图标，这时候在集成模式下打包 APP 就会编译出错，解决这个问题最简单的办法就是在项目中约定资源 文件命名规约，比如强制使每个资源文件的名称以组件名开始，这个可以根据实际情况和开发人员制定规则。</p>
+<p>当然了万能的 Gradle 构建工具也提供了解决方法，通过在在组件的 build.gradle 中添加如下的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        //...</span><br><span class="line">        resourcePrefix &quot;trtc_&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>设置了 resourcePrefix值后，所有的资源名必须以指定的字符串做前缀，否则会报错。<br>但是 resourcePrefix 这个值只能限定 xml 里面的资源，并不能限定图片资源，所有图片资源仍然需要手动去修改资源名。</p>
+<h2 id="2-组件模式和集成模式的转换"><a href="#2-组件模式和集成模式的转换" class="headerlink" title="2. 组件模式和集成模式的转换"></a>2. 组件模式和集成模式的转换</h2><p>Android Studio 中的 Module 主要有两种属性，分别为：</p>
+<ol>
+<li>application 属性，可以独立运行的 Android 程序，也就是我们的 APP； </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: ‘com.android.application’</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>library 属性，不可以独立运行，一般是 Android 程序依赖的库文件； </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: ‘com.android.library’</span><br></pre></td></tr></table></figure>
+<p>Module 的属性是在每个组件的 build.gradle 文件中配置的，当我们在组件模式开发时，业务组件应处于 application 属性，这时的业务组件就是一个 Android App，可以独立开发和 调试；而当我们转换到集成模式开发时，业务组件应该处于 library 属性，这样才能被我们 的“app 壳工程”所依赖，组成一个具有完整功能的 APP。</p>
+<p>Gradle 自动构建工具有一个重要属性，可以帮助我们完成这个事情。每当我们用 AndroidStudio 创建一个 Android 项目后，就会在项目的根目录中生成一个文 件 gradle.properties，在 Android 项目中的任何一 个 build.gradle 文件中都可以把 gradle.properties 中的常量读取出来；那么我们可以在 gradle.properties 中定义一个常量值 isModule（是否是组件开发模式，true 为是，false 为否）：</p>
+<blockquote>
+<p>每次更改“isModule”的值后，需要点击 “Sync Project” 按钮 </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">isModule=false</span><br></pre></td></tr></table></figure>
+<p>然后我们在业务组件的 build.gradle 中读取 isModule，但是 gradle.properties 还有一个重要属性： gradle.properties 中的数据类型都是 String 类型，使用其他数据类型需要自行转换；也就是说我们读到 isModule 是个 String 类型的值，而我们需要的是 Boolean 值， 代码如下： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (isModule.toBoolean()) &#123; </span><br><span class="line">    apply plugin: &apos;com.android.application&apos;</span><br><span class="line">&#125; else &#123; </span><br><span class="line">    apply plugin: &apos;com.android.library&apos; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样我们第一个问题就解决了，当然了 每次改变 isModule 的值后，都要同步项目才能生效。</p>
+<h2 id="3-组件之间-AndroidManifest-合并问题"><a href="#3-组件之间-AndroidManifest-合并问题" class="headerlink" title="3. 组件之间 AndroidManifest 合并问题"></a>3. 组件之间 AndroidManifest 合并问题</h2><p>在 AndroidStudio 中每一个组件都会有对应的 AndroidManifest.xml，用于声明需要的权 限、Application、Activity、Service、Broadcast 等，当项目处于组件模式时，业务组件的 AndroidManifest.xml 应该具有一个 Android APP 所具有的的所有属性，尤其是声明 Application 和要 launch 的 Activity，但是当项目处于集成模式的时候，每一个业务组件的 AndroidManifest.xml 都要合并到“app 壳工程”中，要是每一个业务组件都有自己的 Application 和 launch 的 Activity，那么合并的时候肯定会冲突。</p>
+<p>我们可以为组件开发模式下的业务组件再创建一个 AndroidManifest.xml，然后根据 isModule 指定 AndroidManifest.xml 的文件路径，让业务组件在集成模式和组件模式下使用不同的 AndroidManifest.xml，这样清单文件冲突的问题就可以规避了。</p>
+<p>，首先我们在 main 文件夹下创建一个 module 文件夹用于存放组件开发模式下业务组件的 AndroidManifest.xml，而<br>AndroidStudio 生成的 AndroidManifest.xml 则依然保留，并用于集成开发模式下业务组件的清单；然后我们需要在业务组件的 build.gradle 中指定清单文件的路径，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sourceSets &#123;</span><br><span class="line">        main &#123;</span><br><span class="line">            if (isModule.toBoolean()) &#123;</span><br><span class="line">                manifest.srcFile &apos;AndroidManifest-module.xml&apos;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                manifest.srcFile &apos;AndroidManifest.xml&apos;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sourceSets &#123;</span><br><span class="line">        main &#123;</span><br><span class="line">            if (isModule.toBoolean()) &#123;</span><br><span class="line">                manifest.srcFile &apos;src/main/module/AndroidManifest.xml&apos;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                manifest.srcFile &apos;src/main/AndroidManifest.xml&apos;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样在不同的模式下就会读取到不同的 AndroidManifest.xml ，然后我们需要修改这 两个AndroidManifest的内容为我们不同的开发模式服务。</p>
+<p>首先是集成模式下的 AndroidManifest.xml，前面我们说过集成模式下，业务组件的AndroidManifest是绝对不能拥有自己的 Application 和 launch Activity 的，也不能声明 APP 名称、 图标等属性，总之 app 壳工程有的属性，业务组件都不能有。</p>
+<p>下面是集成开发模式下业务组件的 AndroidManifest.xml：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    package=&quot;com.pm.setting&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;application&gt;</span><br><span class="line">        &lt;activity android:name=&quot;.SettingActivity&quot;&gt;&lt;/activity&gt;</span><br><span class="line">    &lt;/application&gt;</span><br><span class="line"></span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<p>我在这个清单文件中只声明了应用的主题，而且这个主题还是跟 app 壳工程中的主题是一致的， 都引用了 basics 组件中的资源文件，在这里声明主题是为了方便这个业务组件中有使用 默认主题的 Activity 时就不用再给 Activity 单独声明 theme 了。</p>
+<p>以下是组件开发模式下的AndroidManifest.xml：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    package=&quot;com.pm.setting&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;</span><br><span class="line">    &lt;application</span><br><span class="line">        android:name=&quot;com.basics.base.BaseApplication&quot;</span><br><span class="line">        android:allowBackup=&quot;true&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/base_ic_launcher&quot;</span><br><span class="line">        android:label=&quot;@string/setting_module_name&quot;</span><br><span class="line">        android:roundIcon=&quot;@mipmap/base_ic_launcher_round&quot;</span><br><span class="line">        android:supportsRtl=&quot;true&quot;</span><br><span class="line">        android:theme=&quot;@style/BaseAppTheme&quot;&gt;</span><br><span class="line">        &lt;activity android:name=&quot;.SettingActivity&quot;&gt;</span><br><span class="line">            &lt;intent-filter&gt;</span><br><span class="line">                &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;</span><br><span class="line">                &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;</span><br><span class="line">            &lt;/intent-filter&gt;</span><br><span class="line">        &lt;/activity&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/application&gt;</span><br><span class="line"></span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<p>组件模式下的业务组件清单文件就是一个 Android 项目普通的 AndroidManifest.xml，这里就不 在过多介绍了。</p>
+<h2 id="3-全局-Context-的获取及组件数据初始化"><a href="#3-全局-Context-的获取及组件数据初始化" class="headerlink" title="3. 全局 Context 的获取及组件数据初始化"></a>3. 全局 Context 的获取及组件数据初始化</h2><p>当 Android 程序启动时，Android 系统会为每个程序创建一个 Application 类的对象，并且只创建一个，application 对象的生命周期是整个程序中最长的，它的生命周期就等于这个程序的生命周期。在默认情况下应用系统会自动生成 Application 对象，但是如果我们自定义了 Application，那就需要在 AndroidManifest.xml 中声明告知系统，实例化的时候，是实例化我们自定义的，而非默认的。</p>
+<p>但是我们在组件化开发的时候，可能为了数据的问题每一个组件都会自定义一个Application 类，如果我们在自己的组件中开发时需要获取全局的 Context，一般都会直接获取application 对象，但是当所有组件要打包合并在一起的时候就会出现问题，因为最后程序 只有一个 Application，我们组件中自己定义的 Application 肯定是没法使用的，因此我们可以在组件化工程基础Liabray中定义一个BaseApplication。BaseApplication 主要用于各个业务组件和 app 壳工程中声明的 Application 类继承用的， 只要各个业务组件和 app 壳工程中声明的 Application 类继承了 BaseApplication，当应用启动时 BaseApplication 就会被动实例化，这样从 BaseApplication 获取的 Context 就会 生效，也就从根本上解决了我们不能直接从各个组件获取全局 Context 的问题。</p>
+<p>实际上业务组件中的 Application 在最终的集成项目中是没有什么实际作用的，组件 自己的 Application 仅限于在组件模式下发挥功能，因此我们需要在将项目从组件模式转换到集成模式后将组件自己的 Application 剔除出我们的项目。</p>
+<p>我们在 src/main/java 文件夹下创建一个 module 文件夹，用于存放在组件模式下需要的一些类。如 XXApplication, XXActivity。<br>最后在集成模式下我们需要剔除module下的所有java文件。代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sourceSets &#123;</span><br><span class="line">    main &#123;</span><br><span class="line">        if (isModule.toBoolean()) &#123;</span><br><span class="line">            manifest.srcFile &apos;src/main/module/AndroidManifest.xml&apos;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            manifest.srcFile &apos;src/main/AndroidManifest.xml&apos;</span><br><span class="line">            //集成开发模式下排除 module 文件夹中的所有 Java 文件</span><br><span class="line">            java &#123;</span><br><span class="line">                exclude &apos;module/**&apos;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-library-依赖问题"><a href="#4-library-依赖问题" class="headerlink" title="4. library 依赖问题"></a>4. library 依赖问题</h2><p>剔除重复依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">api(project(&quot;:basics-arch&quot;))&#123;</span><br><span class="line">    exclude module: &apos;support-v4&apos;//根据组件名排除 </span><br><span class="line">    exclude group: &apos;com.pm.common&apos;//根据包名排除</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>避免在Library中使用Glide的AppGlideModule。应该像如下使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Glide.with(fragment)</span><br><span class="line">    .load(url)</span><br><span class="line">    .transition(withCrossFade())</span><br><span class="line">    .into(view);</span><br></pre></td></tr></table></figure>
+<p>在Library中使用butterknife</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">  repositories &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">    google()</span><br><span class="line">  &#125;</span><br><span class="line">  dependencies &#123;</span><br><span class="line">    classpath &apos;com.jakewharton:butterknife-gradle-plugin:10.2.3&apos;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: &apos;com.android.library&apos;</span><br><span class="line">apply plugin: &apos;com.jakewharton.butterknife&apos;</span><br></pre></td></tr></table></figure>
+<p><a href="http://bumptech.github.io/glide/doc/configuration.html#avoid-appglidemodule-in-libraries" target="_blank" rel="noopener">参考Glide官方指导</a></p>
+<h2 id="5-组件之间调用和跳转"><a href="#5-组件之间调用和跳转" class="headerlink" title="5. 组件之间调用和跳转"></a>5. 组件之间调用和跳转</h2><p>在组件化开发的时候，组件之间是没有依赖关系，我们不能在使用显示调用来跳转页面了， 因为我们组件化的目的之一就是解决模块间的强依赖问题，假如现在要从 A 业务组件跳转 到业务 B 组件，并且要携带参数跳转，这时候怎么办呢？而且组件这么多怎么管理也是个 问题，这时候就需要引入“路由”的概念了，由本文开始的组件化模型下的业务关系图可知路 由就是起到一个转发的作用。</p>
+<p>路由开源库：</p>
+<ul>
+<li>ActivityRouter</li>
+<li>ARouter</li>
+</ul>
+<h2 id="6-组件之间通信"><a href="#6-组件之间通信" class="headerlink" title="6. 组件之间通信"></a>6. 组件之间通信</h2><ul>
+<li>广播</li>
+<li>EventBus</li>
+<li>LiveData</li>
+<li>ContentProvider</li>
+</ul>
+<h1 id="4、组件化项目的工程类型"><a href="#4、组件化项目的工程类型" class="headerlink" title="4、组件化项目的工程类型"></a>4、组件化项目的工程类型</h1><p>在组件化工程模型中主要有：app 壳工程、业务组件和功能组件 3 种类型，而业务组件中 的 Main 组件和功能组件中的 Basics 组件比较特殊，下面将分别介绍。</p>
+<h2 id="1-APP壳工程"><a href="#1-APP壳工程" class="headerlink" title="1. APP壳工程"></a>1. APP壳工程</h2><p>app 壳工程是从名称来解释就是一个空壳工程，没有任何的业务代码，也不能有 Activity， 但它又必须被单独划分成一个组件，而不能融合到其他组件中，是因为它有如下几点重要功能：</p>
+<ol>
+<li>app 壳工程中声明了我们 Android 应用的 Application，这个 Application 必须继承自 Basics 组件中的 BaseApplication（如果你无需实现自己的 Application 可以直接在AndroidManifest 声明 BaseApplication），因为只有这样，在打包应用后才能让 BaseApplication 中的 Context 生效，当然你还可以在这个 Application 中初始化我们工程中使用到的库文件，还可以在这 里解决 Android 引用方法数不能超过 65535 的限制，对崩溃事件的捕获和发送也可以在这里声明。</li>
+<li>app 壳工程的 AndroidManifest.xml 是我 Android 应用的根表单，应用的名称、图标 以及是否支持备份等等属性都是在这份表单中配置的，其他组件中的表单最终在集成模式下都被合并到这份 AndroidManifest.xml 中。</li>
+<li>app 壳工程的 build.gradle 是比较特殊的，app 壳不管是在集成模式还是组件开 发模式，它的属性始终都是：com.android.application，因为最终其他的组件都要被 app 壳工程所依赖，被打包进 app 壳工程中，这一点从组件化工程模型图中就能体现出来，所以 app 壳工程是不需要单独调试单独开发的。另外 Android 应用的打包签名，以及 buildTypes 和 defaultConfig 都需要在这里配置，而它的 dependencies 则需要根据 isModule 的值分别依赖不同的组件，在组件开发模式下 app 壳工程只需要依赖 Basics 组件，或者为了防止 报错也可以根据实际情况依赖其他功能组件，而在集成模式下 app 壳工程必须依赖所有在应用 Application 中声明的业务组件，并且不需要再依赖任何功能组件。</li>
+</ol>
+<h2 id="2-功能组件和-Basics-组件"><a href="#2-功能组件和-Basics-组件" class="headerlink" title="2. 功能组件和 Basics 组件"></a>2. 功能组件和 Basics 组件</h2><p>功能组件是为了支撑业务组件的某些功能而独立划分出来的组件，功能实质上跟项目中引入 的第三方库是一样的，功能组件的特征如下：</p>
+<ol>
+<li>功能组件的 AndroidManifest.xml 是一张空表，这张表中只有功能组件的包名。</li>
+<li>功能组件不管是在集成开发模式下还是组件开发模式下属性始终是： com.android.library，所以功能组件是不需要读取 gradle.properties 中的 isModule 值的； 另外功能组件的 build.gradle 也无需设置 buildTypes ，只需要 dependencies 这个功能 组件需要的 jar 包和开源库。</li>
+</ol>
+<p>Basics 组件除了有功能组件的普遍属性外，还具有其他功能： </p>
+<ol>
+<li>Basics 组件的 AndroidManifest.xml 不是一张空表，这张表中声明了我们 Android 应用用到的所有使用权限 uses-permission 和 uses-feature，放到这里是因为在组件开发模式下，所有业务组件就无需在自己的 AndroidManifest.xm 声明自己要用到的权限了。 </li>
+<li>Basics 组件的 build.gradle 需要统一依赖业务组件中用到的第三方依赖库和 jar 包， 例如我们用到的 ARouter、Okhttp 等等。 </li>
+<li>Basics 组件中封装了 Android 应用的 Base 类和网络请求工具、图片加载工具等等， 公用的 widget 控件也应该放在 Basics 组件中；业务组件中都用到的数据也应放于 Common 组件中，例如保存到 SharedPreferences 和 DataBase 中的登陆数据。</li>
+<li>Basics 组件的资源文件中需要放置项目公用的 drawable、layout、sting、dimen、 color 和 style 等等，另外项目中的 Activity 主题必须定义在 Basics 中，方便和 BaseActivity 配合保持整个 Android 应用的界面风格统一。</li>
+</ol>
+<h2 id="3-业务组件和-Main-组件"><a href="#3-业务组件和-Main-组件" class="headerlink" title="3. 业务组件和 Main 组件"></a>3. 业务组件和 Main 组件</h2><p>业务组件就是根据业务逻辑的不同拆分出来的组件，业务组件的特征如下：</p>
+<ol>
+<li>业务组件中要有两个 AndroidManifest.xml文件，分别对应组件开发模式和集成开发模式。</li>
+<li>业务组件在集成模式下是不能有自己的 Application 的，但在组件开发模式下又必须实现自己的 Application 并且要继承自 Basics 组件的 BaseApplication，并且这个 Application 不能被业务组件中的代码引用，因为它的功能就是为了使业务组件从 BaseApplication 中获取的全局 Context 生效，还有初始化数据之用。 </li>
+<li>业务组件java目录下有 module 文件夹，这个文件夹在集成模式下会从业务组件的代码中排除掉，所以 module 文件夹中的类不能被业务组件强引用，例如组件模式下的 Application 就是置于 这个文件夹中，还有组件模式下开发给目标 Activity 传递参数的用的 launch Activity 也应该置于 module 文件夹中。</li>
+<li>业务组件必须在自己的 Java 文件夹中创建业务组件声明类，以使 app 壳工程 中的应用 Application 能够引用，实现组件跳转，具体请查看组件之间调用和通信 小节。 </li>
+<li>业务组件必须在自己的 build.gradle 中根据 isModule 值的不同改变自己的属性，在 组件模式下是：com.android.application，而在集成模式下 com.android.library；同时还需要在 build.gradle 配置资源文件，如 指定不同开发模式下的 AndroidManifest.xml 文件路径， 排除 module 文件夹等；业务组件还必须在 dependencies 中依赖 Basics 组件，并且引入 ARouter 的注解处理器 annotationProcessor，以及依赖其他用到的功能组件。</li>
+</ol>
+<p>Main 组件除了有业务组件的普遍属性外，还有一项重要功能： </p>
+<ol>
+<li>Main 组件集成模式下的 AndroidManifest.xml 是跟其他业务组件不一样的，Main 组件的清单文件中声明了我们整个 Android 应用的 launch Activity，这就是 Main 组件的独特之处；所以我建议 SplashActivity、登陆 Activity 以及主界面都应属于 Main 组件，也就是说 Android 应用启动后要调用的页面应置于 Main 组件。</li>
+</ol>
+<h1 id="5、组件化项目的混淆方案"><a href="#5、组件化项目的混淆方案" class="headerlink" title="5、组件化项目的混淆方案"></a>5、组件化项目的混淆方案</h1><p>组件化项目的 Java 代码混淆方案采用在集成模式下集中在 app 壳工程中混淆，各个业务 组件不配置混淆文件。集成开发模式下在 app 壳工程中 build.gradle 文件的 release 构建类 型中开启混淆属性，其他 buildTypes 配置方案跟普通项目保持一致，Java 混淆配置文件也 放置在 app 壳工程中，各个业务组件的混淆配置规则都应该在 app 壳工程中的混淆配置文 件中添加和修改。 </p>
+<p>之所以不采用在每个业务组件中开启混淆的方案，是因为 组件在集成模式下都被 Gradle 构建成了 release 类型的 arr 包，一旦业务组件的代码被混淆，而这时候代码中又出现了 bug，将很难根据日志找出导致 bug 的原因；另外每个业务组件中都保留一份混淆配置文件 非常不便于修改和管理，这也是不推荐在业务组件的 build.gradle 文件中配置 buildTypes （构建类型）的原因。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2020/09/28/组件化架构实现方案/">组件化架构实现方案</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Pu Ming 的个人博客">Pu Ming</a></p>
+        <p><span>发布时间:</span>2020年09月28日 - 20时10分</p>
+        <p><span>最后更新:</span>2020年09月28日 - 20时10分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2020/09/28/组件化架构实现方案/" title="组件化架构实现方案">http://yoursite.com/2020/09/28/组件化架构实现方案/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/09/28/组件化架构实现方案/　　作者: Pu Ming" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2020/10/31/进程保活与拉活/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          进程保活与拉活
+        
+      </div>
+    </a>
+  
+  
+    <a  href="/2019/09/09/Activity启动过程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Activity启动过程</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1、为什么要项目组件化"><span class="toc-number">1.</span> <span class="toc-text">1、为什么要项目组件化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2、如何组件化"><span class="toc-number">2.</span> <span class="toc-text">2、如何组件化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3、组件化实施流程"><span class="toc-number">3.</span> <span class="toc-text">3、组件化实施流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-组件之间资源名冲突"><span class="toc-number">3.1.</span> <span class="toc-text">1. 组件之间资源名冲突</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-组件模式和集成模式的转换"><span class="toc-number">3.2.</span> <span class="toc-text">2. 组件模式和集成模式的转换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-组件之间-AndroidManifest-合并问题"><span class="toc-number">3.3.</span> <span class="toc-text">3. 组件之间 AndroidManifest 合并问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-全局-Context-的获取及组件数据初始化"><span class="toc-number">3.4.</span> <span class="toc-text">3. 全局 Context 的获取及组件数据初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-library-依赖问题"><span class="toc-number">3.5.</span> <span class="toc-text">4. library 依赖问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-组件之间调用和跳转"><span class="toc-number">3.6.</span> <span class="toc-text">5. 组件之间调用和跳转</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-组件之间通信"><span class="toc-number">3.7.</span> <span class="toc-text">6. 组件之间通信</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4、组件化项目的工程类型"><span class="toc-number">4.</span> <span class="toc-text">4、组件化项目的工程类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-APP壳工程"><span class="toc-number">4.1.</span> <span class="toc-text">1. APP壳工程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-功能组件和-Basics-组件"><span class="toc-number">4.2.</span> <span class="toc-text">2. 功能组件和 Basics 组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-业务组件和-Main-组件"><span class="toc-number">4.3.</span> <span class="toc-text">3. 业务组件和 Main 组件</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5、组件化项目的混淆方案"><span class="toc-number">5.</span> <span class="toc-text">5、组件化项目的混淆方案</span></a></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+    <style>
+        .toc {
+            white-space: nowrap;
+            overflow-x: hidden;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $(".toc li a").mouseover(function() {
+                var title = $(this).attr('href');
+                $(this).attr("title", title);
+            });
+        })
+    </script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'xxxx',
+      conf: 'xxxxxxxxx'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2020/10/31/进程保活与拉活/" title="上一篇: 进程保活与拉活">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/2019/09/09/Activity启动过程/" title="下一篇: Activity启动过程">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/10/31/进程保活与拉活/">进程保活与拉活</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/09/28/组件化架构实现方案/">组件化架构实现方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Activity启动过程/">Activity启动过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/09/20/Android-Binder机制/">Android-Binder机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Android焦点分发策略/">Android焦点分发策略</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/04/Android加载ReactNative页面流程/">Android加载ReactNative页面流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/12/Android-Multidex原理/">Android Multidex原理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/11/结构性模式-代理模式/">结构性模式-代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/Redux-for-ReactNative/">Redux for ReactNative</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/02/ReactNavigation/">ReactNavigation</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/11/React组件生命周期/">React组件生命周期</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/26/Android嵌套RN页面/">Android嵌套RN页面</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/01/17/Annotation/">Java注解</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/24/AndroidStudio阅读Android系统源码/">AndroidStudio阅读Android系统源码</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/02/06/Android传感器/">Android传感器</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/13/自定义ContentProvider/">自定义ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/12/ContentProvider/">ContentProvider</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/05/Activity/">Activity</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/16/Handler/">Handler机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/08/BroadcastReceiver/">BroadcastReceiver</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/02/Service/">Service</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2021 Pu Ming
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo &nbsp;&nbsp;</a><a href="https://github.com/maochunguang" target="_blank">Blog</a> by tommy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'xxxxx', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?xxxxxx";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
